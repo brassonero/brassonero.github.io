@@ -235,16 +235,20 @@
         
         @media (min-width: 768px) {
             .submit-btn {
+                background-color: var(--neon-blue);
+                color: var(--dark-bg);
+                box-shadow: var(--glow);
                 padding: 0.8rem 2rem;
                 font-size: 1rem;
             }
         }
-        
-        .submit-btn:hover {
-            background-color: var(--neon-blue);
-            color: var(--dark-bg);
-            box-shadow: var(--glow);
-        }
+        /*   
+            .submit-btn:hover {
+                background-color: var(--neon-blue);
+                color: var(--dark-bg);
+                box-shadow: var(--glow);
+            }
+        */
         
         .submit-btn::after {
             content: "✓";
@@ -610,6 +614,7 @@
             left: 20%;
             animation-delay: 9s;
         }
+        
     </style>
 </head>
 <body>
