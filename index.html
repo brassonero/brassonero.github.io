@@ -215,9 +215,10 @@
         }
         
         .submit-btn {
-            background-color: transparent;
+            background-color: var(--neon-blue);
             border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: var(--glow);
             padding: 0.7rem 1.5rem;
             font-family: 'Share Tech Mono', monospace;
             text-transform: uppercase;
@@ -235,20 +236,16 @@
         
         @media (min-width: 768px) {
             .submit-btn {
-                background-color: var(--neon-blue);
-                color: var(--dark-bg);
-                box-shadow: var(--glow);
                 padding: 0.8rem 2rem;
                 font-size: 1rem;
             }
         }
-        /*   
-            .submit-btn:hover {
-                background-color: var(--neon-blue);
-                color: var(--dark-bg);
-                box-shadow: var(--glow);
-            }
-        */
+        
+        .submit-btn:hover {
+            background-color: transparent;
+            color: var(--neon-blue);
+            box-shadow: none;
+        }
         
         .submit-btn::after {
             content: "✓";
@@ -614,7 +611,6 @@
             left: 20%;
             animation-delay: 9s;
         }
-        
     </style>
 </head>
 <body>
