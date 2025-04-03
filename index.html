@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>brassonero</title>
+    
+    <!-- Browser Theme Color Meta Tags -->
+    <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-navbutton-color" content="#0a0a12">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Social Media Meta Tags -->
+    <meta property="og:title" content="brassonero">
+    <meta property="og:description" content="新たな始まり!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://brassonero.github.io/">
+    <meta property="og:image" content="./assets/gomez.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="brassonero UI">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="brassonero">
+    <meta name="twitter:description" content="新たな始まり!">
+    <meta name="twitter:image" content="./assets/gomez.png">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;700&display=swap');
         
@@ -596,29 +617,85 @@
             100% { transform: translate(0, 0) rotate(360deg); }
         }
         
-        /* Randomly position fragmented boxes */
-        .fragmented-box:nth-child(1) {
-            top: 10%;
-            left: 5%;
-            animation-delay: 0s;
+        /* Social Media Share Button */
+        .share-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--neon-pink);
+            color: var(--dark-bg);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+            z-index: 100;
+            transition: all 0.3s;
         }
         
-        .fragmented-box:nth-child(2) {
-            top: 70%;
-            left: 80%;
-            animation-delay: 3s;
+        .share-button:hover {
+            transform: scale(1.1);
         }
         
-        .fragmented-box:nth-child(3) {
-            top: 30%;
-            left: 60%;
-            animation-delay: 6s;
+        /* Share modal */
+        .share-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(5, 5, 8, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
         
-        .fragmented-box:nth-child(4) {
-            top: 80%;
-            left: 20%;
-            animation-delay: 9s;
+        .share-modal-content {
+            background-color: var(--darker-bg);
+            border: 1px solid var(--neon-blue);
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--glow);
+            position: relative;
+        }
+        
+        .share-modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--neon-pink);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .share-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+        
+        .share-option {
+            background-color: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .share-option:hover {
+            background-color: var(--neon-blue);
+            color: var(--dark-bg);
         }
     </style>
 </head>
@@ -637,11 +714,11 @@
         
         <div class="signup-form">
             <div class="form-group">
-                <label for="username">USER AUTH</label>
+                <label for="username">USERNAME</label>
                 <input type="text" id="username" placeholder="ENTER USERNAME">
             </div>
             <div class="form-group">
-                <label for="password">ACCESS CODE</label>
+                <label for="password">PASSWORD</label>
                 <input type="password" id="password" placeholder="••••••••">
             </div>
             <button class="submit-btn">AUTHENTICATE</button>
@@ -692,6 +769,23 @@
     <div class="caution-text" style="top: 85%; left: 25%;">SECURE</div>
     <div class="caution-text" style="top: 75%; left: 85%;">WARNING</div>
     
+    <!-- Share Button -->
+    <button class="share-button" id="shareBtn">⇪</button>
+    
+    <!-- Share Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-modal-content">
+            <button class="share-modal-close" id="closeModal">&times;</button>
+            <h2>SHARE INTERFACE</h2>
+            <p>Spread this cyberpunk experience across the digital realm.</p>
+            <div class="share-options">
+                <button class="share-option" id="twitterShare">Twitter</button>
+                <button class="share-option" id="facebookShare">Facebook</button>
+                <button class="share-option" id="copyLink">Copy Link</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // Add some random glitch effects
         document.addEventListener('DOMContentLoaded', function() {
@@ -730,11 +824,9 @@
                 const fragmentedBoxes = document.querySelectorAll('.fragmented-box');
                 
                 if (isMobile) {
-                    // Adjust layout for mobile
                     cautionTexts.forEach(text => text.style.display = 'none');
                     fragmentedBoxes.forEach(box => box.style.display = 'none');
                 } else {
-                    // Adjust layout for desktop
                     cautionTexts.forEach(text => text.style.display = 'block');
                     fragmentedBoxes.forEach(box => box.style.display = 'block');
                 }
@@ -745,6 +837,67 @@
             
             // Add resize listener
             window.addEventListener('resize', handleResize);
+            
+            // Share functionality
+            const shareBtn = document.getElementById('shareBtn');
+            const shareModal = document.getElementById('shareModal');
+            const closeModal = document.getElementById('closeModal');
+            const twitterShare = document.getElementById('twitterShare');
+            const facebookShare = document.getElementById('facebookShare');
+            const copyLink = document.getElementById('copyLink');
+            
+            shareBtn.addEventListener('click', () => {
+                shareModal.style.display = 'flex';
+            });
+            
+            closeModal.addEventListener('click', () => {
+                shareModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            shareModal.addEventListener('click', (e) => {
+                if (e.target === shareModal) {
+                    shareModal.style.display = 'none';
+                }
+            });
+            
+            // Twitter share
+            twitterShare.addEventListener('click', () => {
+                const url = encodeURIComponent(window.location.href);
+                const text = encodeURIComponent("Check out this Cyberpunk Interface: 新たな始まり! A New Beginning in the digital realm.");
+                window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+            });
+            
+            // Facebook share
+            facebookShare.addEventListener('click', () => {
+                const url = encodeURIComponent(window.location.href);
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+            });
+            
+            // Copy link
+            copyLink.addEventListener('click', () => {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('Link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Could not copy text: ', err);
+                });
+                shareModal.style.display = 'none';
+            });
+            
+            // Check if Web Share API is available
+            if (navigator.share) {
+                shareBtn.addEventListener('click', async () => {
+                    try {
+                        await navigator.share({
+                            title: 'CYBERPUNK INTERFACE',
+                            text: '新たな始まり! A New Beginning in the digital realm.',
+                            url: window.location.href,
+                        });
+                    } catch (err) {
+                        console.log('Error sharing:', err);
+                    }
+                });
+            }
         });
     </script>
 </body>
