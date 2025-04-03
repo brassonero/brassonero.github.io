@@ -28,7 +28,7 @@
             overflow-x: hidden;
             position: relative;
             min-height: 100vh;
-            padding: 2rem;
+            padding: 1rem;
             background-image: 
                 radial-gradient(circle at 20% 30%, rgba(15, 240, 252, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 80% 70%, rgba(255, 42, 109, 0.1) 0%, transparent 20%);
@@ -55,9 +55,15 @@
             margin: 0 auto;
             border: 1px solid var(--neon-blue);
             box-shadow: var(--glow);
-            padding: 2rem;
+            padding: 1.5rem;
             background-color: rgba(5, 5, 8, 0.7);
             overflow: hidden;
+        }
+        
+        @media (min-width: 768px) {
+            .glitch-container {
+                padding: 2rem;
+            }
         }
         
         .glitch-container::after {
@@ -84,13 +90,21 @@
         
         h1 {
             font-family: 'Rajdhani', sans-serif;
-            font-size: 4rem;
+            font-size: 2.5rem;
             text-align: center;
-            margin: 2rem 0;
+            margin: 1.5rem 0;
             text-transform: uppercase;
-            letter-spacing: 0.5rem;
+            letter-spacing: 0.3rem;
             text-shadow: var(--glow);
             animation: flicker 3s infinite alternate;
+        }
+        
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 4rem;
+                margin: 2rem 0;
+                letter-spacing: 0.5rem;
+            }
         }
         
         @keyframes flicker {
@@ -105,12 +119,19 @@
         }
         
         .japanese-title {
-            font-size: 3rem;
+            font-size: 1.8rem;
             text-align: center;
-            margin: 2rem 0;
+            margin: 1.5rem 0;
             color: var(--neon-pink);
             text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
             animation: glitch 2s infinite alternate;
+        }
+        
+        @media (min-width: 768px) {
+            .japanese-title {
+                font-size: 3rem;
+                margin: 2rem 0;
+            }
         }
         
         @keyframes glitch {
@@ -124,12 +145,19 @@
         
         .signup-form {
             max-width: 400px;
-            margin: 3rem auto;
-            padding: 2rem;
+            margin: 2rem auto;
+            padding: 1.5rem;
             border: 1px solid var(--neon-blue);
             box-shadow: 0 0 15px var(--neon-blue);
             position: relative;
             overflow: hidden;
+        }
+        
+        @media (min-width: 768px) {
+            .signup-form {
+                margin: 3rem auto;
+                padding: 2rem;
+            }
         }
         
         .signup-form::before {
@@ -145,8 +173,14 @@
         }
         
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             position: relative;
+        }
+        
+        @media (min-width: 768px) {
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
         }
         
         .form-group label {
@@ -159,13 +193,19 @@
         
         .form-group input {
             width: 100%;
-            padding: 0.8rem;
+            padding: 0.7rem;
             background-color: transparent;
             border: 1px solid var(--neon-blue);
             color: var(--neon-blue);
             font-family: 'Share Tech Mono', monospace;
             outline: none;
             transition: all 0.3s;
+        }
+        
+        @media (min-width: 768px) {
+            .form-group input {
+                padding: 0.8rem;
+            }
         }
         
         .form-group input:focus {
@@ -177,7 +217,7 @@
             background-color: transparent;
             border: 1px solid var(--neon-blue);
             color: var(--neon-blue);
-            padding: 0.8rem 2rem;
+            padding: 0.7rem 1.5rem;
             font-family: 'Share Tech Mono', monospace;
             text-transform: uppercase;
             letter-spacing: 0.1rem;
@@ -189,6 +229,14 @@
             align-items: center;
             justify-content: center;
             width: 100%;
+            font-size: 0.9rem;
+        }
+        
+        @media (min-width: 768px) {
+            .submit-btn {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
         }
         
         .submit-btn:hover {
@@ -200,27 +248,47 @@
         .submit-btn::after {
             content: "✓";
             margin-left: 0.5rem;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
         
         .progress-container {
-            margin: 3rem auto;
-            max-width: 600px;
+            margin: 2rem auto;
+            max-width: 100%;
+            width: 600px;
+        }
+        
+        @media (min-width: 768px) {
+            .progress-container {
+                margin: 3rem auto;
+            }
         }
         
         .progress-label {
             text-align: center;
             margin-bottom: 1rem;
-            font-size: 1.2rem;
+            font-size: 1rem;
             text-transform: uppercase;
-            letter-spacing: 0.2rem;
+            letter-spacing: 0.1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .progress-label {
+                font-size: 1.2rem;
+                letter-spacing: 0.2rem;
+            }
         }
         
         .progress-bar {
-            height: 30px;
+            height: 20px;
             border: 1px solid var(--neon-blue);
             position: relative;
             overflow: hidden;
+        }
+        
+        @media (min-width: 768px) {
+            .progress-bar {
+                height: 30px;
+            }
         }
         
         .progress-fill {
@@ -259,15 +327,24 @@
         .pixel-squares {
             display: flex;
             margin-top: 0.5rem;
+            justify-content: center;
         }
         
         .pixel-square {
-            width: 15px;
-            height: 15px;
+            width: 10px;
+            height: 10px;
             background-color: var(--neon-blue);
-            margin-right: 5px;
+            margin-right: 3px;
             opacity: 0;
             animation: pixel-load 1.5s infinite;
+        }
+        
+        @media (min-width: 768px) {
+            .pixel-square {
+                width: 15px;
+                height: 15px;
+                margin-right: 5px;
+            }
         }
         
         .pixel-square:nth-child(1) { animation-delay: 0s; }
@@ -285,14 +362,26 @@
         
         .loading-container {
             text-align: center;
-            margin: 3rem auto;
+            margin: 2rem auto;
+        }
+        
+        @media (min-width: 768px) {
+            .loading-container {
+                margin: 3rem auto;
+            }
         }
         
         .loading-text {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             margin-bottom: 1rem;
             position: relative;
             display: inline-block;
+        }
+        
+        @media (min-width: 768px) {
+            .loading-text {
+                font-size: 1.5rem;
+            }
         }
         
         .loading-text::after {
@@ -323,13 +412,21 @@
         }
         
         .error-section {
-            margin: 3rem auto;
-            max-width: 600px;
+            margin: 2rem auto;
+            max-width: 100%;
+            width: 600px;
             border: 1px solid var(--neon-pink);
-            padding: 1.5rem;
+            padding: 1.2rem;
             position: relative;
             overflow: hidden;
             animation: error-glitch 0.5s infinite alternate;
+        }
+        
+        @media (min-width: 768px) {
+            .error-section {
+                margin: 3rem auto;
+                padding: 1.5rem;
+            }
         }
         
         @keyframes error-glitch {
@@ -343,20 +440,42 @@
         
         .error-title {
             color: var(--neon-pink);
-            font-size: 2rem;
-            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
             text-shadow: 0 0 5px var(--neon-pink);
+        }
+        
+        @media (min-width: 768px) {
+            .error-title {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
         }
         
         .warning-title {
             color: var(--neon-pink);
-            font-size: 1.5rem;
-            margin-top: 2rem;
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
             text-shadow: 0 0 5px var(--neon-pink);
         }
         
+        @media (min-width: 768px) {
+            .warning-title {
+                font-size: 1.5rem;
+                margin-top: 2rem;
+            }
+        }
+        
         .error-text {
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+        
+        @media (min-width: 768px) {
+            .error-text {
+                line-height: 1.6;
+                font-size: 1rem;
+            }
         }
         
         .matrix-effect {
@@ -364,21 +483,57 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 50px;
+            height: 40px;
             color: rgba(15, 240, 252, 0.3);
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             display: flex;
-            justify-content: space-between;
-            padding: 0 2rem;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 1rem;
             z-index: -1;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 768px) {
+            .matrix-effect {
+                height: 50px;
+                font-size: 0.8rem;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 2rem;
+            }
+        }
+        
+        .matrix-effect span {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0.2rem 0;
+        }
+        
+        @media (min-width: 768px) {
+            .matrix-effect span {
+                display: inline;
+                margin: 0;
+            }
         }
         
         .caution-text {
             position: absolute;
             color: rgba(255, 42, 109, 0.5);
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             transform: rotate(-45deg);
             text-transform: uppercase;
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .caution-text {
+                display: block;
+                font-size: 0.7rem;
+            }
         }
         
         .circuit-pattern {
@@ -416,11 +571,21 @@
         
         .fragmented-box {
             position: absolute;
-            width: 100px;
-            height: 100px;
+            width: 60px;
+            height: 60px;
             border: 1px solid var(--neon-blue);
-            opacity: 0.3;
+            opacity: 0.2;
             animation: float 15s infinite linear;
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .fragmented-box {
+                display: block;
+                width: 100px;
+                height: 100px;
+                opacity: 0.3;
+            }
         }
         
         @keyframes float {
@@ -557,6 +722,29 @@
                     }
                 });
             }, 50);
+            
+            // Handle mobile view
+            function handleResize() {
+                const isMobile = window.innerWidth < 768;
+                const cautionTexts = document.querySelectorAll('.caution-text');
+                const fragmentedBoxes = document.querySelectorAll('.fragmented-box');
+                
+                if (isMobile) {
+                    // Adjust layout for mobile
+                    cautionTexts.forEach(text => text.style.display = 'none');
+                    fragmentedBoxes.forEach(box => box.style.display = 'none');
+                } else {
+                    // Adjust layout for desktop
+                    cautionTexts.forEach(text => text.style.display = 'block');
+                    fragmentedBoxes.forEach(box => box.style.display = 'block');
+                }
+            }
+            
+            // Initial check
+            handleResize();
+            
+            // Add resize listener
+            window.addEventListener('resize', handleResize);
         });
     </script>
 </body>
