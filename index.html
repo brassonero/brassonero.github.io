@@ -2,12 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <!-- Mobile browser theming -->
-    <meta name="theme-color" content="#0a0a12">
-    <meta name="msapplication-navbutton-color" content="#0a0a12">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>brassonero</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;700&display=swap');
@@ -18,14 +13,6 @@
             --dark-bg: #0a0a12;
             --darker-bg: #050508;
             --glow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
-        }
-        
-        /* Mobile color boost */
-        @media (max-width: 767px) {
-            :root {
-                --neon-blue: #0ffffc;
-                --neon-pink: #ff1a6d;
-            }
         }
         
         * {
@@ -45,15 +32,6 @@
             background-image: 
                 radial-gradient(circle at 20% 30%, rgba(15, 240, 252, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 80% 70%, rgba(255, 42, 109, 0.1) 0%, transparent 20%);
-            -webkit-tap-highlight-color: rgba(15, 240, 252, 0.5);
-        }
-        
-        /* Mobile background enhancement */
-        @media (max-width: 767px) {
-            body {
-                background: linear-gradient(135deg, #050508 0%, #0a0a20 100%);
-                background-attachment: fixed;
-            }
         }
         
         body::before {
@@ -70,16 +48,6 @@
             z-index: -1;
         }
         
-        /* Mobile background pattern adjustment */
-        @media (max-width: 767px) {
-            body::before {
-                background: 
-                    linear-gradient(rgba(5, 5, 8, 0.9), rgba(5, 5, 8, 0.9)),
-                    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50"><rect width="1" height="1" x="10" y="10" fill="%230ff0fc" opacity="0.3"/><rect width="1" height="1" x="25" y="25" fill="%230ff0fc" opacity="0.3"/><rect width="1" height="1" x="40" y="40" fill="%230ff0fc" opacity="0.3"/></svg>');
-                background-size: 50px 50px;
-            }
-        }
-        
         .glitch-container {
             position: relative;
             width: 100%;
@@ -90,24 +58,6 @@
             padding: 1.5rem;
             background-color: rgba(5, 5, 8, 0.7);
             overflow: hidden;
-        }
-        
-        /* Mobile glow enhancement */
-        @media (max-width: 767px) {
-            .glitch-container {
-                box-shadow: 0 0 15px var(--neon-blue), 
-                            0 0 30px var(--neon-blue),
-                            0 0 45px var(--neon-blue);
-                animation: mobile-glitch 8s infinite alternate;
-            }
-            
-            @keyframes mobile-glitch {
-                0% { filter: hue-rotate(0deg); }
-                20% { filter: hue-rotate(5deg) brightness(1.1); }
-                40% { filter: hue-rotate(-5deg) brightness(1.05); }
-                60% { filter: hue-rotate(3deg) brightness(1.07); }
-                100% { filter: hue-rotate(0deg); }
-            }
         }
         
         @media (min-width: 768px) {
@@ -133,20 +83,6 @@
             pointer-events: none;
         }
         
-        /* Mobile scanline enhancement */
-        @media (max-width: 767px) {
-            .glitch-container::after {
-                height: 3px;
-                background: linear-gradient(
-                    0deg,
-                    transparent 0%,
-                    var(--neon-blue) 50%,
-                    transparent 100%
-                );
-                animation: scanline 4s linear infinite;
-            }
-        }
-        
         @keyframes scanline {
             0% { transform: translateY(-100%); }
             100% { transform: translateY(100%); }
@@ -161,14 +97,6 @@
             letter-spacing: 0.3rem;
             text-shadow: var(--glow);
             animation: flicker 3s infinite alternate;
-        }
-        
-        /* Mobile title enhancement */
-        @media (max-width: 767px) {
-            h1 {
-                text-shadow: 0 0 15px currentColor;
-                filter: brightness(1.1);
-            }
         }
         
         @media (min-width: 768px) {
@@ -199,14 +127,6 @@
             animation: glitch 2s infinite alternate;
         }
         
-        /* Mobile Japanese title enhancement */
-        @media (max-width: 767px) {
-            .japanese-title {
-                text-shadow: 0 0 15px currentColor;
-                filter: brightness(1.1);
-            }
-        }
-        
         @media (min-width: 768px) {
             .japanese-title {
                 font-size: 3rem;
@@ -231,13 +151,6 @@
             box-shadow: 0 0 15px var(--neon-blue);
             position: relative;
             overflow: hidden;
-        }
-        
-        /* Mobile form enhancement */
-        @media (max-width: 767px) {
-            .signup-form {
-                box-shadow: 0 0 20px var(--neon-blue);
-            }
         }
         
         @media (min-width: 768px) {
@@ -317,15 +230,6 @@
             justify-content: center;
             width: 100%;
             font-size: 0.9rem;
-        }
-        
-        /* Mobile button enhancement */
-        @media (max-width: 767px) {
-            .submit-btn:active {
-                background-color: var(--neon-blue);
-                color: var(--dark-bg);
-                box-shadow: 0 0 20px var(--neon-blue);
-            }
         }
         
         @media (min-width: 768px) {
@@ -691,6 +595,31 @@
             75% { transform: translate(50px, -50px) rotate(270deg); }
             100% { transform: translate(0, 0) rotate(360deg); }
         }
+        
+        /* Randomly position fragmented boxes */
+        .fragmented-box:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        
+        .fragmented-box:nth-child(2) {
+            top: 70%;
+            left: 80%;
+            animation-delay: 3s;
+        }
+        
+        .fragmented-box:nth-child(3) {
+            top: 30%;
+            left: 60%;
+            animation-delay: 6s;
+        }
+        
+        .fragmented-box:nth-child(4) {
+            top: 80%;
+            left: 20%;
+            animation-delay: 9s;
+        }
     </style>
 </head>
 <body>
@@ -794,43 +723,18 @@
                 });
             }, 50);
             
-            // Mobile detection and enhancements
-            function detectMobile() {
-                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            }
-            
-            if (detectMobile()) {
-                // Boost colors for mobile
-                document.documentElement.style.setProperty('--neon-blue', '#0ffffc');
-                document.documentElement.style.setProperty('--neon-pink', '#ff1a6d');
-                
-                // Add touch feedback for buttons
-                document.querySelectorAll('.submit-btn').forEach(btn => {
-                    btn.addEventListener('touchstart', function() {
-                        this.style.transform = 'scale(0.98)';
-                        this.style.backgroundColor = 'var(--neon-blue)';
-                        this.style.color = 'var(--dark-bg)';
-                        this.style.boxShadow = '0 0 20px var(--neon-blue)';
-                    });
-                    btn.addEventListener('touchend', function() {
-                        this.style.transform = 'scale(1)';
-                        this.style.backgroundColor = 'transparent';
-                        this.style.color = 'var(--neon-blue)';
-                        this.style.boxShadow = 'none';
-                    });
-                });
-            }
-            
-            // Handle mobile/desktop view changes
+            // Handle mobile view
             function handleResize() {
                 const isMobile = window.innerWidth < 768;
                 const cautionTexts = document.querySelectorAll('.caution-text');
                 const fragmentedBoxes = document.querySelectorAll('.fragmented-box');
                 
                 if (isMobile) {
+                    // Adjust layout for mobile
                     cautionTexts.forEach(text => text.style.display = 'none');
                     fragmentedBoxes.forEach(box => box.style.display = 'none');
                 } else {
+                    // Adjust layout for desktop
                     cautionTexts.forEach(text => text.style.display = 'block');
                     fragmentedBoxes.forEach(box => box.style.display = 'block');
                 }
