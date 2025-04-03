@@ -480,43 +480,31 @@
         
         .matrix-effect {
             position: fixed;
-            bottom: 0;
+            top: 0;
             left: 0;
             width: 100%;
-            height: 40px;
-            color: rgba(15, 240, 252, 0.3);
-            font-size: 0.7rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 1rem;
+            height: 100%;
+            color: rgba(15, 240, 252, 0.7);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            line-height: 1.2;
             z-index: -1;
             overflow: hidden;
+            pointer-events: none;
         }
         
-        @media (min-width: 768px) {
-            .matrix-effect {
-                height: 50px;
-                font-size: 0.8rem;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0 2rem;
-            }
+        .matrix-column {
+            position: absolute;
+            top: 0;
+            width: 1em;
+            text-align: center;
+            transform: translateY(-100%);
+            animation: matrix-fall linear infinite;
         }
         
-        .matrix-effect span {
-            display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin: 0.2rem 0;
-        }
-        
-        @media (min-width: 768px) {
-            .matrix-effect span {
-                display: inline;
-                margin: 0;
+        @keyframes matrix-fall {
+            to {
+                transform: translateY(100vh);
             }
         }
         
@@ -677,10 +665,7 @@
         </div>
     </div>
     
-    <div class="matrix-effect">
-        <span>01101000 01100001 01100011 01101011 00100000 01110100 01101000 01100101 00100000 01110000 01101100 01100001 01101110 01100101 01110100</span>
-        <span>01010111 01000001 01010010 01001110 01001001 01001110 01000111 00111010 00100000 01010011 01011001 01010011 01010100 01000101 01001101 00100000 01000110 01000001 01001001 01001100 01010101 01010010 01000101</span>
-    </div>
+    <div class="matrix-effect" id="matrixContainer"></div>
     
     <div class="caution-text" style="top: 15%; left: 15%;">CAUTION</div>
     <div class="caution-text" style="top: 25%; left: 75%;">RESTRICTED</div>
@@ -702,21 +687,87 @@
                 }
             }, 100);
             
-            // Add random matrix characters
-            const matrixChars = "01!@#$%^&*()_+{}|:\"<>?~`-=[]\\;',./";
-            const elements = document.querySelectorAll('.matrix-effect span');
-            
-            setInterval(() => {
-                elements.forEach(el => {
-                    if (Math.random() > 0.8) {
-                        const index = Math.floor(Math.random() * el.textContent.length);
-                        const newChar = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-                        let newText = el.textContent.split('');
-                        newText[index] = newChar;
-                        el.textContent = newText.join('');
+            // Matrix effect
+            const matrixContainer = document.getElementById('matrixContainer');
+            const matrixChars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+            const columns = Math.floor(window.innerWidth / 16); // Adjust column count based on screen width
+
+            // Create columns
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                
+                // Random positioning
+                column.style.left = `${Math.random() * 100}%`;
+                
+                // Random animation duration (3-8 seconds)
+                const duration = 3 + Math.random() * 5;
+                column.style.animationDuration = `${duration}s`;
+                
+                // Random delay (0-5 seconds)
+                column.style.animationDelay = `${Math.random() * 5}s`;
+                
+                // Create initial characters
+                const charCount = 10 + Math.floor(Math.random() * 20);
+                let html = '';
+                for (let j = 0; j < charCount; j++) {
+                    const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                    // Random brightness
+                    const opacity = 0.1 + Math.random() * 0.9;
+                    html += `<span style="opacity:${opacity}">${char}</span><br>`;
+                }
+                column.innerHTML = html;
+                
+                matrixContainer.appendChild(column);
+                
+                // Make the column regenerate characters periodically
+                setInterval(() => {
+                    const newCharCount = 10 + Math.floor(Math.random() * 20);
+                    let newHtml = '';
+                    for (let j = 0; j < newCharCount; j++) {
+                        const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                        const opacity = 0.1 + Math.random() * 0.9;
+                        newHtml += `<span style="opacity:${opacity}">${char}</span><br>`;
                     }
-                });
-            }, 50);
+                    column.innerHTML = newHtml;
+                    column.style.transform = 'translateY(-100%)';
+                }, duration * 1000);
+            }
+
+            // Handle window resize
+            function handleMatrixResize() {
+                matrixContainer.innerHTML = '';
+                const newColumns = Math.floor(window.innerWidth / 16);
+                for (let i = 0; i < newColumns; i++) {
+                    const column = document.createElement('div');
+                    column.className = 'matrix-column';
+                    column.style.left = `${Math.random() * 100}%`;
+                    const duration = 3 + Math.random() * 5;
+                    column.style.animationDuration = `${duration}s`;
+                    column.style.animationDelay = `${Math.random() * 5}s`;
+                    const charCount = 10 + Math.floor(Math.random() * 20);
+                    let html = '';
+                    for (let j = 0; j < charCount; j++) {
+                        const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                        const opacity = 0.1 + Math.random() * 0.9;
+                        html += `<span style="opacity:${opacity}">${char}</span><br>`;
+                    }
+                    column.innerHTML = html;
+                    matrixContainer.appendChild(column);
+                    
+                    setInterval(() => {
+                        const newCharCount = 10 + Math.floor(Math.random() * 20);
+                        let newHtml = '';
+                        for (let j = 0; j < newCharCount; j++) {
+                            const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                            const opacity = 0.1 + Math.random() * 0.9;
+                            newHtml += `<span style="opacity:${opacity}">${char}</span><br>`;
+                        }
+                        column.innerHTML = newHtml;
+                        column.style.transform = 'translateY(-100%)';
+                    }, duration * 1000);
+                }
+            }
             
             // Handle mobile view
             function handleResize() {
@@ -733,6 +784,9 @@
                     cautionTexts.forEach(text => text.style.display = 'block');
                     fragmentedBoxes.forEach(box => box.style.display = 'block');
                 }
+                
+                // Also handle matrix resize
+                handleMatrixResize();
             }
             
             // Initial check
