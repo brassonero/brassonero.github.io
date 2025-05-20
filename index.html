@@ -3,8 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Invitación a la Primera Comunión de Ana Mía">
     <title>Primera Comunión Ana Mía</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #8B5A2B;
+            --secondary-color: #F8EDE3;
+            --accent-color: #A38F84;
+            --text-color: #333;
+            --white: #FFFFFF;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,27 +25,36 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: white;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--white);
+            color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
 
         .invitation {
-            max-width: 600px; /* Changed from 100vh to pixel-based for better control */
-            background-color: white;
+            max-width: 600px;
+            width: 100%;
+            background-color: var(--white);
             border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow);
             overflow: hidden;
+            position: relative;
         }
 
         .baby-photo img {
             width: 100%;
             height: auto;
             display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .baby-photo a:hover img {
+            transform: scale(1.02);
         }
 
         .text-image {
@@ -57,31 +79,37 @@
             margin: 20px 0;
             font-size: 2em;
             font-weight: bold;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
         }
 
         .countdown > div {
             margin: 0 10px;
             text-align: center;
+            min-width: 70px;
         }
 
         .countdown-label {
             font-size: 0.5em;
-            color: #545454;
+            color: var(--accent-color);
             display: block;
             text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
         }
 
         #seconds {
-            color: red;
+            color: var(--primary-color);
         }
 
-        /* Updated Gallery Styles */
+        /* Gallery Styles */
         .gallery {
             position: relative;
             width: 100%;
             max-width: 600px;
             margin: 20px auto;
             overflow: hidden;
+            border-radius: 15px;
         }
 
         .gallery-container {
@@ -95,17 +123,14 @@
             justify-content: center;
             align-items: center;
             padding: 1.5em;
-            /* Added padding */
         }
 
         .gallery-image {
             width: 100%;
             height: 400px;
-            /* Fixed square dimensions */
             object-fit: cover;
-            /* Ensures image covers the area without distortion */
-            border-radius: 15px;
-            /* Optional: adds rounded corners */
+            border-radius: 10px;
+            box-shadow: var(--shadow);
         }
 
         .gallery-controls {
@@ -115,126 +140,164 @@
             top: 50%;
             width: 100%;
             transform: translateY(-50%);
+            padding: 0 10px;
         }
 
         .gallery-control {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(139, 90, 43, 0.7);
             color: white;
             border: none;
-            padding: 10px;
+            padding: 12px 15px;
             cursor: pointer;
+            border-radius: 50%;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-control:hover {
+            background: rgba(139, 90, 43, 0.9);
+            transform: scale(1.1);
         }
 
         .gallery-dots {
             display: flex;
             justify-content: center;
-            margin-top: 10px;
+            margin: 15px 0;
+            padding: 5px;
         }
 
         .gallery-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #bbb;
+            width: 12px;
+            height: 12px;
+            background-color: var(--secondary-color);
             border-radius: 50%;
             margin: 0 5px;
             cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-dot:hover {
+            background-color: var(--accent-color);
         }
 
         .gallery-dot.active {
-            background-color: #717171;
+            background-color: var(--primary-color);
+            transform: scale(1.2);
         }
 
         .event-locations {
             display: flex;
             justify-content: space-around;
-            /*padding: 20px;*/
-            background-color: #F8EDE3;
+            background-color: var(--secondary-color);
         }
 
-        .event-locations .baby-photo {
-            width: 100%;
-            margin-top: 1em;
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .countdown {
+                font-size: 1.5em;
+            }
+            
+            .countdown > div {
+                min-width: 50px;
+                margin: 0 5px;
+            }
+            
+            .gallery-image {
+                height: 300px;
+            }
+            
+            .text-image {
+                max-width: 90%;
+            }
         }
 
-        .event-locations .baby-photo img {
-            width: 100%;
-            height: auto;
-            /*border-radius: 1em;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);*/
+        /* Animation for countdown */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
+
+        .countdown > div {
+            animation: pulse 2s infinite;
+        }
+
+        .countdown > div:nth-child(1) { animation-delay: 0s; }
+        .countdown > div:nth-child(2) { animation-delay: 0.5s; }
+        .countdown > div:nth-child(3) { animation-delay: 1s; }
+        .countdown > div:nth-child(4) { animation-delay: 1.5s; }
     </style>
 </head>
 <body>
-    <div class="invitation" style="background-color: white;">
-        <!-- Previous content remains the same -->
+    <div class="invitation">
         <div class="baby-photo">
-            <img src="./assets/1.png" alt="Ana Mia - Mi primera comunion">
+            <img src="./assets/1.png" alt="Ana Mia - Mi primera comunión" loading="lazy">
         </div>
         <div class="baby-photo">
-            <img src="./assets/2.png" alt="Baptism invitation text">
+            <img src="./assets/2.png" alt="Invitación a la primera comunión" loading="lazy">
         </div>
         <div class="baby-photo">
-            <img src="./assets/3.png" alt="Baptism invitation details">
+            <img src="./assets/3.png" alt="Detalles de la ceremonia" loading="lazy">
         </div>
 
         <!-- Gallery -->
         <div class="gallery" style="margin-bottom: 2em;">
             <div class="gallery-container" id="galleryContainer">
                 <div class="gallery-image-wrapper">
-                    <img src="./assets/gallery-01.jpeg" alt="Gallery Image 1" class="gallery-image">
+                    <img src="./assets/gallery-01.jpeg" alt="Ana Mía - Foto 1" class="gallery-image" loading="lazy">
                 </div>
                 <div class="gallery-image-wrapper">
-                    <img src="./assets/gallery-02.jpeg" alt="Gallery Image 2" class="gallery-image">
+                    <img src="./assets/gallery-02.jpeg" alt="Ana Mía - Foto 2" class="gallery-image" loading="lazy">
                 </div>
                 <div class="gallery-image-wrapper">
-                    <img src="./assets/gallery-03.jpeg" alt="Gallery Image 3" class="gallery-image">
+                    <img src="./assets/gallery-03.jpeg" alt="Ana Mía - Foto 3" class="gallery-image" loading="lazy">
                 </div>
             </div>
 
             <div class="gallery-controls">
-                <button class="gallery-control" id="prevBtn">&lt;</button>
-                <button class="gallery-control" id="nextBtn">&gt;</button>
+                <button class="gallery-control" id="prevBtn" aria-label="Previous image">&lt;</button>
+                <button class="gallery-control" id="nextBtn" aria-label="Next image">&gt;</button>
             </div>
 
             <div class="gallery-dots" id="galleryDots"></div>
         </div>
 
         <div class="baby-photo text-image" style="margin-bottom: 4em; margin-top: 2em;">
-            <img src="./assets/7.png" alt="Countdown text" class="text-image">
+            <img src="./assets/7.png" alt="Cuenta regresiva para la comunión" class="text-image" loading="lazy">
         </div>
 
         <div class="baby-photo" style="margin-top: 2em;">
-            <a href="https://maps.app.goo.gl/Bn62wwXvEocPMnhs9" target="_blank">
-                <img src="./assets/8.png" alt="Gift registry">
+            <a href="https://maps.app.goo.gl/Bn62wwXvEocPMnhs9" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/8.png" alt="Ubicación de la ceremonia en Google Maps" loading="lazy">
             </a>
         </div>
 
         <div class="baby-photo">
-            <a href="https://maps.app.goo.gl/Mn7nrFsKAzCs5yTr7" target="_blank">
-                <img src="./assets/9.png" alt="Gift registry">
+            <a href="https://maps.app.goo.gl/Mn7nrFsKAzCs5yTr7" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/9.png" alt="Ubicación de la celebración en Google Maps" loading="lazy">
             </a>
         </div>
 
         <div class="baby-photo">
-            <img src="./assets/10.png" alt="Baptism invitation details">
+            <img src="./assets/10.png" alt="Detalles del evento" loading="lazy">
         </div>
 
         <div class="baby-photo">
-            <img src="./assets/11.png" alt="Baptism invitation details">
+            <img src="./assets/11.png" alt="Código de vestimenta para el evento" loading="lazy">
         </div>
 
         <div class="baby-photo" style="margin: 0; padding:0;">
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLScysgjrs80KzkkhcNYKqu4687IjT7KQzdNFDTGGFXWL8DklSw/viewform?usp=header" target="_blank">
-                <img src="./assets/14.png" alt="Gift registry">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScysgjrs80KzkkhcNYKqu4687IjT7KQzdNFDTGGFXWL8DklSw/viewform?usp=header" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/14.png" alt="Formulario de confirmación de asistencia" loading="lazy">
             </a>
         </div>
 
         <div class="baby-photo" style="margin: 0; padding:0;">
-            <img src="./assets/1.png" alt="Baptism invitation details">
+            <img src="./assets/1.png" alt="Ana Mía - Mi primera comunión" loading="lazy">
         </div>
 
         <div class="baby-photo text-image" style="margin-bottom: 5em; margin-top: 5em;">
-            <img src="./assets/15.png" alt="Countdown text" class="text-image">
+            <img src="./assets/15.png" alt="Cuenta regresiva para el gran día" class="text-image" loading="lazy">
         </div>
 
         <div class="countdown" style="margin-bottom:4em;">
@@ -296,6 +359,7 @@
 
         let currentSlide = 0;
         const imageWrappers = document.querySelectorAll('.gallery-image-wrapper');
+        let slideInterval;
 
         // Create dots
         imageWrappers.forEach((_, index) => {
@@ -319,17 +383,73 @@
         function goToSlide(slideIndex) {
             currentSlide = slideIndex;
             updateGallery();
+            resetSlideInterval();
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % imageWrappers.length;
+            updateGallery();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + imageWrappers.length) % imageWrappers.length;
+            updateGallery();
+        }
+
+        function startSlideInterval() {
+            slideInterval = setInterval(nextSlide, 5000);
+        }
+
+        function resetSlideInterval() {
+            clearInterval(slideInterval);
+            startSlideInterval();
         }
 
         nextBtn.addEventListener('click', () => {
-            currentSlide = (currentSlide + 1) % imageWrappers.length;
-            updateGallery();
+            nextSlide();
+            resetSlideInterval();
         });
 
         prevBtn.addEventListener('click', () => {
-            currentSlide = (currentSlide - 1 + imageWrappers.length) % imageWrappers.length;
-            updateGallery();
+            prevSlide();
+            resetSlideInterval();
         });
+
+        // Start auto-sliding
+        startSlideInterval();
+
+        // Pause on hover
+        galleryContainer.addEventListener('mouseenter', () => {
+            clearInterval(slideInterval);
+        });
+
+        galleryContainer.addEventListener('mouseleave', () => {
+            startSlideInterval();
+        });
+
+        // Touch events for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        galleryContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            clearInterval(slideInterval);
+        }, {passive: true});
+
+        galleryContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+            startSlideInterval();
+        }, {passive: true});
+
+        function handleSwipe() {
+            const threshold = 50;
+            if (touchEndX < touchStartX - threshold) {
+                nextSlide();
+            } else if (touchEndX > touchStartX + threshold) {
+                prevSlide();
+            }
+        }
     </script>
 </body>
 </html>
