@@ -82,7 +82,6 @@
             max-width: 600px;
             margin: 20px auto;
             overflow: hidden;
-            aspect-ratio: 1867 / 3394; /* Maintain image aspect ratio */
         }
 
         .gallery-container {
@@ -96,14 +95,17 @@
             justify-content: center;
             align-items: center;
             padding: 1.5em;
+            /* Added padding */
         }
 
         .gallery-image {
             width: 100%;
-            height: auto;
-            aspect-ratio: 1867 / 3394; /* Ensure images maintain 1867x3394 ratio */
-            object-fit: contain; /* Changed to contain to show full image */
+            height: 400px;
+            /* Fixed square dimensions */
+            object-fit: cover;
+            /* Ensures image covers the area without distortion */
             border-radius: 15px;
+            /* Optional: adds rounded corners */
         }
 
         .gallery-controls {
@@ -145,7 +147,8 @@
         .event-locations {
             display: flex;
             justify-content: space-around;
-            background-color: white;
+            /*padding: 20px;*/
+            background-color: #F8EDE3;
         }
 
         .event-locations .baby-photo {
@@ -156,19 +159,8 @@
         .event-locations .baby-photo img {
             width: 100%;
             height: auto;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .gallery {
-                max-width: 100%;
-            }
-            .gallery-image {
-                max-height: 300px; /* Limit height on small screens */
-            }
-            .countdown {
-                font-size: 1.5em;
-            }
+            /*border-radius: 1em;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);*/
         }
     </style>
 </head>
@@ -185,29 +177,29 @@
             <img src="./assets/3.png" alt="Baptism invitation details">
         </div>
 
-        <!-- Updated Gallery -->
+        <!-- Gallery -->
         <div class="gallery" style="margin-bottom: 2em;">
             <div class="gallery-container" id="galleryContainer">
                 <div class="gallery-image-wrapper">
-                    <img src="./assets/gallery-01.jpeg" alt="Baptism Gallery Image 1" class="gallery-image" loading="lazy">
+                    <img src="./assets/gallery-01.jpeg" alt="Gallery Image 1" class="gallery-image">
                 </div>
                 <div class="gallery-image-wrapper">
-                    <img src="./assets/gallery-02.jpeg" alt="Baptism Gallery Image 2" class="gallery-image" loading="lazy">
+                    <img src="./assets/gallery-02.jpeg" alt="Gallery Image 2" class="gallery-image">
                 </div>
                 <div class="gallery-image-wrapper">
-                    <img src="./assets/gallery-03.jpeg" alt="Baptism Gallery Image 3" class="gallery-image" loading="lazy">
+                    <img src="./assets/gallery-03.jpeg" alt="Gallery Image 3" class="gallery-image">
                 </div>
             </div>
 
             <div class="gallery-controls">
-                <button class="gallery-control" id="prevBtn" aria-label="Previous image"><</button>
-                <button class="gallery-control" id="nextBtn" aria-label="Next image">></button>
+                <button class="gallery-control" id="prevBtn">&lt;</button>
+                <button class="gallery-control" id="nextBtn">&gt;</button>
             </div>
 
             <div class="gallery-dots" id="galleryDots"></div>
         </div>
 
-        <div class="baby-photo text-image" style="margin-bottom: 4em;">
+        <div class="baby-photo text-image" style="margin-bottom: 4em; margin-top: 2em;">
             <img src="./assets/7.png" alt="Countdown text" class="text-image">
         </div>
 
@@ -305,6 +297,7 @@
         let currentSlide = 0;
         const imageWrappers = document.querySelectorAll('.gallery-image-wrapper');
 
+        // Create dots
         imageWrappers.forEach((_, index) => {
             const dot = document.createElement('div');
             dot.classList.add('gallery-dot');
@@ -317,6 +310,7 @@
 
         function updateGallery() {
             galleryContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+
             dots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === currentSlide);
             });
