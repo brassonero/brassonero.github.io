@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -72,7 +71,39 @@
             text-align: center;
         }
 
-        /* Countdown timer styles */
+        
+        .timer {
+            display: flex;
+            justify-content: center; /* Centers the timer elements */
+            gap: 0.1em; /* Slightly reduced gap for better fit on smaller screens */
+            font-size: 2em; /* Base font size for larger screens */
+            color: #545454;
+            padding: 0 10px; /* Add padding to prevent edge overflow */
+            flex-wrap: wrap; /* Allow wrapping on very small screens */
+        }
+
+        .timer div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-width: 50px; /* Ensure enough space for numbers */
+        }
+
+        .timer span {
+            font-size: 0.5em; /* Relative to parent font-size */
+            color: #545454;
+            text-transform: uppercase; /* Consistent with your design aesthetic */
+        }
+
+        .separator {
+            font-size: 1.5em; /* Slightly smaller for balance */
+            color: #545454;
+            display: flex;
+            align-items: center;
+        }
+/* Countdown timer styles 
         .countdown {
             display: flex;
             justify-content: center;
@@ -101,7 +132,7 @@
         #seconds {
             color: var(--primary-color);
         }
-
+*/
         /* Gallery Styles */
         .gallery {
             position: relative;
@@ -193,13 +224,26 @@
 
         /* Responsive adjustments */
         @media (max-width: 480px) {
-            .countdown {
+            /*.countdown {
                 font-size: 1.5em;
             }
             
             .countdown > div {
                 min-width: 50px;
                 margin: 0 5px;
+            }*/
+
+            .timer {
+                    font-size: 1.2em; /* Further reduction for very small screens */
+                    gap: 0.125em;
+                }
+
+            .timer div {
+                min-width: 2em;
+            }
+
+            .separator {
+                font-size: 1em;
             }
             
             .gallery-image {
@@ -211,21 +255,22 @@
             }
         }
 
-        /* Animation for countdown */
+        /* Animation for countdown 
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
 
-        .countdown > div {
+        .timer > div {
             animation: pulse 2s infinite;
         }
 
-        .countdown > div:nth-child(1) { animation-delay: 0s; }
-        .countdown > div:nth-child(2) { animation-delay: 0.5s; }
-        .countdown > div:nth-child(3) { animation-delay: 1s; }
-        .countdown > div:nth-child(4) { animation-delay: 1.5s; }
+        .timer > div:nth-child(1) { animation-delay: 0s; }
+        .timer > div:nth-child(2) { animation-delay: 0.5s; }
+        .timer > div:nth-child(3) { animation-delay: 1s; }
+        .timer > div:nth-child(4) { animation-delay: 1.5s; }
+        */
     </style>
 </head>
 <body>
@@ -316,26 +361,29 @@
             <img src="./assets/1.png" alt="Ana Mía - Mi primera comunión" loading="lazy">
         </div>
 
-        <div class="baby-photo text-image" style="margin-bottom: 5em; margin-top: 5em;">
+        <div class="baby-photo text-image" style="margin-bottom: 4em; margin-top: 3em;">
             <img src="./assets/15.png" alt="Cuenta regresiva para el gran día" class="text-image" loading="lazy">
         </div>
 
-        <div class="countdown" style="margin-bottom:4em;">
+        <div class="timer" style="margin-bottom:4em;">
             <div>
-                <span id="days">00</span>
-                <span class="countdown-label">Días</span>
+                <div id="days">00</div>
+                <span>Días</span>
             </div>
+            <div class="separator">|</div>
             <div>
-                <span id="hours">00</span>
-                <span class="countdown-label">Horas</span>
+                <div id="hours">00</div>
+                <span>Horas</span>
             </div>
+            <div class="separator">|</div>
             <div>
-                <span id="minutes">00</span>
-                <span class="countdown-label">Minutos</span>
+                <div id="minutes">00</div>
+                <span>Min</span>
             </div>
+            <div class="separator">|</div>
             <div>
-                <span id="seconds">00</span>
-                <span class="countdown-label">Segundos</span>
+                <div id="seconds">00</div>
+                <span>Seg</span>
             </div>
         </div>
     </div>
