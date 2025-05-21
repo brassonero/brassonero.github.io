@@ -1,4 +1,5 @@
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6,14 +7,16 @@
     <title>Primera Comunión Ana Mía</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary-color: #8B5A2B;
             --secondary-color: #F8EDE3;
             --accent-color: #A38F84;
-            --text-color: #333;
             --white: #FFFFFF;
+            --grey: #545454;
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
@@ -26,7 +29,7 @@
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: var(--white);
-            color: var(--text-color);
+            color: var(--grey);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -71,16 +74,16 @@
             text-align: center;
         }
 
-        
+
         .timer {
             display: flex;
-            justify-content: center; /* Centers the timer elements */
-            gap: 0.1em; /* Slightly reduced gap for better fit on smaller screens */
-            font-size: 2em; /* Base font size for larger screens */
-            color: #545454;
-            padding: 0 10px; /* Add padding to prevent edge overflow */
-            flex-wrap: wrap; /* Allow wrapping on very small screens */
-            margin-bottom:4em;
+            justify-content: center;
+            gap: 0.1em;
+            font-size: 2em;
+            color: var(--grey);
+            padding: 0 10px;
+            flex-wrap: wrap;
+            margin-bottom: 4em;
         }
 
         .timer div {
@@ -89,51 +92,22 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            min-width: 50px; /* Ensure enough space for numbers */
+            min-width: 50px;
         }
 
         .timer span {
-            font-size: 0.5em; /* Relative to parent font-size */
-            color: #545454;
-            text-transform: uppercase; /* Consistent with your design aesthetic */
+            font-size: 0.5em;
+            color: var(--grey);
+            text-transform: uppercase;
         }
 
         .separator {
-            font-size: 1.5em; /* Slightly smaller for balance */
-            color: #545454;
+            font-size: 1.5em;
+            color: var(--grey);
             display: flex;
             align-items: center;
         }
-/* Countdown timer styles 
-        .countdown {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-            font-size: 2em;
-            font-weight: bold;
-            font-family: 'Playfair Display', serif;
-            color: var(--primary-color);
-        }
 
-        .countdown > div {
-            margin: 0 10px;
-            text-align: center;
-            min-width: 70px;
-        }
-
-        .countdown-label {
-            font-size: 0.5em;
-            color: var(--accent-color);
-            display: block;
-            text-transform: uppercase;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-        }
-
-        #seconds {
-            color: var(--primary-color);
-        }
-*/
         /* Gallery Styles */
         .gallery {
             position: relative;
@@ -177,7 +151,7 @@
 
         .gallery-control {
             background: rgba(139, 90, 43, 0.7);
-            color: white;
+            color: var(--white);
             border: none;
             padding: 12px 15px;
             cursor: pointer;
@@ -225,20 +199,12 @@
 
         /* Responsive adjustments */
         @media (max-width: 480px) {
-            /*.countdown {
-                font-size: 1.5em;
-            }
-            
-            .countdown > div {
-                min-width: 50px;
-                margin: 0 5px;
-            }*/
 
             .timer {
-                    font-size: 1.2em; /* Further reduction for very small screens */
-                    gap: 0.125em;
-                    margin-bottom:6em;
-                }
+                font-size: 1.2em;
+                gap: 0.125em;
+                margin-bottom: 6em;
+            }
 
             .timer div {
                 min-width: 2em;
@@ -247,44 +213,30 @@
             .separator {
                 font-size: 1em;
             }
-            
+
             .gallery-image {
                 height: 300px;
             }
-            
+
             .text-image {
                 max-width: 90%;
             }
         }
-
-        /* Animation for countdown 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .timer > div {
-            animation: pulse 2s infinite;
-        }
-
-        .timer > div:nth-child(1) { animation-delay: 0s; }
-        .timer > div:nth-child(2) { animation-delay: 0.5s; }
-        .timer > div:nth-child(3) { animation-delay: 1s; }
-        .timer > div:nth-child(4) { animation-delay: 1.5s; }
-        */
     </style>
 </head>
+
 <body>
     <div class="invitation">
         <div class="baby-photo">
             <img src="./assets/1.png" alt="Ana Mia - Mi primera comunión" loading="lazy">
         </div>
         <div class="baby-photo">
-            <img src="./assets/2.png" alt="Invitación a la primera comunión" loading="lazy">
+            <img src="./assets/2.png" alt="Oración" loading="lazy">
         </div>
         <div class="baby-photo">
-            <img src="./assets/3.png" alt="Detalles de la ceremonia" loading="lazy">
+            <img src="./assets/3.png"
+                alt="Junto a mis padres: Manuel Jesús Ortega Pacheco, Ana Paola Sánchez Castellot, y mis padrinos: José Alberto Vázquez Perera, Anielka Sánchez Castellot"
+                loading="lazy">
         </div>
 
         <!-- Gallery -->
@@ -313,7 +265,7 @@
         </div>
 
         <div class="baby-photo text-image" style="margin-bottom: 4em; margin-top: 2em;">
-            <img src="./assets/7.png" alt="Cuenta regresiva para la comunión" class="text-image" loading="lazy">
+            <img src="./assets/7.png" alt="Sabado Junio 21 2025 10:00 h" class="text-image" loading="lazy">
         </div>
 
         <div class="baby-photo" style="margin-top: 2em;">
@@ -335,29 +287,31 @@
         <div class="baby-photo">
             <img src="./assets/11.png" alt="Mesa de regalos" loading="lazy">
         </div>
-        
+
         <div class="baby-photo">
-            <img src="./assets/12.png" alt="Mesa de regalos Liverpool" loading="lazy">
+            <img src="./assets/12.png" alt="Liverpool" loading="lazy">
         </div>
 
         <div class="baby-photo" style="margin: 0; padding:0;">
-            <a href="https://mesaderegalos.liverpool.com.mx/milistaderegalos/51664972" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/13.png" alt="Liverpool" loading="lazy">
+            <a href="https://mesaderegalos.liverpool.com.mx/milistaderegalos/51664972" target="_blank"
+                rel="noopener noreferrer">
+                <img src="./assets/13.png" alt="Mesa de regalos Liverpool" loading="lazy">
             </a>
         </div>
 
         <div class="baby-photo">
-            <img src="./assets/12-1.png" alt="Mesa de regalos Amazon" loading="lazy">
+            <img src="./assets/12-1.png" alt="Amazon" loading="lazy">
         </div>
 
         <div class="baby-photo" style="margin: 0; padding:0;">
-            <a href="https://www.amazon.com.mx/registries/gl/guest-view/2D30A3IJKMAQN" target="_blank" rel="noopener noreferrer">
-                <img src="./assets/13.png" alt="Amazon" loading="lazy">
+            <a href="https://www.amazon.com.mx/registries/gl/guest-view/2D30A3IJKMAQN" target="_blank"
+                rel="noopener noreferrer">
+                <img src="./assets/13.png" alt="Mesa de regalos Amazon" loading="lazy">
             </a>
         </div>
 
         <div class="baby-photo" style="margin: 0; padding:0;">
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLScysgjrs80KzkkhcNYKqu4687IjT7KQzdNFDTGGFXWL8DklSw/viewform?usp=header" target="_blank" rel="noopener noreferrer">
+            <a href="https://forms.gle/fP1poY4SLTbm7GRB6" target="_blank" rel="noopener noreferrer">
                 <img src="./assets/14.png" alt="Formulario de confirmación de asistencia" loading="lazy">
             </a>
         </div>
@@ -367,7 +321,7 @@
         </div>
 
         <div class="baby-photo text-image" style="margin-bottom: 3em; margin-top: 3em;">
-            <img src="./assets/15.png" alt="Cuenta regresiva para el gran día" class="text-image" loading="lazy">
+            <img src="./assets/15.png" alt="¡Te esperamos!" class="text-image" loading="lazy">
         </div>
 
         <div class="timer">
@@ -507,13 +461,13 @@
         galleryContainer.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].screenX;
             clearInterval(slideInterval);
-        }, {passive: true});
+        }, { passive: true });
 
         galleryContainer.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].screenX;
             handleSwipe();
             startSlideInterval();
-        }, {passive: true});
+        }, { passive: true });
 
         function handleSwipe() {
             const threshold = 50;
@@ -525,4 +479,5 @@
         }
     </script>
 </body>
+
 </html>
