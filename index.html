@@ -249,11 +249,62 @@
                 max-width: 90%;
             }
         }
+
+        /* Loading animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-spinner {
+            border: 5px solid var(--secondary-color);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 
 <body>
-    <div class="invitation">
+    <!-- Loading screen -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p>Cargando invitación...</p>
+        </div>
+    </div>
+    <div class="invitation fade-in" id="invitation" style="display: none;">
         <div class="baby-photo">
             <img src="./assets/1.png" alt="Ana Mia - Mi primera comunión" loading="lazy">
         </div>
@@ -375,6 +426,18 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show content after 1.5 seconds (simulate loading)
+            setTimeout(function() {
+                document.getElementById('loader').style.opacity = '0';
+                document.getElementById('invitation').style.display = 'block';
+                
+                // Remove loader from DOM after transition
+                setTimeout(function() {
+                    document.getElementById('loader').style.display = 'none';
+                }, 500);
+            }, 1500);
+            
         // Countdown Timer
         const eventDate = new Date("2025-06-21T10:00:00").getTime();
 
@@ -504,6 +567,7 @@
                 prevSlide();
             }
         }
+    });
     </script>
 </body>
 </html>
