@@ -21,7 +21,7 @@
                 background-position: 0% 50%;
             }
         }
-        
+
         body {
             margin: 0;
             padding: 0;
@@ -42,26 +42,47 @@
             justify-content: center;
             align-items: center;
             text-align: center;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <audio id="backgroundAudio" autoplay loop muted>
+    <audio id="backgroundAudio" loop muted>
         <source src="./assets/brassonero.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
+
+
     <script>
-        // Attempt to unmute audio after user interaction
+        const audio = document.getElementById('backgroundAudio');
+        let isInitialized = false;
+        let isPlaying = false;
+
         document.addEventListener('click', function() {
-            const audio = document.getElementById('backgroundAudio');
-            if (audio.muted) {
+            if (!isInitialized) {
+                // First click - initialize and start playing
                 audio.muted = false;
-                audio.play().catch(error => {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    isInitialized = true;
+                }).catch(error => {
                     console.log('Autoplay prevented:', error);
                 });
+            } else {
+                // Subsequent clicks - toggle play/pause
+                if (isPlaying) {
+                    audio.pause();
+                    isPlaying = false;
+                } else {
+                    audio.play().then(() => {
+                        isPlaying = true;
+                    }).catch(error => {
+                        console.log('Play failed:', error);
+                    });
+                }
             }
-        }, { once: true });
+        });
     </script>
 </body>
 </html>
