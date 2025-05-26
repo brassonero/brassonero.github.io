@@ -43,8 +43,25 @@
             align-items: center;
             text-align: center;
         }
-
-        
     </style>
 </head>
+<body>
+    <audio id="backgroundAudio" autoplay loop muted>
+        <source src="./assets/brassonero.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Attempt to unmute audio after user interaction
+        document.addEventListener('click', function() {
+            const audio = document.getElementById('backgroundAudio');
+            if (audio.muted) {
+                audio.muted = false;
+                audio.play().catch(error => {
+                    console.log('Autoplay prevented:', error);
+                });
+            }
+        }, { once: true });
+    </script>
+</body>
 </html>
