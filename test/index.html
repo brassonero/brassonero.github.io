@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Animated Gradient background">
+    <title>brassonero</title>
+    <!-- Favicon -->
+    <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon">
+    <style>
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 50% 100%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            75% {
+                background-position: 50% 0%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.01);
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(
+                -45deg, 
+                #FEA837, 
+                #DE741C, 
+                #B85B56, 
+                #84495F, 
+                #593E67
+            );
+            background-size: 300% 300%;
+            animation: 
+                gradientFlow 12s ease infinite,
+                pulse 15s ease infinite;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: rotate 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        body:active {
+            animation: 
+                gradientFlow 4s ease infinite,
+                pulse 2s ease infinite;
+        }
+    </style>
+</head>
+<body>
+    <audio id="backgroundAudio" loop muted>
+        <source src="./assets/brassonero.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const audio = document.getElementById('backgroundAudio');
+        let isInitialized = false;
+        let isPlaying = false;
+
+        document.addEventListener('click', function() {
+            if (!isInitialized) {
+                // First click - initialize and start playing
+                audio.muted = false;
+                audio.play().then(() => {
+                    isPlaying = true;
+                    isInitialized = true;
+                    document.body.style.animationDuration = '8s, 10s';
+                }).catch(error => {
+                    console.log('Autoplay prevented:', error);
+                });
+            } else {
+                // Subsequent clicks - toggle play/pause
+                if (isPlaying) {
+                    audio.pause();
+                    isPlaying = false;
+                    document.body.style.animationDuration = '15s, 20s';
+                } else {
+                    audio.play().then(() => {
+                        isPlaying = true;
+                        document.body.style.animationDuration = '8s, 10s';
+                    }).catch(error => {
+                        console.log('Play failed:', error);
+                    });
+                }
+            }
+        });
+
+        // Change animation speed based on mouse movement
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            document.body.style.animationDuration = `${8 + y * 10}s, ${10 + x * 15}s`;
+        });
+    </script>
+</body>
+</html>
