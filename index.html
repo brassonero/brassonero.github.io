@@ -313,7 +313,7 @@
         <div class="orb orb3"></div>
     </div>
 
-    <div class="hint">Haz lo que quieras</div>
+    <div class="hint">brassonero</div>
 
     <div class="cursor-glow"></div>
 
@@ -338,7 +338,7 @@
 
     <audio id="backgroundAudio" loop>
         <source src="./assets/brassonero.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
+        Tu navegador no admite el elemento de audio.
     </audio>
 
     <script>
@@ -351,13 +351,12 @@
         const cursorGlow = document.querySelector('.cursor-glow');
         let isPlaying = false;
 
-        // Audio control
         function toggleAudio() {
             if (!isPlaying) {
                 audio.play().then(() => {
                     isPlaying = true;
                     document.body.classList.add('playing');
-                    audioText.textContent = 'brassonero';
+                    audioText.textContent = 'ℏ';
                     playIcon.style.display = 'none';
                     pauseIcon.style.display = 'block';
                     visualizer.style.display = 'flex';
@@ -380,26 +379,22 @@
             toggleAudio();
         });
 
-        // Click anywhere to play
         document.body.addEventListener('click', (e) => {
             if (!isPlaying && e.target === document.body) {
                 toggleAudio();
             }
         });
 
-        // Cursor glow effect
         document.addEventListener('mousemove', (e) => {
             cursorGlow.style.left = e.clientX + 'px';
             cursorGlow.style.top = e.clientY + 'px';
             
-            // Subtle animation speed change based on cursor position
             const x = e.clientX / window.innerWidth;
             const y = e.clientY / window.innerHeight;
             const duration = isPlaying ? `${10 + y * 5}s, ${5 + x * 3}s` : `${15 + y * 10}s, ${8 + x * 6}s`;
             document.body.style.animationDuration = duration;
         });
 
-        // Hide cursor glow when mouse leaves
         document.addEventListener('mouseenter', () => {
             cursorGlow.style.opacity = '1';
         });
@@ -408,7 +403,6 @@
             cursorGlow.style.opacity = '0';
         });
 
-        // Keyboard support
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 e.preventDefault();
