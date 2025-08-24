@@ -300,20 +300,6 @@
             50% { opacity: 0.6; }
         }
 
-        .tap-hint {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: clamp(14px, 3.5vw, 16px);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0;
-            pointer-events: none;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-            display: none;
-        }
-
         @media (max-width: 1024px) {
             body {
                 background-size: 600% 600%;
@@ -350,11 +336,6 @@
 
             .cursor-glow {
                 display: none;
-            }
-
-            .tap-hint {
-                display: block;
-                animation: fadeInOut 4s ease-in-out 1s;
             }
 
             .hint {
@@ -435,7 +416,6 @@
     </div>
 
     <div class="hint">brassonero</div>
-    <div class="tap-hint">brassonero</div>
 
     <div class="cursor-glow"></div>
 
