@@ -4,138 +4,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Animated Gradient background">
+    <meta name="description" content="Immersive Animated Gradient Experience">
     <title>brassonero</title>
     <!-- Favicon -->
     <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         @keyframes gradientFlow {
             0% {
-                background-position: 0% 50%;
+                background-position: 0% 0%;
             }
             25% {
-                background-position: 50% 100%;
-            }
-            50% {
                 background-position: 100% 50%;
             }
+            50% {
+                background-position: 100% 100%;
+            }
             75% {
-                background-position: 50% 0%;
+                background-position: 0% 50%;
             }
             100% {
-                background-position: 0% 50%;
+                background-position: 0% 0%;
             }
         }
 
-        @keyframes pulse {
+        @keyframes breathe {
             0%, 100% {
-                transform: scale(1);
+                transform: scale(1) translateZ(0);
+                filter: brightness(1) saturate(1);
             }
             50% {
-                transform: scale(1.01);
+                transform: scale(1.02) translateZ(0);
+                filter: brightness(1.1) saturate(1.2);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-20px) translateX(10px) rotate(120deg);
+            }
+            66% {
+                transform: translateY(10px) translateX(-10px) rotate(240deg);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                opacity: 0;
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100%) translateY(100%) rotate(45deg);
             }
         }
 
         body {
-            margin: 0;
-            padding: 0;
             min-height: 100vh;
-            background: linear-gradient(
-                -45deg, 
-                #FEA837, 
-                #DE741C, 
-                #B85B56, 
-                #84495F, 
-                #593E67
-            );
-            background-size: 300% 300%;
+            background: 
+                radial-gradient(ellipse at top left, rgba(254, 168, 55, 0.4), transparent 40%),
+                radial-gradient(ellipse at bottom right, rgba(89, 62, 103, 0.4), transparent 40%),
+                radial-gradient(ellipse at center, rgba(184, 91, 86, 0.3), transparent 60%),
+                linear-gradient(
+                    135deg, 
+                    #FEA837,
+                    #DE741C,
+                    #B85B56,
+                    #84495F,
+                    #593E67,
+                    #84495F,
+                    #B85B56,
+                    #DE741C,
+                    #FEA837
+                );
+            background-size: 400% 400%;
             animation: 
-                gradientFlow 12s ease infinite,
-                pulse 15s ease infinite;
+                gradientFlow 20s cubic-bezier(0.4, 0, 0.6, 1) infinite,
+                breathe 8s ease-in-out infinite;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.5s ease;
+            cursor: crosshair;
             overflow: hidden;
+            position: relative;
         }
 
         body::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            right: -50%;
-            bottom: -50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            animation: rotate 20s linear infinite;
+            inset: -50%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+            animation: float 30s ease-in-out infinite;
             pointer-events: none;
         }
 
-        @keyframes rotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+        body::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 8s ease-in-out infinite;
+            pointer-events: none;
+            mix-blend-mode: overlay;
         }
 
-        body:active {
-            animation: 
-                gradientFlow 4s ease infinite,
-                pulse 2s ease infinite;
+        .orbs-container {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            filter: blur(40px);
+            opacity: 0.4;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            mix-blend-mode: screen;
+        }
+
+        .orb1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(254, 168, 55, 0.8), transparent);
+            top: -200px;
+            left: -200px;
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(89, 62, 103, 0.8), transparent);
+            bottom: -150px;
+            right: -150px;
+            animation: float 30s ease-in-out infinite reverse;
+        }
+
+        .orb3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(184, 91, 86, 0.6), transparent);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 20s ease-in-out infinite 5s;
+        }
+
+        .audio-control {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .audio-control:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 
+                0 12px 48px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .audio-icon {
+            width: 24px;
+            height: 24px;
+            position: relative;
+            opacity: 0.9;
+        }
+
+        .audio-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+        }
+
+        .audio-text {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            user-select: none;
+        }
+
+        .visualizer {
+            display: flex;
+            gap: 3px;
+            height: 20px;
+            align-items: center;
+        }
+
+        .bar {
+            width: 3px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.9));
+            border-radius: 2px;
+            transition: height 0.2s ease;
+        }
+
+        .bar1 { height: 8px; }
+        .bar2 { height: 12px; }
+        .bar3 { height: 6px; }
+        .bar4 { height: 14px; }
+        .bar5 { height: 10px; }
+
+        body.playing .bar {
+            animation: dance 0.8s ease-in-out infinite;
+        }
+
+        body.playing .bar1 { animation-delay: 0s; }
+        body.playing .bar2 { animation-delay: 0.1s; }
+        body.playing .bar3 { animation-delay: 0.2s; }
+        body.playing .bar4 { animation-delay: 0.3s; }
+        body.playing .bar5 { animation-delay: 0.4s; }
+
+        @keyframes dance {
+            0%, 100% { height: 8px; }
+            50% { height: 20px; }
+        }
+
+        body.playing {
+            animation-duration: 12s, 6s;
+        }
+
+        .cursor-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05), transparent 40%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+            z-index: 5;
+            mix-blend-mode: overlay;
+        }
+
+        .hint {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: fadeInOut 6s ease-in-out 2s;
+            pointer-events: none;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.6; }
+        }
+
+        @media (max-width: 768px) {
+            .audio-control {
+                bottom: 20px;
+                padding: 12px 20px;
+            }
+            
+            .audio-text {
+                font-size: 12px;
+            }
+            
+            .cursor-glow {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <audio id="backgroundAudio" loop muted>
+    <div class="orbs-container">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+
+    <div class="hint">Haz lo que quieras</div>
+
+    <div class="cursor-glow"></div>
+
+    <div class="audio-control">
+        <div class="audio-icon">
+            <svg viewBox="0 0 24 24" class="play-icon">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg viewBox="0 0 24 24" class="pause-icon" style="display: none;">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+        </div>
+        <span class="audio-text">ℏ</span>
+        <div class="visualizer" style="display: none;">
+            <div class="bar bar1"></div>
+            <div class="bar bar2"></div>
+            <div class="bar bar3"></div>
+            <div class="bar bar4"></div>
+            <div class="bar bar5"></div>
+        </div>
+    </div>
+
+    <audio id="backgroundAudio" loop>
         <source src="./assets/brassonero.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
 
     <script>
         const audio = document.getElementById('backgroundAudio');
-        let isInitialized = false;
+        const audioControl = document.querySelector('.audio-control');
+        const audioText = document.querySelector('.audio-text');
+        const playIcon = document.querySelector('.play-icon');
+        const pauseIcon = document.querySelector('.pause-icon');
+        const visualizer = document.querySelector('.visualizer');
+        const cursorGlow = document.querySelector('.cursor-glow');
         let isPlaying = false;
 
-        document.addEventListener('click', function() {
-            if (!isInitialized) {
-                // First click - initialize and start playing
-                audio.muted = false;
+        // Audio control
+        function toggleAudio() {
+            if (!isPlaying) {
                 audio.play().then(() => {
                     isPlaying = true;
-                    isInitialized = true;
-                    document.body.style.animationDuration = '8s, 10s';
+                    document.body.classList.add('playing');
+                    audioText.textContent = 'brassonero';
+                    playIcon.style.display = 'none';
+                    pauseIcon.style.display = 'block';
+                    visualizer.style.display = 'flex';
                 }).catch(error => {
-                    console.log('Autoplay prevented:', error);
+                    console.log('Play failed:', error);
                 });
             } else {
-                // Subsequent clicks - toggle play/pause
-                if (isPlaying) {
-                    audio.pause();
-                    isPlaying = false;
-                    document.body.style.animationDuration = '15s, 20s';
-                } else {
-                    audio.play().then(() => {
-                        isPlaying = true;
-                        document.body.style.animationDuration = '8s, 10s';
-                    }).catch(error => {
-                        console.log('Play failed:', error);
-                    });
-                }
+                audio.pause();
+                isPlaying = false;
+                document.body.classList.remove('playing');
+                audioText.textContent = 'ℏ';
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                visualizer.style.display = 'none';
+            }
+        }
+
+        audioControl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleAudio();
+        });
+
+        // Click anywhere to play
+        document.body.addEventListener('click', (e) => {
+            if (!isPlaying && e.target === document.body) {
+                toggleAudio();
             }
         });
 
-        // Change animation speed based on mouse movement
+        // Cursor glow effect
         document.addEventListener('mousemove', (e) => {
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+            
+            // Subtle animation speed change based on cursor position
             const x = e.clientX / window.innerWidth;
             const y = e.clientY / window.innerHeight;
-            document.body.style.animationDuration = `${8 + y * 10}s, ${10 + x * 15}s`;
+            const duration = isPlaying ? `${10 + y * 5}s, ${5 + x * 3}s` : `${15 + y * 10}s, ${8 + x * 6}s`;
+            document.body.style.animationDuration = duration;
+        });
+
+        // Hide cursor glow when mouse leaves
+        document.addEventListener('mouseenter', () => {
+            cursorGlow.style.opacity = '1';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cursorGlow.style.opacity = '0';
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                toggleAudio();
+            }
         });
     </script>
 </body>
