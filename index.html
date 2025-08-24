@@ -367,7 +367,7 @@
         @media (max-width: 480px) {
             .audio-control {
                 width: calc(100% - 40px);
-                max-width: 5rem;
+                max-width: 7.5rem;
                 justify-content: center;
             }
 
@@ -438,7 +438,7 @@
         </div>
     </div>
 
-    <audio id="backgroundAudio" loop>
+    <audio id="backgroundAudio">
         <source src="./assets/brassonero.mp3" type="audio/mpeg">
         Tu navegador no admite el elemento de audio.
     </audio>
@@ -452,6 +452,7 @@
         const visualizer = document.querySelector('.visualizer');
         const cursorGlow = document.querySelector('.cursor-glow');
         let isPlaying = false;
+        let hasPlayed = false;
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                         window.matchMedia("(max-width: 768px)").matches;
@@ -462,8 +463,14 @@
 
         function toggleAudio() {
             if (!isPlaying) {
+                if (hasPlayed && audio.ended) {
+                    audio.currentTime = 0;
+                    hasPlayed = false;
+                }
+                
                 audio.play().then(() => {
                     isPlaying = true;
+                    hasPlayed = true;
                     document.body.classList.add('playing');
                     audioText.textContent = 'ℏ';
                     playIcon.style.display = 'none';
@@ -482,6 +489,15 @@
                 visualizer.style.display = 'none';
             }
         }
+
+        audio.addEventListener('ended', () => {
+            isPlaying = false;
+            document.body.classList.remove('playing');
+            audioText.textContent = 'ℏ';
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            visualizer.style.display = 'none';
+        });
 
         audioControl.addEventListener('click', (e) => {
             e.stopPropagation();
