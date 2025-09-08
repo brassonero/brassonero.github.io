@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GLTF/GLB Model Viewer - Responsive</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            overflow: hidden;
+            color: white;
+            touch-action: none;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        #renderCanvas {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            touch-action: none;
+        }
+        
+        /* Hamburger Menu Button */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(20, 20, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-toggle:hover {
+            background: rgba(30, 30, 40, 0.95);
+            border-color: #4a9eff;
+        }
+        
+        .menu-toggle span {
+            width: 22px;
+            height: 2px;
+            background: white;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+        
+        /* Control Panel */
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            width: 300px;
+            max-width: calc(100vw - 40px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        #controls.hidden {
+            transform: translateX(-120%);
+            opacity: 0;
+        }
+        
+        /* Info Panel */
+        #info {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(20, 20, 30, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            max-width: 250px;
+        }
+        
+        .info-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(20, 20, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 999;
+            font-size: 18px;
+        }
+        
+        h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a9eff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        select, button {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+        
+        select:hover, button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: #4a9eff;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4a9eff 0%, #2a5298 100%);
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-height: 44px;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        /* Loading Status */
+        .status {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: none;
+            z-index: 2000;
+        }
+        
+        .status.loading {
+            display: block;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #4a9eff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Overlay for mobile menu */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(20, 20, 30, 0.95);
+            padding: 12px 20px;
+            border-radius: 25px;
+            color: white;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 2001;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+            
+            #controls {
+                top: 80px;
+                width: calc(100vw - 40px);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            
+            #controls.hidden {
+                pointer-events: none;
+            }
+            
+            #controls:not(.hidden) {
+                pointer-events: all;
+            }
+            
+            #info {
+                bottom: -100%;
+                left: 20px;
+                right: 20px;
+                max-width: none;
+                width: calc(100% - 40px);
+                transition: bottom 0.3s ease;
+            }
+            
+            #info.show {
+                bottom: 20px;
+            }
+            
+            .info-toggle {
+                display: flex;
+            }
+            
+            h3 {
+                font-size: 14px;
+            }
+            
+            button, select {
+                min-height: 48px;
+                font-size: 16px;
+            }
+        }
+        
+        /* Tablet Styles */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #controls {
+                width: 280px;
+            }
+        }
+        
+        /* Small Mobile Optimization */
+        @media (max-width: 380px) {
+            #controls {
+                padding: 15px;
+            }
+            
+            .control-group {
+                margin-bottom: 12px;
+            }
+            
+            h3 {
+                font-size: 13px;
+                margin-bottom: 12px;
+            }
+        }
+        
+        /* Landscape Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #controls {
+                top: 60px;
+                max-height: calc(100vh - 80px);
+                padding: 15px;
+            }
+            
+            .menu-toggle {
+                top: 10px;
+                left: 10px;
+            }
+            
+            .control-group {
+                margin-bottom: 10px;
+            }
+            
+            button, select {
+                min-height: 40px;
+                padding: 8px 10px;
+            }
+        }
+        
+        /* Smooth scrolling for iOS */
+        #controls {
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Prevent text selection on UI elements */
+        .menu-toggle, button, label, h3 {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    
+    <!-- Mobile Menu Toggle -->
+    <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Control Panel -->
+    <div id="controls" class="hidden">
+        <h3>🎮 Model Controls</h3>
+        
+        <div class="control-group">
+            <label>Select Model File:</label>
+            <select id="modelSelect">
+                <option value="cube.gltf">cube.gltf</option>
+                <option value="cube.glb">cube.glb</option>
+                <option value="multiple_cubes.gltf">multiple_cubes.gltf</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <button id="loadBtn">Load Model</button>
+        </div>
+        
+        <div class="control-group">
+            <button id="resetBtn">Reset View</button>
+        </div>
+        
+        <div class="control-group">
+            <label>Animation:</label>
+            <select id="animateSelect">
+                <option value="rotate">Auto Rotate</option>
+                <option value="none">Static</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label>Display Mode:</label>
+            <select id="displayMode">
+                <option value="solid">Solid</option>
+                <option value="wireframe">Wireframe</option>
+                <option value="both">Solid + Wireframe</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Info Panel -->
+    <div id="info">
+        <h3>Controls</h3>
+        <div class="desktop-controls">
+            <div>🖱️ Left Drag: Rotate</div>
+            <div>🖱️ Right Drag: Pan</div>
+            <div>🖱️ Scroll: Zoom</div>
+        </div>
+        <div class="mobile-controls" style="display: none;">
+            <div>👆 One Finger: Rotate</div>
+            <div>👆👆 Two Fingers: Zoom</div>
+            <div>👆👆 Two Fingers: Pan</div>
+        </div>
+    </div>
+    
+    <!-- Info Toggle for Mobile -->
+    <div class="info-toggle" id="infoToggle">ℹ️</div>
+    
+    <!-- Loading Status -->
+    <div class="status" id="loadingStatus">
+        <div class="spinner"></div>
+        <div>Loading Model...</div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Import Three.js and GLTFLoader -->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.150.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.150.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        
+        // Global variables
+        let scene, camera, renderer, controls;
+        let currentModel = null;
+        let mixer = null;
+        let clock = new THREE.Clock();
+        let animationMode = 'rotate';
+        let displayMode = 'solid';
+        let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Initialize the scene
+        function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1e);
+            scene.fog = new THREE.Fog(0x0a0a1e, 10, 100);
+            
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(
+                45,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(8, 6, 8);
+            
+            // Renderer setup
+            const canvas = document.getElementById('renderCanvas');
+            renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true,
+                powerPreference: "high-performance"
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1;
+            
+            // Controls with touch support
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = true;
+            controls.minDistance = 3;
+            controls.maxDistance = 50;
+            controls.maxPolarAngle = Math.PI / 2;
+            controls.target.set(0, 0, 0);
+            controls.touches = {
+                ONE: THREE.TOUCH.ROTATE,
+                TWO: THREE.TOUCH.DOLLY_PAN
+            };
+            
+            // Lighting
+            setupLighting();
+            
+            // Helpers
+            addHelpers();
+            
+            // Event listeners
+            setupEventListeners();
+            
+            // Update UI based on device
+            updateUIForDevice();
+        }
+        
+        function setupLighting() {
+            // Ambient light
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+            
+            // Main directional light
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+            dirLight.position.set(5, 10, 5);
+            dirLight.castShadow = true;
+            dirLight.shadow.camera.near = 0.1;
+            dirLight.shadow.camera.far = 50;
+            dirLight.shadow.camera.left = -10;
+            dirLight.shadow.camera.right = 10;
+            dirLight.shadow.camera.top = 10;
+            dirLight.shadow.camera.bottom = -10;
+            dirLight.shadow.mapSize.width = isMobile ? 1024 : 2048;
+            dirLight.shadow.mapSize.height = isMobile ? 1024 : 2048;
+            dirLight.shadow.bias = -0.0005;
+            scene.add(dirLight);
+            
+            // Fill light
+            const fillLight = new THREE.DirectionalLight(0x4a9eff, 0.3);
+            fillLight.position.set(-5, 5, -5);
+            scene.add(fillLight);
+            
+            // Point lights for color accent (reduce on mobile)
+            if (!isMobile) {
+                const pointLight1 = new THREE.PointLight(0x4a9eff, 0.5, 20);
+                pointLight1.position.set(-5, 2, 5);
+                scene.add(pointLight1);
+                
+                const pointLight2 = new THREE.PointLight(0xff4a9e, 0.3, 20);
+                pointLight2.position.set(5, 2, -5);
+                scene.add(pointLight2);
+            }
+        }
+        
+        function addHelpers() {
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x2a2a3e, 0x1a1a2e);
+            scene.add(gridHelper);
+            
+            // Axes
+            const axesHelper = new THREE.AxesHelper(3);
+            scene.add(axesHelper);
+            
+            // Ground plane for shadows
+            const planeGeometry = new THREE.PlaneGeometry(50, 50);
+            const planeMaterial = new THREE.ShadowMaterial({ opacity: 0.2 });
+            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.rotation.x = -Math.PI / 2;
+            plane.position.y = -0.01;
+            plane.receiveShadow = true;
+            scene.add(plane);
+        }
+        
+        function updateUIForDevice() {
+            const desktopControls = document.querySelector('.desktop-controls');
+            const mobileControls = document.querySelector('.mobile-controls');
+            
+            if (isMobile) {
+                if (desktopControls) desktopControls.style.display = 'none';
+                if (mobileControls) mobileControls.style.display = 'block';
+            } else {
+                if (desktopControls) desktopControls.style.display = 'block';
+                if (mobileControls) mobileControls.style.display = 'none';
+            }
+        }
+        
+        function setupEventListeners() {
+            // Window resize
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('orientationchange', onWindowResize);
+            
+            // Mobile menu toggle
+            const menuToggle = document.getElementById('menuToggle');
+            const controlsPanel = document.getElementById('controls');
+            const overlay = document.getElementById('overlay');
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => {
+                    const isHidden = controlsPanel.classList.contains('hidden');
+                    
+                    if (isHidden) {
+                        controlsPanel.classList.remove('hidden');
+                        menuToggle.classList.add('active');
+                        overlay.classList.add('active');
+                    } else {
+                        controlsPanel.classList.add('hidden');
+                        menuToggle.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Close menu when clicking overlay
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    controlsPanel.classList.add('hidden');
+                    menuToggle.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+            
+            // Info panel toggle for mobile
+            const infoToggle = document.getElementById('infoToggle');
+            const infoPanel = document.getElementById('info');
+            
+            if (infoToggle) {
+                infoToggle.addEventListener('click', () => {
+                    const isShowing = infoPanel.classList.contains('show');
+                    
+                    if (isShowing) {
+                        infoPanel.classList.remove('show');
+                    } else {
+                        infoPanel.classList.add('show');
+                        setTimeout(() => {
+                            infoPanel.classList.remove('show');
+                        }, 3000);
+                    }
+                });
+            }
+            
+            // Load button
+            document.getElementById('loadBtn').addEventListener('click', () => {
+                const filename = document.getElementById('modelSelect').value;
+                loadModel(filename);
+                
+                // Close mobile menu after action
+                if (isMobile) {
+                    document.getElementById('controls').classList.add('hidden');
+                    document.getElementById('menuToggle').classList.remove('active');
+                    document.getElementById('overlay').classList.remove('active');
+                }
+            });
+            
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                resetCamera();
+                showToast('Camera reset');
+            });
+            
+            // Animation mode
+            document.getElementById('animateSelect').addEventListener('change', (e) => {
+                animationMode = e.target.value;
+                showToast(animationMode === 'rotate' ? 'Auto-rotation enabled' : 'Auto-rotation disabled');
+            });
+            
+            // Display mode
+            document.getElementById('displayMode').addEventListener('change', (e) => {
+                displayMode = e.target.value;
+                updateDisplayMode();
+                showToast(`Display mode: ${displayMode}`);
+            });
+            
+            // Prevent touch scrolling on canvas
+            renderer.domElement.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+            
+            renderer.domElement.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // Update UI for device changes
+            isMobile = window.innerWidth <= 768;
+            updateUIForDevice();
+        }
+        
+        function resetCamera() {
+            camera.position.set(8, 6, 8);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        }
+        
+        function showLoading(show) {
+            const status = document.getElementById('loadingStatus');
+            status.classList.toggle('loading', show);
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        
+        async function loadModel(filename) {
+            showLoading(true);
+            
+            // Remove existing model
+            if (currentModel) {
+                scene.remove(currentModel);
+                currentModel = null;
+                mixer = null;
+            }
+            
+            try {
+                let modelData;
+                
+                // Try to read file using window.fs if available
+                if (window.fs && window.fs.readFile) {
+                    try {
+                        const fileData = await window.fs.readFile(filename);
+                        modelData = URL.createObjectURL(new Blob([fileData]));
+                    } catch (e) {
+                        console.log('File not found, creating demo model');
+                        createDemoModel(filename);
+                        showLoading(false);
+                        showToast(`Demo model created for ${filename}`);
+                        return;
+                    }
+                } else {
+                    // Create demo model if file system not available
+                    createDemoModel(filename);
+                    showLoading(false);
+                    showToast(`Demo model created for ${filename}`);
+                    return;
+                }
+                
+                // Load with GLTFLoader
+                const loader = new GLTFLoader();
+                loader.load(
+                    modelData,
+                    (gltf) => {
+                        currentModel = gltf.scene;
+                        
+                        // Setup materials and shadows
+                        currentModel.traverse((child) => {
+                            if (child.isMesh) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                                
+                                // Enhance material if it's basic
+                                if (child.material) {
+                                    child.material.side = THREE.DoubleSide;
+                                    if (child.material.isMeshBasicMaterial) {
+                                        const color = child.material.color;
+                                        child.material = new THREE.MeshPhongMaterial({
+                                            color: color,
+                                            side: THREE.DoubleSide
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // Center and scale model
+                        const box = new THREE.Box3().setFromObject(currentModel);
+                        const center = box.getCenter(new THREE.Vector3());
+                        const size = box.getSize(new THREE.Vector3());
+                        
+                        const maxDim = Math.max(size.x, size.y, size.z);
+                        const scale = 5 / maxDim;
+                        currentModel.scale.multiplyScalar(scale);
+                        
+                        currentModel.position.x = -center.x * scale;
+                        currentModel.position.y = -center.y * scale;
+                        currentModel.position.z = -center.z * scale;
+                        
+                        // Setup animations if present
+                        if (gltf.animations && gltf.animations.length) {
+                            mixer = new THREE.AnimationMixer(currentModel);
+                            gltf.animations.forEach((clip) => {
+                                mixer.clipAction(clip).play();
+                            });
+                        }
+                        
+                        scene.add(currentModel);
+                        updateDisplayMode();
+                        showLoading(false);
+                        showToast(`Loaded: ${filename}`);
+                        
+                        // Clean up blob URL
+                        URL.revokeObjectURL(modelData);
+                    },
+                    (progress) => {
+                        const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                        console.log(`Loading: ${percent}%`);
+                    },
+                    (error) => {
+                        console.error('Error loading GLTF:', error);
+                        createDemoModel(filename);
+                        showLoading(false);
+                        showToast(`Using demo model for ${filename}`);
+                        URL.revokeObjectURL(modelData);
+                    }
+                );
+            } catch (error) {
+                console.error('Error:', error);
+                createDemoModel(filename);
+                showLoading(false);
+                showToast(`Error loading ${filename}`);
+            }
+        }
+        
+        function createDemoModel(filename) {
+            // Remove existing model
+            if (currentModel) {
+                scene.remove(currentModel);
+                currentModel = null;
+            }
+            
+            if (filename.includes('multiple')) {
+                // Multiple cubes like in your Python script
+                currentModel = new THREE.Group();
+                
+                const positions = [-3, 0, 3];
+                const colors = [0xff8080, 0x80ff80, 0x8080ff];
+                
+                positions.forEach((x, i) => {
+                    const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+                    const material = new THREE.MeshPhongMaterial({
+                        color: colors[i],
+                        emissive: colors[i],
+                        emissiveIntensity: 0.1
+                    });
+                    
+                    const cube = new THREE.Mesh(geometry, material);
+                    cube.position.x = x;
+                    cube.castShadow = true;
+                    cube.receiveShadow = true;
+                    
+                    currentModel.add(cube);
+                });
+            } else {
+                // Single cube with color from your Python script
+                const geometry = new THREE.BoxGeometry(2, 2, 2);
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0x7fb3ff,  // Light blue from your script
+                    emissive: 0x7fb3ff,
+                    emissiveIntensity: 0.1
+                });
+                
+                currentModel = new THREE.Mesh(geometry, material);
+                currentModel.castShadow = true;
+                currentModel.receiveShadow = true;
+            }
+            
+            scene.add(currentModel);
+            updateDisplayMode();
+        }
+        
+        function updateDisplayMode() {
+            if (!currentModel) return;
+            
+            currentModel.traverse((child) => {
+                if (child.isMesh) {
+                    // Remove old wireframe overlay if exists
+                    if (child.wireframeOverlay) {
+                        child.remove(child.wireframeOverlay);
+                        child.wireframeOverlay = null;
+                    }
+                    
+                    if (displayMode === 'wireframe') {
+                        child.material.wireframe = true;
+                    } else if (displayMode === 'solid') {
+                        child.material.wireframe = false;
+                    } else if (displayMode === 'both') {
+                        // Create wireframe overlay
+                        const wireframeMaterial = new THREE.MeshBasicMaterial({
+                            color: 0x4a9eff,
+                            wireframe: true,
+                            transparent: true,
+                            opacity: 0.3
+                        });
+                        const wireframeMesh = new THREE.Mesh(child.geometry, wireframeMaterial);
+                        wireframeMesh.scale.multiplyScalar(1.001);
+                        child.add(wireframeMesh);
+                        child.wireframeOverlay = wireframeMesh;
+                        child.material.wireframe = false;
+                    }
+                }
+            });
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            
+            // Update animations
+            if (mixer) {
+                mixer.update(delta);
+            }
+            
+            // Auto rotate
+            if (currentModel && animationMode === 'rotate') {
+                currentModel.rotation.y += 0.005;
+            }
+            
+            // Update controls
+            controls.update();
+            
+            // Render
+            renderer.render(scene, camera);
+        }
+        
+        // Initialize and start
+        init();
+        animate();
+        
+        // Load initial model after a short delay
+        setTimeout(() => {
+            loadModel('cube.gltf');
+            
+            // Show initial toast on mobile
+            if (isMobile) {
+                setTimeout(() => {
+                    showToast('Tap ☰ for controls');
+                }, 1000);
+            }
+        }, 500);
+        
+        // Desktop: show controls by default
+        if (!isMobile && window.innerWidth > 768) {
+            document.getElementById('controls').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
