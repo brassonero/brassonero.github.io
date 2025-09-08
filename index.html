@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="ℏ">
+    <meta name="description" content="ℏ - An immersive audio-visual experience">
     <title>brassonero</title>
     <!-- Favicon -->
     <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
@@ -16,44 +16,47 @@
             box-sizing: border-box;
         }
 
-        @keyframes gradientFlow {
+        @keyframes psychedelicFlow {
             0% {
                 background-position: 0% 0%;
+                filter: hue-rotate(0deg) brightness(1) saturate(1.2);
             }
             25% {
                 background-position: 100% 50%;
+                filter: hue-rotate(45deg) brightness(1.1) saturate(1.5);
             }
             50% {
                 background-position: 100% 100%;
+                filter: hue-rotate(90deg) brightness(1.05) saturate(1.3);
             }
             75% {
                 background-position: 0% 50%;
+                filter: hue-rotate(45deg) brightness(1.1) saturate(1.4);
             }
             100% {
                 background-position: 0% 0%;
+                filter: hue-rotate(0deg) brightness(1) saturate(1.2);
             }
         }
 
         @keyframes breathe {
             0%, 100% {
                 transform: scale(1) translateZ(0);
-                filter: brightness(1) saturate(1);
             }
             50% {
-                transform: scale(1.02) translateZ(0);
-                filter: brightness(1.1) saturate(1.2);
+                transform: scale(1.03) translateZ(0);
             }
         }
 
         @keyframes float {
             0%, 100% {
-                transform: translateY(0) translateX(0) rotate(0deg);
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1);
             }
             33% {
-                transform: translateY(-20px) translateX(10px) rotate(120deg);
+                transform: translateY(-30px) translateX(20px) rotate(120deg) scale(1.1);
             }
             66% {
-                transform: translateY(10px) translateX(-10px) rotate(240deg);
+                transform: translateY(20px) translateX(-20px) rotate(240deg) scale(0.95);
             }
         }
 
@@ -63,11 +66,31 @@
                 transform: translateX(-100%) translateY(-100%) rotate(45deg);
             }
             50% {
-                opacity: 0.5;
+                opacity: 0.7;
             }
             100% {
                 opacity: 0;
                 transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        @keyframes morphOrb {
+            0%, 100% {
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            }
+            50% {
+                border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+            }
+        }
+
+        @keyframes geometricPulse {
+            0%, 100% {
+                transform: rotate(0deg) scale(1);
+                opacity: 0.03;
+            }
+            50% {
+                transform: rotate(180deg) scale(1.2);
+                opacity: 0.08;
             }
         }
 
@@ -76,25 +99,27 @@
             min-height: -webkit-fill-available;
             min-height: 100dvh;
             background: 
-                radial-gradient(ellipse at top left, rgba(254, 168, 55, 0.4), transparent 40%),
-                radial-gradient(ellipse at bottom right, rgba(89, 62, 103, 0.4), transparent 40%),
-                radial-gradient(ellipse at center, rgba(184, 91, 86, 0.3), transparent 60%),
+                radial-gradient(ellipse at 20% 30%, rgba(255, 20, 147, 0.4), transparent 40%),
+                radial-gradient(ellipse at 80% 70%, rgba(0, 255, 255, 0.3), transparent 40%),
+                radial-gradient(ellipse at 50% 50%, rgba(138, 43, 226, 0.3), transparent 50%),
+                radial-gradient(ellipse at top left, rgba(254, 168, 55, 0.5), transparent 40%),
+                radial-gradient(ellipse at bottom right, rgba(89, 62, 103, 0.5), transparent 40%),
                 linear-gradient(
                     135deg, 
+                    #FF1493,
+                    #FF6B35,
                     #FEA837,
-                    #DE741C,
-                    #B85B56,
-                    #84495F,
-                    #593E67,
-                    #84495F,
-                    #B85B56,
-                    #DE741C,
-                    #FEA837
+                    #00CED1,
+                    #8A2BE2,
+                    #FF1493,
+                    #00FA9A,
+                    #FFD700,
+                    #FF1493
                 );
             background-size: 400% 400%;
             animation: 
-                gradientFlow 20s cubic-bezier(0.4, 0, 0.6, 1) infinite,
-                breathe 8s ease-in-out infinite;
+                psychedelicFlow 30s cubic-bezier(0.4, 0, 0.6, 1) infinite,
+                breathe 6s ease-in-out infinite;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             color: white;
             display: flex;
@@ -104,6 +129,23 @@
             overflow: hidden;
             position: relative;
             -webkit-tap-highlight-color: transparent;
+            transition: filter 2s ease;
+        }
+
+        body.playing {
+            animation-duration: 15s, 4s;
+        }
+
+        .geometric-overlay {
+            position: absolute;
+            inset: -20%;
+            pointer-events: none;
+            opacity: 0.05;
+            mix-blend-mode: overlay;
+            animation: geometricPulse 10s ease-in-out infinite;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.03) 10px, rgba(255, 255, 255, 0.03) 20px),
+                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.03) 10px, rgba(255, 255, 255, 0.03) 20px);
         }
 
         body::before {
@@ -111,10 +153,10 @@
             position: absolute;
             inset: -50%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
-            animation: float 30s ease-in-out infinite;
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 20, 147, 0.03) 0%, transparent 50%);
+            animation: float 25s ease-in-out infinite;
             pointer-events: none;
         }
 
@@ -122,8 +164,8 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: shimmer 8s ease-in-out infinite;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            animation: shimmer 6s ease-in-out infinite;
             pointer-events: none;
             mix-blend-mode: overlay;
         }
@@ -133,41 +175,81 @@
             inset: 0;
             pointer-events: none;
             filter: blur(40px);
-            opacity: 0.4;
+            opacity: 0.5;
+        }
+
+        body.playing .orbs-container {
+            filter: blur(30px);
+            opacity: 0.6;
         }
 
         .orb {
             position: absolute;
-            border-radius: 50%;
             mix-blend-mode: screen;
+            animation: morphOrb 8s ease-in-out infinite;
         }
 
         .orb1 {
             width: min(600px, 80vw);
             height: min(600px, 80vw);
-            background: radial-gradient(circle, rgba(254, 168, 55, 0.8), transparent);
+            background: radial-gradient(circle, rgba(255, 20, 147, 0.8), rgba(254, 168, 55, 0.4), transparent);
             top: -20%;
             left: -20%;
-            animation: float 25s ease-in-out infinite;
+            animation: float 20s ease-in-out infinite, morphOrb 8s ease-in-out infinite;
         }
 
         .orb2 {
             width: min(400px, 60vw);
             height: min(400px, 60vw);
-            background: radial-gradient(circle, rgba(89, 62, 103, 0.8), transparent);
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.8), rgba(138, 43, 226, 0.4), transparent);
             bottom: -15%;
             right: -15%;
-            animation: float 30s ease-in-out infinite reverse;
+            animation: float 25s ease-in-out infinite reverse, morphOrb 10s ease-in-out infinite reverse;
         }
 
         .orb3 {
             width: min(350px, 50vw);
             height: min(350px, 50vw);
-            background: radial-gradient(circle, rgba(184, 91, 86, 0.6), transparent);
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.6), rgba(0, 255, 127, 0.3), transparent);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            animation: float 20s ease-in-out infinite 5s;
+            animation: float 18s ease-in-out infinite 3s, morphOrb 7s ease-in-out infinite;
+        }
+
+        .particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 15s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+                transform: translateY(80vh) translateX(20px) scale(1);
+            }
+            90% {
+                opacity: 0.8;
+                transform: translateY(20vh) translateX(-20px) scale(1);
+            }
+            100% {
+                transform: translateY(0) translateX(0) scale(0);
+                opacity: 0;
+            }
         }
 
         .audio-control {
@@ -175,10 +257,10 @@
             bottom: max(env(safe-area-inset-bottom), 20px);
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 50px;
             padding: clamp(12px, 3vw, 15px) clamp(20px, 5vw, 30px);
             display: flex;
@@ -188,17 +270,19 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                0 8px 32px rgba(138, 43, 226, 0.2),
+                0 0 80px rgba(255, 20, 147, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
             touch-action: manipulation;
         }
 
         .audio-control:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(-50%) translateY(-2px);
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(-50%) translateY(-3px) scale(1.05);
             box-shadow: 
-                0 12px 48px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                0 12px 48px rgba(138, 43, 226, 0.3),
+                0 0 120px rgba(255, 20, 147, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
 
         .audio-control:active {
@@ -209,36 +293,39 @@
             width: clamp(20px, 5vw, 24px);
             height: clamp(20px, 5vw, 24px);
             position: relative;
-            opacity: 0.9;
+            opacity: 0.95;
         }
 
         .audio-icon svg {
             width: 100%;
             height: 100%;
             fill: white;
+            filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.5));
         }
 
         .audio-text {
-            font-size: clamp(12px, 3vw, 14px);
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            font-size: clamp(14px, 3vw, 16px);
+            font-weight: 600;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            opacity: 0.9;
+            opacity: 0.95;
             user-select: none;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
         }
 
         .visualizer {
             display: flex;
-            gap: 3px;
-            height: 20px;
+            gap: 4px;
+            height: 24px;
             align-items: center;
         }
 
         .bar {
             width: 3px;
-            background: linear-gradient(to top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.9));
-            border-radius: 2px;
-            transition: height 0.2s ease;
+            background: linear-gradient(to top, rgba(255, 20, 147, 0.8), rgba(0, 255, 255, 0.9));
+            border-radius: 3px;
+            transition: height 0.15s ease;
+            box-shadow: 0 0 5px currentColor;
         }
 
         .bar1 { height: 8px; }
@@ -248,35 +335,38 @@
         .bar5 { height: 10px; }
 
         body.playing .bar {
-            animation: dance 0.8s ease-in-out infinite;
+            animation: dance 0.6s ease-in-out infinite;
         }
 
         body.playing .bar1 { animation-delay: 0s; }
-        body.playing .bar2 { animation-delay: 0.1s; }
-        body.playing .bar3 { animation-delay: 0.2s; }
-        body.playing .bar4 { animation-delay: 0.3s; }
-        body.playing .bar5 { animation-delay: 0.4s; }
+        body.playing .bar2 { animation-delay: 0.08s; }
+        body.playing .bar3 { animation-delay: 0.16s; }
+        body.playing .bar4 { animation-delay: 0.24s; }
+        body.playing .bar5 { animation-delay: 0.32s; }
 
         @keyframes dance {
-            0%, 100% { height: 8px; }
-            50% { height: 20px; }
-        }
-
-        body.playing {
-            animation-duration: 12s, 6s;
+            0%, 100% { 
+                height: 8px;
+                background: linear-gradient(to top, rgba(255, 20, 147, 0.8), rgba(0, 255, 255, 0.9));
+            }
+            50% { 
+                height: 24px;
+                background: linear-gradient(to top, rgba(138, 43, 226, 0.8), rgba(255, 215, 0, 0.9));
+            }
         }
 
         .cursor-glow {
             position: fixed;
-            width: 400px;
-            height: 400px;
+            width: 500px;
+            height: 500px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05), transparent 40%);
+            background: radial-gradient(circle, rgba(255, 20, 147, 0.08), rgba(0, 255, 255, 0.04), transparent 40%);
             pointer-events: none;
             transform: translate(-50%, -50%);
             transition: opacity 0.3s ease;
             z-index: 5;
-            mix-blend-mode: overlay;
+            mix-blend-mode: screen;
+            filter: blur(2px);
         }
 
         .hint {
@@ -286,136 +376,124 @@
             transform: translateX(-50%);
             font-size: clamp(10px, 2.5vw, 12px);
             text-transform: uppercase;
-            letter-spacing: clamp(1px, 0.3vw, 2px);
+            letter-spacing: clamp(2px, 0.3vw, 3px);
             opacity: 0;
-            animation: fadeInOut 6s ease-in-out 2s;
+            animation: fadeInOut 8s ease-in-out 2s;
             pointer-events: none;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            text-shadow: 
+                0 0 20px rgba(255, 20, 147, 0.5),
+                0 2px 10px rgba(0, 0, 0, 0.3);
             padding: 0 20px;
             text-align: center;
         }
 
         @keyframes fadeInOut {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 0.6; }
+            0%, 100% { 
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            50% { 
+                opacity: 0.7;
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
-        @media (max-width: 1024px) {
-            body {
-                background-size: 600% 600%;
-            }
+        .kaleidoscope {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 3s ease;
+            mix-blend-mode: multiply;
+        }
 
-            .orbs-container {
-                filter: blur(30px);
-                opacity: 0.35;
-            }
+        body.playing .kaleidoscope {
+            opacity: 0.03;
+        }
 
-            .audio-control {
-                bottom: max(env(safe-area-inset-bottom), 30px);
-            }
+        .kaleidoscope::before,
+        .kaleidoscope::after {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(255, 20, 147, 0.1),
+                transparent,
+                rgba(0, 255, 255, 0.1),
+                transparent,
+                rgba(138, 43, 226, 0.1),
+                transparent
+            );
+            animation: rotate 60s linear infinite;
+        }
+
+        .kaleidoscope::after {
+            animation-direction: reverse;
+            animation-duration: 45s;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
             body {
                 cursor: default;
-                animation-duration: 25s, 10s;
-            }
-
-            body::before {
-                animation-duration: 40s;
-            }
-
-            body::after {
-                animation-duration: 12s;
-            }
-
-            .orbs-container {
-                filter: blur(25px);
-                opacity: 0.3;
+                animation-duration: 35s, 12s;
             }
 
             .cursor-glow {
                 display: none;
             }
 
-            .hint {
-                top: max(env(safe-area-inset-top), 30px);
+            .geometric-overlay {
+                opacity: 0.03;
             }
 
-            .visualizer {
-                gap: 2px;
-            }
-
-            .bar {
-                width: 2px;
-            }
-
-            @media (prefers-reduced-motion: reduce) {
-                body {
-                    animation: none;
-                    background-size: 100% 100%;
-                }
-
-                body::before,
-                body::after,
-                .orb {
-                    animation: none;
-                }
-            }
-        }
-
-        @media (max-width: 480px) {
-            .audio-control {
-                width: calc(100% - 40px);
-                max-width: 7.5rem;
-                justify-content: center;
-            }
-
-            .visualizer {
+            .particles {
                 display: none;
             }
 
-            body.playing .visualizer {
-                display: flex;
+            .kaleidoscope {
+                display: none;
             }
         }
 
-        @media (max-height: 500px) and (orientation: landscape) {
-            .audio-control {
-                bottom: max(env(safe-area-inset-bottom), 15px);
-                padding: 10px 20px;
+        @media (prefers-reduced-motion: reduce) {
+            body {
+                animation: none;
+                background-size: 100% 100%;
             }
 
-            .hint {
-                top: max(env(safe-area-inset-top), 15px);
-            }
-        }
-
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .audio-control {
-                border-width: 0.5px;
-            }
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .audio-control {
-                background: rgba(0, 0, 0, 0.2);
-            }
-
-            .audio-control:hover {
-                background: rgba(0, 0, 0, 0.3);
+            body::before,
+            body::after,
+            .orb,
+            .particle,
+            .kaleidoscope::before,
+            .kaleidoscope::after,
+            .geometric-overlay {
+                animation: none;
             }
         }
     </style>
 </head>
 <body>
+    <div class="geometric-overlay"></div>
+    
     <div class="orbs-container">
         <div class="orb orb1"></div>
         <div class="orb orb2"></div>
         <div class="orb orb3"></div>
     </div>
 
-    <div class="hint">brassonero</div>
+    <div class="kaleidoscope"></div>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="hint">∞ brassonero ∞</div>
 
     <div class="cursor-glow"></div>
 
@@ -451,14 +529,22 @@
         const pauseIcon = document.querySelector('.pause-icon');
         const visualizer = document.querySelector('.visualizer');
         const cursorGlow = document.querySelector('.cursor-glow');
+        const particles = document.getElementById('particles');
         let isPlaying = false;
         let hasPlayed = false;
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                         window.matchMedia("(max-width: 768px)").matches;
 
-        if (isMobile) {
-            document.body.style.willChange = 'transform';
+        if (!isMobile) {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particles.appendChild(particle);
+            }
         }
 
         function toggleAudio() {
@@ -472,10 +558,14 @@
                     isPlaying = true;
                     hasPlayed = true;
                     document.body.classList.add('playing');
-                    audioText.textContent = 'ℏ';
+                    audioText.textContent = '∞';
                     playIcon.style.display = 'none';
                     pauseIcon.style.display = 'block';
                     visualizer.style.display = 'flex';
+                    
+                    if (!isMobile) {
+                        document.body.style.filter = 'hue-rotate(0deg) brightness(1.1) saturate(1.3)';
+                    }
                 }).catch(error => {
                     console.log('Play failed:', error);
                 });
@@ -487,6 +577,8 @@
                 playIcon.style.display = 'block';
                 pauseIcon.style.display = 'none';
                 visualizer.style.display = 'none';
+                
+                document.body.style.filter = '';
             }
         }
 
@@ -497,6 +589,7 @@
             playIcon.style.display = 'block';
             pauseIcon.style.display = 'none';
             visualizer.style.display = 'none';
+            document.body.style.filter = '';
         });
 
         audioControl.addEventListener('click', (e) => {
@@ -530,13 +623,35 @@
         });
 
         if (!isMobile) {
+            let mouseX = 0, mouseY = 0;
+            let glowX = 0, glowY = 0;
+            
+            function animateGlow() {
+                glowX += (mouseX - glowX) * 0.1;
+                glowY += (mouseY - glowY) * 0.1;
+                
+                cursorGlow.style.left = glowX + 'px';
+                cursorGlow.style.top = glowY + 'px';
+                
+                requestAnimationFrame(animateGlow);
+            }
+            animateGlow();
+            
             document.addEventListener('mousemove', (e) => {
-                cursorGlow.style.left = e.clientX + 'px';
-                cursorGlow.style.top = e.clientY + 'px';
+                mouseX = e.clientX;
+                mouseY = e.clientY;
                 
                 const x = e.clientX / window.innerWidth;
                 const y = e.clientY / window.innerHeight;
-                const duration = isPlaying ? `${10 + y * 5}s, ${5 + x * 3}s` : `${15 + y * 10}s, ${8 + x * 6}s`;
+                
+                const hueRotation = x * 60 - 30;
+                const brightness = 0.95 + y * 0.1;
+                
+                if (isPlaying) {
+                    document.body.style.filter = `hue-rotate(${hueRotation}deg) brightness(${brightness}) saturate(1.4)`;
+                }
+                
+                const duration = isPlaying ? `${10 + y * 5}s, ${4 + x * 2}s` : `${20 + y * 10}s, ${6 + x * 4}s`;
                 document.body.style.animationDuration = duration;
             });
 
@@ -554,13 +669,27 @@
                 e.preventDefault();
                 toggleAudio();
             }
+            
+            if (e.code === 'KeyP' && !isMobile) {
+                document.body.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(1.2) saturate(2)`;
+                setTimeout(() => {
+                    document.body.style.filter = isPlaying ? 'brightness(1.1) saturate(1.3)' : '';
+                }, 2000);
+            }
         });
 
-        window.addEventListener('orientationchange', () => {
-            setTimeout(() => {
-                window.scrollTo(0, 0);
-            }, 100);
-        });
+        function setViewportHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        setViewportHeight();
+        window.addEventListener('resize', setViewportHeight);
+        window.addEventListener('orientationchange', setViewportHeight);
+
+        if (isMobile) {
+            document.body.style.willChange = 'transform';
+        }
 
         let touchStartY = 0;
         document.addEventListener('touchstart', (e) => {
@@ -575,15 +704,6 @@
                 e.preventDefault();
             }
         }, { passive: false });
-
-        function setViewportHeight() {
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
-        }
-
-        setViewportHeight();
-        window.addEventListener('resize', setViewportHeight);
-        window.addEventListener('orientationchange', setViewportHeight);
     </script>
 </body>
 </html>
