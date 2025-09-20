@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A♭m⁹ | Fm⁹ | Cm⁹ | G⁷⁽♯⁵⁾ | B♭¹³ˢᵘˢ</title>
+    <link rel="icon" href=".././assets/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href=".././assets/favicon.ico" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 0%;
+            }
+            25% {
+                background-position: 100% 50%;
+            }
+            50% {
+                background-position: 100% 100%;
+            }
+            75% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 0% 0%;
+            }
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1) translateZ(0);
+                filter: brightness(1) saturate(1);
+            }
+            50% {
+                transform: scale(1.02) translateZ(0);
+                filter: brightness(1.1) saturate(1.2);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-20px) translateX(10px) rotate(120deg);
+            }
+            66% {
+                transform: translateY(10px) translateX(-10px) rotate(240deg);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                opacity: 0;
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            min-height: 100dvh;
+            background: 
+                radial-gradient(ellipse at top left, rgba(254, 168, 55, 0.4), transparent 40%),
+                radial-gradient(ellipse at bottom right, rgba(89, 62, 103, 0.4), transparent 40%),
+                radial-gradient(ellipse at center, rgba(184, 91, 86, 0.3), transparent 60%),
+                linear-gradient(
+                    135deg, 
+                    #FEA837,
+                    #DE741C,
+                    #B85B56,
+                    #84495F,
+                    #593E67,
+                    #84495F,
+                    #B85B56,
+                    #DE741C,
+                    #FEA837
+                );
+            background-size: 400% 400%;
+            animation: 
+                gradientFlow 20s cubic-bezier(0.4, 0, 0.6, 1) infinite,
+                breathe 8s ease-in-out infinite;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+            animation: float 30s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 8s ease-in-out infinite;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        .orbs-container {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            filter: blur(40px);
+            opacity: 0.4;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            mix-blend-mode: screen;
+        }
+
+        .orb1 {
+            width: min(600px, 80vw);
+            height: min(600px, 80vw);
+            background: radial-gradient(circle, rgba(254, 168, 55, 0.8), transparent);
+            top: -20%;
+            left: -20%;
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .orb2 {
+            width: min(400px, 60vw);
+            height: min(400px, 60vw);
+            background: radial-gradient(circle, rgba(89, 62, 103, 0.8), transparent);
+            bottom: -15%;
+            right: -15%;
+            animation: float 30s ease-in-out infinite reverse;
+        }
+
+        .orb3 {
+            width: min(350px, 50vw);
+            height: min(350px, 50vw);
+            background: radial-gradient(circle, rgba(184, 91, 86, 0.6), transparent);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 20s ease-in-out infinite 5s;
+        }
+
+        .chord-display {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 5;
+            position: relative;
+        }
+
+        .chord-title {
+            font-size: clamp(14px, 3vw, 18px);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.7;
+            margin-bottom: 15px;
+        }
+
+        .chord-progression {
+            font-size: clamp(20px, 4vw, 32px);
+            font-weight: 300;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+        }
+
+        .controls-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            z-index: 10;
+            position: relative;
+        }
+
+        .audio-control, .download-control {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: clamp(12px, 3vw, 15px) clamp(20px, 5vw, 30px);
+            display: flex;
+            align-items: center;
+            gap: clamp(10px, 2vw, 15px);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: white;
+        }
+
+        .audio-control:hover, .download-control:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 48px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .audio-control:active, .download-control:active {
+            transform: scale(0.98);
+        }
+
+        .icon {
+            width: clamp(20px, 5vw, 24px);
+            height: clamp(20px, 5vw, 24px);
+            position: relative;
+            opacity: 0.9;
+        }
+
+        .icon svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+        }
+
+        .control-text {
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            user-select: none;
+        }
+
+        .visualizer {
+            display: flex;
+            gap: 3px;
+            height: 20px;
+            align-items: center;
+        }
+
+        .bar {
+            width: 3px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.9));
+            border-radius: 2px;
+            transition: height 0.2s ease;
+        }
+
+        .bar1 { height: 8px; }
+        .bar2 { height: 12px; }
+        .bar3 { height: 6px; }
+        .bar4 { height: 14px; }
+        .bar5 { height: 10px; }
+
+        body.playing .bar {
+            animation: dance 0.8s ease-in-out infinite;
+        }
+
+        body.playing .bar1 { animation-delay: 0s; }
+        body.playing .bar2 { animation-delay: 0.1s; }
+        body.playing .bar3 { animation-delay: 0.2s; }
+        body.playing .bar4 { animation-delay: 0.3s; }
+        body.playing .bar5 { animation-delay: 0.4s; }
+
+        @keyframes dance {
+            0%, 100% { height: 8px; }
+            50% { height: 20px; }
+        }
+
+        body.playing {
+            animation-duration: 12s, 6s;
+        }
+
+        .hint {
+            position: fixed;
+            top: max(env(safe-area-inset-top), 30px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(10px, 2.5vw, 12px);
+            text-transform: uppercase;
+            letter-spacing: clamp(1px, 0.3vw, 2px);
+            opacity: 0.6;
+            pointer-events: none;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            padding: 0 20px;
+            text-align: center;
+            z-index: 5;
+        }
+
+        @media (max-width: 768px) {
+            .controls-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .audio-control, .download-control {
+                width: min(200px, 80vw);
+                justify-content: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body {
+                animation: none;
+                background-size: 100% 100%;
+            }
+
+            body::before,
+            body::after,
+            .orb {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="orbs-container">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+
+    <div class="hint">In xochitl,<br>in cuicatl</div>
+
+    <div class="chord-display">
+        <div class="chord-title"><strong>01</strong></div>
+        <div class="chord-progression">A♭m⁹ | Fm⁹ | Cm⁹ | G⁷⁽♯⁵⁾ | B♭¹³ˢᵘˢ</div>
+    </div>
+
+    <div class="controls-container">
+        <div class="audio-control" id="audioControl">
+            <div class="icon">
+                <svg viewBox="0 0 24 24" class="play-icon">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="pause-icon" style="display: none;">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                </svg>
+            </div>
+            <span class="control-text">ℎ</span>
+            <div class="visualizer" style="display: none;">
+                <div class="bar bar1"></div>
+                <div class="bar bar2"></div>
+                <div class="bar bar3"></div>
+                <div class="bar bar4"></div>
+                <div class="bar bar5"></div>
+            </div>
+        </div>
+
+        <a href="../assets/01.mid" download="01.mid" class="download-control">
+            <div class="icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+            </div>
+            <span class="control-text">MIDI</span>
+        </a>
+
+        <a href="../assets/01.pdf" download="01.pdf" class="download-control">
+            <div class="icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+            </div>
+            <span class="control-text">PDF</span>
+        </a>
+    </div>
+
+    <!-- Audio element for the WAV file -->
+    <!-- IMPORTANT: You need to convert 01.mid to 01.wav and place it in the assets folder -->
+    <!-- Also place 01.pdf (sheet music) in the assets folder for the PDF download -->
+    <audio id="backgroundAudio" loop>
+        <source src="../assets/01.wav" type="audio/wav">
+        <source src="../assets/01.mp3" type="audio/mpeg">
+        Your browser doesn't support the audio element.
+    </audio>
+
+    <script>
+        const audio = document.getElementById('backgroundAudio');
+        const audioControl = document.getElementById('audioControl');
+        const playIcon = document.querySelector('.play-icon');
+        const pauseIcon = document.querySelector('.pause-icon');
+        const visualizer = document.querySelector('.visualizer');
+        const controlText = document.querySelector('.control-text');
+        let isPlaying = false;
+
+        // Set loop attribute
+        audio.loop = true;
+
+        function toggleAudio() {
+            if (!isPlaying) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    document.body.classList.add('playing');
+                    controlText.textContent = '∞';
+                    playIcon.style.display = 'none';
+                    pauseIcon.style.display = 'block';
+                    visualizer.style.display = 'flex';
+                }).catch(error => {
+                    console.log('Play failed:', error);
+                    alert('Please convert 01.mid to 01.wav and place it in the assets folder');
+                });
+            } else {
+                audio.pause();
+                isPlaying = false;
+                document.body.classList.remove('playing');
+                controlText.textContent = 'ℎ';
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                visualizer.style.display = 'none';
+            }
+        }
+
+        // Click to play/pause
+        audioControl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleAudio();
+        });
+
+        // Spacebar to play/pause
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                toggleAudio();
+            }
+        });
+
+        // Auto-play attempt (might be blocked by browser)
+        window.addEventListener('load', () => {
+            // Try to autoplay after user interaction
+            document.addEventListener('click', function initAudio() {
+                if (!isPlaying) {
+                    audio.play().then(() => {
+                        isPlaying = true;
+                        document.body.classList.add('playing');
+                        controlText.textContent = '∞';
+                        playIcon.style.display = 'none';
+                        pauseIcon.style.display = 'block';
+                        visualizer.style.display = 'flex';
+                        document.removeEventListener('click', initAudio);
+                    }).catch(() => {});
+                }
+            }, { once: true });
+        });
+
+        // Handle audio ending (shouldn't happen with loop, but just in case)
+        audio.addEventListener('ended', () => {
+            if (audio.loop) {
+                // Loop is enabled, it should auto-restart
+                console.log('Looping...');
+            } else {
+                isPlaying = false;
+                document.body.classList.remove('playing');
+                controlText.textContent = 'ℎ';
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                visualizer.style.display = 'none';
+            }
+        });
+
+        // Viewport height fix for mobile
+        function setViewportHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        setViewportHeight();
+        window.addEventListener('resize', setViewportHeight);
+        window.addEventListener('orientationchange', setViewportHeight);
+    </script>
+</body>
+</html>
