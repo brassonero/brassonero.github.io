@@ -217,41 +217,6 @@
             animation: float 18s ease-in-out infinite 3s, morphOrb 7s ease-in-out infinite;
         }
 
-        .particles {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: white;
-            border-radius: 50%;
-            opacity: 0;
-            animation: particleFloat 15s linear infinite;
-        }
-
-        @keyframes particleFloat {
-            0% {
-                transform: translateY(100vh) translateX(0) scale(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.8;
-                transform: translateY(80vh) translateX(20px) scale(1);
-            }
-            90% {
-                opacity: 0.8;
-                transform: translateY(20vh) translateX(-20px) scale(1);
-            }
-            100% {
-                transform: translateY(0) translateX(0) scale(0);
-                opacity: 0;
-            }
-        }
-
         .audio-control {
             position: fixed;
             bottom: max(env(safe-area-inset-bottom), 20px);
@@ -453,10 +418,6 @@
                 opacity: 0.03;
             }
 
-            .particles {
-                display: none;
-            }
-
             .kaleidoscope {
                 display: none;
             }
@@ -471,7 +432,6 @@
             body::before,
             body::after,
             .orb,
-            .particle,
             .kaleidoscope::before,
             .kaleidoscope::after,
             .geometric-overlay {
@@ -490,8 +450,6 @@
     </div>
 
     <div class="kaleidoscope"></div>
-
-    <div class="particles" id="particles"></div>
 
     <div class="hint">brassonero</div>
 
@@ -529,23 +487,12 @@
         const pauseIcon = document.querySelector('.pause-icon');
         const visualizer = document.querySelector('.visualizer');
         const cursorGlow = document.querySelector('.cursor-glow');
-        const particles = document.getElementById('particles');
         let isPlaying = false;
         let hasPlayed = false;
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                         window.matchMedia("(max-width: 768px)").matches;
 
-        if (!isMobile) {
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
-                particles.appendChild(particle);
-            }
-        }
 
         function toggleAudio() {
             if (!isPlaying) {
