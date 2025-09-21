@@ -239,6 +239,8 @@
                 0 0 80px rgba(255, 20, 147, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
             touch-action: manipulation;
+            min-width: 120px;
+            justify-content: center;
         }
 
         .audio-control:hover {
@@ -259,6 +261,7 @@
             height: clamp(20px, 5vw, 24px);
             position: relative;
             opacity: 0.95;
+            flex-shrink: 0;
         }
 
         .audio-icon svg {
@@ -266,6 +269,30 @@
             height: 100%;
             fill: white;
             filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.5));
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .play-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .pause-icon {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        body.playing .play-icon {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        body.playing .pause-icon {
+            opacity: 1;
+            transform: scale(1);
         }
 
         .audio-text {
@@ -276,6 +303,9 @@
             opacity: 0.95;
             user-select: none;
             text-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+            min-width: 20px;
+            text-align: center;
+            transition: opacity 0.3s ease;
         }
 
         .visualizer {
@@ -283,6 +313,17 @@
             gap: 4px;
             height: 24px;
             align-items: center;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            width: 0;
+            overflow: hidden;
+        }
+
+        body.playing .visualizer {
+            opacity: 1;
+            transform: scale(1);
+            width: auto;
         }
 
         .bar {
@@ -460,12 +501,12 @@
             <svg viewBox="0 0 24 24" class="play-icon">
                 <path d="M8 5v14l11-7z"/>
             </svg>
-            <svg viewBox="0 0 24 24" class="pause-icon" style="display: none;">
+            <svg viewBox="0 0 24 24" class="pause-icon">
                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
             </svg>
         </div>
         <span class="audio-text">ℏ</span>
-        <div class="visualizer" style="display: none;">
+        <div class="visualizer">
             <div class="bar bar1"></div>
             <div class="bar bar2"></div>
             <div class="bar bar3"></div>
@@ -506,9 +547,6 @@
                     hasPlayed = true;
                     document.body.classList.add('playing');
                     audioText.textContent = '∞';
-                    playIcon.style.display = 'none';
-                    pauseIcon.style.display = 'block';
-                    visualizer.style.display = 'flex';
                     
                     if (!isMobile) {
                         document.body.style.filter = 'hue-rotate(0deg) brightness(1.1) saturate(1.3)';
@@ -521,9 +559,6 @@
                 isPlaying = false;
                 document.body.classList.remove('playing');
                 audioText.textContent = 'ℏ';
-                playIcon.style.display = 'block';
-                pauseIcon.style.display = 'none';
-                visualizer.style.display = 'none';
                 
                 document.body.style.filter = '';
             }
@@ -533,9 +568,6 @@
             isPlaying = false;
             document.body.classList.remove('playing');
             audioText.textContent = 'ℏ';
-            playIcon.style.display = 'block';
-            pauseIcon.style.display = 'none';
-            visualizer.style.display = 'none';
             document.body.style.filter = '';
         });
 
