@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -18,25 +19,32 @@
             0% {
                 background-position: 0% 0%;
             }
+
             25% {
                 background-position: 100% 50%;
             }
+
             50% {
                 background-position: 100% 100%;
             }
+
             75% {
                 background-position: 0% 50%;
             }
+
             100% {
                 background-position: 0% 0%;
             }
         }
 
         @keyframes breathe {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1) translateZ(0);
                 filter: brightness(1) saturate(1);
             }
+
             50% {
                 transform: scale(1.02) translateZ(0);
                 filter: brightness(1.1) saturate(1.2);
@@ -44,12 +52,16 @@
         }
 
         @keyframes float {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0) translateX(0) rotate(0deg);
             }
+
             33% {
                 transform: translateY(-20px) translateX(10px) rotate(120deg);
             }
+
             66% {
                 transform: translateY(10px) translateX(-10px) rotate(240deg);
             }
@@ -60,9 +72,11 @@
                 opacity: 0;
                 transform: translateX(-100%) translateY(-100%) rotate(45deg);
             }
+
             50% {
                 opacity: 0.5;
             }
+
             100% {
                 opacity: 0;
                 transform: translateX(100%) translateY(100%) rotate(45deg);
@@ -73,12 +87,11 @@
             min-height: 100vh;
             min-height: -webkit-fill-available;
             min-height: 100dvh;
-            background: 
+            background:
                 radial-gradient(ellipse at top left, rgba(254, 168, 55, 0.4), transparent 40%),
                 radial-gradient(ellipse at bottom right, rgba(89, 62, 103, 0.4), transparent 40%),
                 radial-gradient(ellipse at center, rgba(184, 91, 86, 0.3), transparent 60%),
-                linear-gradient(
-                    135deg,
+                linear-gradient(135deg,
                     #ff0080,
                     #ff8c00,
                     #ff3c00,
@@ -87,10 +100,9 @@
                     #8000ff,
                     #ff3c00,
                     #ff8c00,
-                    #ff0080
-                );
+                    #ff0080);
             background-size: 400% 400%;
-            animation: 
+            animation:
                 gradientFlow 20s cubic-bezier(0.4, 0, 0.6, 1) infinite,
                 breathe 8s ease-in-out infinite;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -107,7 +119,7 @@
             content: '';
             position: absolute;
             inset: -50%;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
@@ -186,11 +198,11 @@
             font-size: clamp(20px, 4vw, 32px);
             font-weight: 300;
             letter-spacing: 2px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
         }
 
         .controls-container {
@@ -203,7 +215,8 @@
             position: relative;
         }
 
-        .audio-control, .download-control {
+        .audio-control,
+        .download-control {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -215,22 +228,24 @@
             gap: clamp(10px, 2vw, 15px);
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
+            box-shadow:
                 0 8px 32px rgba(0, 0, 0, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
             text-decoration: none;
             color: white;
         }
 
-        .audio-control:hover, .download-control:hover {
+        .audio-control:hover,
+        .download-control:hover {
             background: rgba(255, 255, 255, 0.15);
             transform: translateY(-2px);
-            box-shadow: 
+            box-shadow:
                 0 12px 48px rgba(0, 0, 0, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
-        .audio-control:active, .download-control:active {
+        .audio-control:active,
+        .download-control:active {
             transform: scale(0.98);
         }
 
@@ -270,25 +285,60 @@
             transition: height 0.2s ease;
         }
 
-        .bar1 { height: 8px; }
-        .bar2 { height: 12px; }
-        .bar3 { height: 6px; }
-        .bar4 { height: 14px; }
-        .bar5 { height: 10px; }
+        .bar1 {
+            height: 8px;
+        }
+
+        .bar2 {
+            height: 12px;
+        }
+
+        .bar3 {
+            height: 6px;
+        }
+
+        .bar4 {
+            height: 14px;
+        }
+
+        .bar5 {
+            height: 10px;
+        }
 
         body.playing .bar {
             animation: dance 0.8s ease-in-out infinite;
         }
 
-        body.playing .bar1 { animation-delay: 0s; }
-        body.playing .bar2 { animation-delay: 0.1s; }
-        body.playing .bar3 { animation-delay: 0.2s; }
-        body.playing .bar4 { animation-delay: 0.3s; }
-        body.playing .bar5 { animation-delay: 0.4s; }
+        body.playing .bar1 {
+            animation-delay: 0s;
+        }
+
+        body.playing .bar2 {
+            animation-delay: 0.1s;
+        }
+
+        body.playing .bar3 {
+            animation-delay: 0.2s;
+        }
+
+        body.playing .bar4 {
+            animation-delay: 0.3s;
+        }
+
+        body.playing .bar5 {
+            animation-delay: 0.4s;
+        }
 
         @keyframes dance {
-            0%, 100% { height: 8px; }
-            50% { height: 20px; }
+
+            0%,
+            100% {
+                height: 8px;
+            }
+
+            50% {
+                height: 20px;
+            }
         }
 
         body.playing {
@@ -317,7 +367,8 @@
                 gap: 15px;
             }
 
-            .audio-control, .download-control {
+            .audio-control,
+            .download-control {
                 width: min(200px, 80vw);
                 justify-content: center;
             }
@@ -335,9 +386,300 @@
                 animation: none;
             }
         }
+
+        .nav-menu {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .nav-toggle {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-toggle span {
+            width: 20px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .nav-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translateY(6px);
+        }
+
+        .nav-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .nav-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translateY(-6px);
+        }
+
+        .nav-links {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-menu.open .nav-links {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            min-width: 200px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(-5px);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .track-number {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.9;
+            min-width: 25px;
+        }
+
+        .track-chords {
+            font-size: 12px;
+            opacity: 0.7;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-menu.open .nav-link:nth-child(1) {
+            transition-delay: 0.05s;
+        }
+
+        .nav-menu.open .nav-link:nth-child(2) {
+            transition-delay: 0.1s;
+        }
+
+        .nav-menu.open .nav-link:nth-child(3) {
+            transition-delay: 0.15s;
+        }
+
+        .nav-menu.open .nav-link:nth-child(4) {
+            transition-delay: 0.2s;
+        }
+
+        /* Alternative: Minimal dots navigation (uncomment to use instead) */
+        /*
+.nav-dots {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+}
+
+.nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-dot:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(1.5);
+}
+
+.nav-dot.active {
+    background: rgba(255, 255, 255, 0.9);
+    width: 24px;
+    border-radius: 4px;
+}
+
+.nav-dot::after {
+    content: attr(data-title);
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.nav-dot:hover::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: 25px;
+}
+*/
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .nav-links {
+                right: 0;
+                left: auto;
+                align-items: flex-end;
+            }
+
+            .nav-link {
+                min-width: auto;
+                max-width: calc(100vw - 60px);
+                padding: 10px 16px;
+                font-size: 13px;
+                justify-content: center;
+            }
+
+            .track-number {
+                font-size: 14px;
+                font-weight: 600;
+                min-width: auto;
+            }
+
+            .track-chords {
+                display: none;
+            }
+
+            .nav-toggle {
+                width: 44px;
+                height: 44px;
+            }
+
+            .nav-toggle span {
+                width: 18px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .nav-link {
+                padding: 8px 14px;
+                gap: 12px;
+            }
+        }
+
+        .nav-link:focus-visible,
+        .nav-toggle:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.5);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .nav-links,
+            .nav-link,
+            .nav-toggle,
+            .nav-toggle span {
+                transition: none;
+            }
+        }
+
+        @media (max-width: 768px) and (orientation: landscape) {
+            .nav-menu {
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .nav-toggle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .nav-links {
+                bottom: 55px;
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+        }
     </style>
 </head>
+
 <body>
+    <nav class="nav-menu" id="navMenu">
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-links">
+            <a href="../01" class="nav-link" data-track="01">
+                <span class="track-number">01</span>
+                <span class="track-chords">B♭m⁹ | Fm⁹(11) | G♭Maj⁹(13) | G⁹sus⁴</span>
+            </a>
+            <a href="../02" class="nav-link" data-track="02">
+                <span class="track-number">02</span>
+                <span class="track-chords">Cm⁹ | A♭m⁹ | Fm⁹ | B♭¹³ˢᵘˢ | G⁷⁽♯⁵⁾</span>
+            </a>
+        </div>
+    </nav>
     <div class="orbs-container">
         <div class="orb orb1"></div>
         <div class="orb orb2"></div>
@@ -355,10 +697,10 @@
         <div class="audio-control" id="audioControl">
             <div class="icon">
                 <svg viewBox="0 0 24 24" class="play-icon">
-                    <path d="M8 5v14l11-7z"/>
+                    <path d="M8 5v14l11-7z" />
                 </svg>
                 <svg viewBox="0 0 24 24" class="pause-icon" style="display: none;">
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                 </svg>
             </div>
             <span class="control-text">ℎ</span>
@@ -374,7 +716,7 @@
         <a href="../assets/01.mid" download="01.mid" class="download-control">
             <div class="icon">
                 <svg viewBox="0 0 24 24">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
                 </svg>
             </div>
             <span class="control-text">MIDI</span>
@@ -383,7 +725,7 @@
         <a href="../assets/01.pdf" download="01.pdf" class="download-control">
             <div class="icon">
                 <svg viewBox="0 0 24 24">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
                 </svg>
             </div>
             <span class="control-text">PDF</span>
@@ -406,9 +748,11 @@
         const pauseIcon = document.querySelector('.pause-icon');
         const visualizer = document.querySelector('.visualizer');
         const controlText = document.querySelector('.control-text');
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        let isNavOpen = false;
         let isPlaying = false;
 
-        // Set loop attribute
         audio.loop = true;
 
         function toggleAudio() {
@@ -435,13 +779,11 @@
             }
         }
 
-        // Click to play/pause
         audioControl.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleAudio();
         });
 
-        // Spacebar to play/pause
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 e.preventDefault();
@@ -449,9 +791,7 @@
             }
         });
 
-        // Auto-play attempt (might be blocked by browser)
         window.addEventListener('load', () => {
-            // Try to autoplay after user interaction
             document.addEventListener('click', function initAudio() {
                 if (!isPlaying) {
                     audio.play().then(() => {
@@ -462,15 +802,13 @@
                         pauseIcon.style.display = 'block';
                         visualizer.style.display = 'flex';
                         document.removeEventListener('click', initAudio);
-                    }).catch(() => {});
+                    }).catch(() => { });
                 }
             }, { once: true });
         });
 
-        // Handle audio ending (shouldn't happen with loop, but just in case)
         audio.addEventListener('ended', () => {
             if (audio.loop) {
-                // Loop is enabled, it should auto-restart
                 console.log('Looping...');
             } else {
                 isPlaying = false;
@@ -482,7 +820,6 @@
             }
         });
 
-        // Viewport height fix for mobile
         function setViewportHeight() {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -491,6 +828,75 @@
         setViewportHeight();
         window.addEventListener('resize', setViewportHeight);
         window.addEventListener('orientationchange', setViewportHeight);
+
+        navToggle.addEventListener('click', () => {
+            isNavOpen = !isNavOpen;
+            navMenu.classList.toggle('open');
+            navToggle.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!navMenu.contains(e.target) && isNavOpen) {
+                navMenu.classList.remove('open');
+                navToggle.classList.remove('active');
+                isNavOpen = false;
+            }
+        });
+
+        const currentPage = window.location.pathname.split('/').pop();
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active');
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isNavOpen) {
+                navMenu.classList.remove('open');
+                navToggle.classList.remove('active');
+                isNavOpen = false;
+            }
+
+            if (e.key >= '1' && e.key <= '9' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                const trackNumber = e.key.padStart(2, '0');
+                const targetLink = document.querySelector(`[data-track="${trackNumber}"]`);
+                if (targetLink) {
+                    targetLink.click();
+                }
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                setTimeout(() => {
+                    navMenu.classList.remove('open');
+                    navToggle.classList.remove('active');
+                    isNavOpen = false;
+                }, 300);
+            });
+        });
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        navMenu.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        navMenu.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX > touchStartX + 50 && isNavOpen) {
+                navMenu.classList.remove('open');
+                navToggle.classList.remove('active');
+                isNavOpen = false;
+            }
+        }
     </script>
 </body>
+
 </html>
