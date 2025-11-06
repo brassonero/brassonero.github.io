@@ -607,3 +607,159 @@ public ResponseEntity<?> getToken(@Valid @RequestBody OauthTokenRequest request,
 **Estado Global: 2/20 requisitos cumplidos (10%)** ⛔
 
 **Recomendación: NO DESPLEGAR EN PRODUCCIÓN**
+
+## Corrección del ID 14: No usar API Keys para autenticación
+
+### ID 14: No se deben utilizar API Keys para la autenticación
+**✅ CUMPLE PARCIALMENTE**
+**🟡 SEVERIDAD MEDIA**
+
+**Verificación del código actual:**
+
+**✅ ASPECTOS CORRECTOS:**
+- El sistema usa OAuth2 con `client_id` y `client_secret`
+- No hay evidencia de API Keys simples en headers como `X-API-KEY`
+- Usa `Bearer tokens` JWT en lugar de API Keys estáticas
+
+**⚠️ RIESGOS IDENTIFICADOS:**
+
+1. **El `client_secret` puede comportarse como API Key:**
+```java
+// TokenController.java - línea 36
+if (registeredClient == null ||
+    !registeredClient.getClientSecret().equals("{noop}" + request.getClientSecret())) {
+    // El client_secret se usa de forma similar a una API Key
+}
+```
+
+2. **No hay rotación automática de secrets:**
+- Los `client_secret` parecen ser estáticos
+- Sin mecanismo de expiración visible
+- Podría funcionar indefinidamente como una API Key
+
+3. **Falta validación para prevenir uso como API Key:**
+```java
+// No hay código que prevenga esto:
+// Authorization: ApiKey {client_secret}
+// X-API-KEY: {client_secret}
+```
+
+**Implementación requerida para cumplir completamente:**
+
+```java
+// 1. Agregar validación para rechazar headers tipo API Key
+@Component
+public class APIKeyPreventionFilter extends OncePerRequestFilter {
+    
+    private static final Set<String> FORBIDDEN_HEADERS = Set.of(
+        "X-API-KEY",
+        "API-KEY", 
+        "APIKEY",
+        "X-API-TOKEN"
+    );
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain chain) throws ServletException, IOException {
+        
+        // Rechazar cualquier intento de usar API Keys
+        for (String header : FORBIDDEN_HEADERS) {
+            if (request.getHeader(header) != null) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.getWriter().write(
+                    "{\"error\":\"API Keys are not allowed. Use OAuth2 flow.\"}"
+                );
+                return;
+            }
+        }
+        
+        // Validar que Authorization header no use esquema ApiKey
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.toLowerCase().startsWith("apikey")) {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.getWriter().write(
+                "{\"error\":\"API Key authentication is forbidden. Use Bearer token.\"}"
+            );
+            return;
+        }
+        
+        chain.doFilter(request, response);
+    }
+}
+
+// 2. Forzar expiración de client_secrets
+@Entity
+public class RegisteredClient {
+    // ...
+    private Instant secretExpiresAt;
+    private Integer secretVersion;
+    
+    public boolean isSecretExpired() {
+        return Instant.now().isAfter(secretExpiresAt);
+    }
+}
+
+// 3. Validar en TokenController
+@PostMapping("/token")
+public ResponseEntity<?> getToken(@RequestBody OauthTokenRequest request) {
+    RegisteredClient client = registeredClientRepository.findByClientId(request.getClientId());
+    
+    // Verificar que el secret no esté expirado (no funcione como API Key permanente)
+    if (client.isSecretExpired()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(Map.of(
+                "error", "invalid_client",
+                "error_description", "Client secret has expired. Request rotation."
+            ));
+    }
+    
+    // Resto del código...
+}
+```
+
+---
+
+## Resumen Actualizado de Cumplimiento Total
+
+### OAuth2/Autenticación (ID 1-16)
+
+| ID | Requisito | Estado | Severidad | Observación |
+|----|-----------|--------|-----------|-------------|
+| 1 | Verificación permisos post-JWT | ❌ Parcial | 🔴 ALTA | |
+| 2 | Restricción usuario/contraseña | ❌ No implementado | 🔴 ALTA | |
+| 3 | Autenticación certificado | ❌ No implementado | 🔴 ALTA | |
+| 4 | Nonce para replay | ❌ No implementado | 🔴🔴 CRÍTICA | |
+| 5 | No scope default | ❓ No verificable | 🟡 MEDIA | Falta código |
+| 6 | Bloqueo 3 intentos | ❌ No implementado | 🔴🔴 CRÍTICA | |
+| 7 | Algoritmo JWT fijo | ⚠️ Parcial | 🟡 MEDIA | |
+| 8 | No datos sensibles JWT | ⚠️ Riesgo | 🔴 ALTA | |
+| 9 | Validar client_id refresh | ❌ No existe | 🔴 ALTA | |
+| 10 | Revocación tokens | ❌ No implementado | 🔴 ALTA | |
+| 11 | Revocación client_secrets | ❌ No implementado | 🔴🔴 CRÍTICA | |
+| 12 | Rotación refresh token | ⏸️ Fase 3 | - | Postponed |
+| 13 | Datos sensibles POST | ⚠️ Parcial | 🔴 ALTA | |
+| **14** | **No API Keys** | **✅ Parcial** | **🟡 MEDIA** | **Necesita mejoras** |
+| 15 | Grant type obligatorio | ❌ No implementado | 🔴 ALTA | |
+| 16 | No auth en URL | ⚠️ Riesgo | 🔴 ALTA | |
+
+### Acceso y Consumo
+
+| ID | Requisito | Estado | Severidad |
+|----|-----------|--------|-----------|
+| 1 | Rate limiting | ❌ No implementado | 🔴🔴 CRÍTICA |
+| 2 | HSTS header | ❌ No implementado | 🔴 ALTA |
+| 3 | IP whitelist | ❌ No implementado | 🔴 ALTA |
+| 4 | Validación datos | ⚠️ Parcial | 🔴 ALTA |
+
+## Estadísticas Finales
+
+- **Total requisitos evaluables:** 19 (excluyendo ID 12 que es Fase 3)
+- **Cumplidos completamente:** 0
+- **Cumplidos parcialmente:** 3 (ID 7, 13, 14)
+- **No verificables:** 1 (ID 5)
+- **No implementados:** 15
+
+**Porcentaje de cumplimiento: ~8%** ⛔
+
+**Estado: CRÍTICO - Sistema altamente vulnerable**
