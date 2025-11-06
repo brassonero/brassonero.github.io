@@ -763,3 +763,239 @@ public ResponseEntity<?> getToken(@RequestBody OauthTokenRequest request) {
 **Porcentaje de cumplimiento: ~8%** ⛔
 
 **Estado: CRÍTICO - Sistema altamente vulnerable**
+
+
+## Corrección del ID 12: Rotación de Refresh Token
+
+### ID 12: El servidor de autorización deberá proveer rotación de token (Refresh Token Rotation)
+**❌ NO IMPLEMENTADO**
+**🔴 SEVERIDAD ALTA**
+
+**Verificación del código actual:**
+
+**❌ PROBLEMAS IDENTIFICADOS:**
+
+1. **No existe implementación de refresh tokens:**
+```java
+// TokenController.java - Solo genera access tokens
+return ResponseEntity.ok(Map.of(
+    "access_token", jwt.getTokenValue(),
+    "token_type", "Bearer",
+    "expires_in", jwt.getExpiresAt().toEpochMilli() / 1000,
+    "scope", String.join(" ", registeredClient.getScopes())
+    // ⚠️ NO HAY "refresh_token" en la respuesta
+));
+```
+
+2. **OAuthTokenResponse tiene el campo pero no se usa:**
+```java
+// OAuthTokenResponse.java - Campo existe pero nunca se utiliza
+public class OAuthTokenResponse {
+    private String accessToken;
+    private String refreshToken;  // ⚠️ Definido pero no implementado
+    private String tokenType;
+    private String expiresIn;
+}
+```
+
+3. **No hay endpoint para refresh:**
+```java
+// ⚠️ NO EXISTE este endpoint necesario:
+// @PostMapping("/token/refresh")
+```
+
+**Implementación requerida para cumplir:**
+
+```java
+// 1. Servicio para gestionar refresh tokens con rotación
+@Service
+public class RefreshTokenService {
+    
+    @Autowired
+    private RefreshTokenRepository tokenRepository;
+    
+    @Autowired
+    private JwtEncoder jwtEncoder;
+    
+    // Generar refresh token con rotación
+    public RefreshToken createRefreshToken(String clientId) {
+        // Invalidar refresh token anterior si existe
+        tokenRepository.findByClientId(clientId)
+            .ifPresent(token -> token.setRevoked(true));
+        
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setToken(UUID.randomUUID().toString());
+        refreshToken.setClientId(clientId);
+        refreshToken.setExpiryDate(Instant.now().plusMillis(2592000000L)); // 30 días
+        refreshToken.setRevoked(false);
+        refreshToken.setVersion(generateVersion());
+        
+        return tokenRepository.save(refreshToken);
+    }
+    
+    // Rotar refresh token en cada uso
+    public TokenPair rotateRefreshToken(String oldRefreshToken) {
+        RefreshToken storedToken = tokenRepository.findByToken(oldRefreshToken)
+            .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
+        
+        // Validaciones de seguridad
+        if (storedToken.isRevoked()) {
+            // Detectar posible ataque - token ya fue usado
+            revokeAllTokensForClient(storedToken.getClientId());
+            throw new SecurityException("Refresh token reuse detected - possible attack");
+        }
+        
+        if (storedToken.getExpiryDate().isBefore(Instant.now())) {
+            throw new TokenExpiredException("Refresh token expired");
+        }
+        
+        // ROTACIÓN: Invalidar token anterior
+        storedToken.setRevoked(true);
+        tokenRepository.save(storedToken);
+        
+        // Crear NUEVO refresh token (rotación)
+        RefreshToken newRefreshToken = createRefreshToken(storedToken.getClientId());
+        
+        // Generar nuevo access token
+        String newAccessToken = generateAccessToken(storedToken.getClientId());
+        
+        return new TokenPair(newAccessToken, newRefreshToken.getToken());
+    }
+}
+
+// 2. Modificar TokenController para incluir refresh token
+@PostMapping("/token")
+public ResponseEntity<?> getToken(@RequestBody OauthTokenRequest request) {
+    // Validaciones existentes...
+    
+    // Generar access token
+    Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims));
+    
+    // Generar refresh token con rotación
+    RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getClientId());
+    
+    return ResponseEntity.ok(Map.of(
+        "access_token", jwt.getTokenValue(),
+        "refresh_token", refreshToken.getToken(),  // ✅ Agregar refresh token
+        "token_type", "Bearer",
+        "expires_in", 3600,
+        "refresh_expires_in", 2592000  // 30 días
+    ));
+}
+
+// 3. Agregar endpoint para refresh con rotación
+@PostMapping("/token/refresh")
+public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+    try {
+        // Validar client
+        RegisteredClient client = registeredClientRepository.findByClientId(request.getClientId());
+        if (client == null || !validateClientSecret(client, request.getClientSecret())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "invalid_client"));
+        }
+        
+        // ROTACIÓN: Obtener nuevo token pair (invalida el anterior)
+        TokenPair newTokens = refreshTokenService.rotateRefreshToken(request.getRefreshToken());
+        
+        return ResponseEntity.ok(Map.of(
+            "access_token", newTokens.getAccessToken(),
+            "refresh_token", newTokens.getRefreshToken(),  // ✅ NUEVO refresh token
+            "token_type", "Bearer",
+            "expires_in", 3600
+        ));
+        
+    } catch (SecurityException e) {
+        // Posible ataque detectado
+        auditService.logSecurityIncident(e.getMessage(), request.getClientId());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(Map.of("error", "invalid_grant", "error_description", "Token revoked"));
+    }
+}
+
+// 4. Entidad para almacenar refresh tokens
+@Entity
+public class RefreshToken {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+    
+    @Column(unique = true, nullable = false)
+    private String token;
+    
+    private String clientId;
+    private Instant expiryDate;
+    private boolean revoked = false;
+    private Integer version;  // Para tracking de rotación
+    private Instant lastRotation;
+    
+    @OneToOne
+    private RefreshToken previousToken;  // Cadena de rotación para auditoría
+}
+```
+
+**Seguridad adicional para rotación:**
+
+```java
+// Configuración de políticas de rotación
+@ConfigurationProperties(prefix = "oauth2.refresh-token")
+public class RefreshTokenRotationPolicy {
+    private boolean rotateOnEachUse = true;  // Siempre rotar
+    private boolean detectReuse = true;      // Detectar reutilización
+    private int maxChainLength = 5;          // Máximo de rotaciones
+    private Duration lifetime = Duration.ofDays(30);
+    private boolean revokeChainOnReuse = true;  // Revocar toda la cadena si se detecta reuso
+}
+```
+
+---
+
+## Resumen Actualizado de Cumplimiento Total (con ID 12 y 14 evaluados)
+
+### OAuth2/Autenticación (ID 1-16)
+
+| ID | Requisito | Estado | Severidad | Observación |
+|----|-----------|--------|-----------|-------------|
+| 1 | Verificación permisos post-JWT | ❌ Parcial | 🔴 ALTA | |
+| 2 | Restricción usuario/contraseña | ❌ No implementado | 🔴 ALTA | |
+| 3 | Autenticación certificado | ❌ No implementado | 🔴 ALTA | |
+| 4 | Nonce para replay | ❌ No implementado | 🔴🔴 CRÍTICA | |
+| 5 | No scope default | ❓ No verificable | 🟡 MEDIA | Falta código |
+| 6 | Bloqueo 3 intentos | ❌ No implementado | 🔴🔴 CRÍTICA | |
+| 7 | Algoritmo JWT fijo | ⚠️ Parcial | 🟡 MEDIA | |
+| 8 | No datos sensibles JWT | ⚠️ Riesgo | 🔴 ALTA | |
+| 9 | Validar client_id refresh | ❌ No existe | 🔴 ALTA | |
+| 10 | Revocación tokens | ❌ No implementado | 🔴 ALTA | |
+| 11 | Revocación client_secrets | ❌ No implementado | 🔴🔴 CRÍTICA | |
+| **12** | **Rotación refresh token** | **❌ No implementado** | **🔴 ALTA** | **Sin refresh tokens** |
+| 13 | Datos sensibles POST | ⚠️ Parcial | 🔴 ALTA | |
+| 14 | No API Keys | ✅ Parcial | 🟡 MEDIA | Necesita mejoras |
+| 15 | Grant type obligatorio | ❌ No implementado | 🔴 ALTA | |
+| 16 | No auth en URL | ⚠️ Riesgo | 🔴 ALTA | |
+
+### Acceso y Consumo
+
+| ID | Requisito | Estado | Severidad |
+|----|-----------|--------|-----------|
+| 1 | Rate limiting | ❌ No implementado | 🔴🔴 CRÍTICA |
+| 2 | HSTS header | ❌ No implementado | 🔴 ALTA |
+| 3 | IP whitelist | ❌ No implementado | 🔴 ALTA |
+| 4 | Validación datos | ⚠️ Parcial | 🔴 ALTA |
+
+## Estadísticas Finales Actualizadas
+
+- **Total requisitos:** 20
+- **Cumplidos completamente:** 0
+- **Cumplidos parcialmente:** 3 (ID 7, 13, 14)
+- **No verificables:** 1 (ID 5)
+- **No implementados:** 16
+
+**Porcentaje de cumplimiento: ~7.5%** ⛔
+
+### Vulnerabilidades Críticas por falta de Refresh Token Rotation:
+
+1. **Sin gestión de sesiones largas:** Los usuarios deben reautenticarse frecuentemente
+2. **Sin revocación granular:** No se pueden revocar tokens específicos
+3. **Sin detección de token comprometido:** No hay forma de detectar reuso malicioso
+4. **Sin auditoría de rotación:** No hay trazabilidad de uso de tokens
+
+**Estado: CRÍTICO - Sistema no cumple estándares OAuth2 modernos**
