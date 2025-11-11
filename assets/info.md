@@ -3422,3 +3422,1886 @@ El sistema requiere implementación urgente de:
 **Tiempo estimado de corrección:** 2-3 sprints para implementar todos los requisitos críticos.
 
 ---
+
+## Análisis Detallado de Requisitos de Seguridad (Acceso/Consumo IDs 11-12, Perfilado, Sesión/Expiración)
+
+---
+
+## ACCESO / CONSUMO
+
+### ID 11: Configurar la cookie SameSite
+**❌ NO IMPLEMENTADO**
+**🔴 SEVERIDAD ALTA**
+
+**Descripción del requisito:**
+Configurar la propiedad SameSite en cookies HTTP para prevenir ataques de falsificación de solicitud entre sitios (CSRF).
+
+**Ubicación del problema:**
+- **Archivo:** `SecurityConfig.java`
+- **Archivo:** `application.properties`
+- **No existe configuración de cookies**
+
+**Problema específico:**
+```java
+// SecurityConfig.java - CSRF deshabilitado sin alternativa
+@Bean
+@Order(2)
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(/* ... */)
+            .formLogin(Customizer.withDefaults())
+            .httpBasic(Customizer.withDefaults())
+            .csrf(AbstractHttpConfigurer::disable); // ⚠️ CSRF deshabilitado
+    // ⚠️ No hay configuración de SameSite en cookies
+    // ⚠️ No hay gestión de sesiones con cookies seguras
+    return http.build();
+}
+```
+
+```properties
+# application.properties - Sin configuración de cookies
+# ⚠️ FALTA: Configuración de cookies SameSite
+# ⚠️ FALTA: Configuración de cookies HttpOnly
+# ⚠️ FALTA: Configuración de cookies Secure
+```
+
+**Problemas identificados:**
+1. CSRF completamente deshabilitado sin mitigación alternativa
+2. No hay configuración de atributo SameSite en cookies
+3. No hay configuración de cookies HttpOnly y Secure
+4. Vulnerable a ataques CSRF en flujos con autenticación
+
+**Solución requerida:**
+
+```java
+// 1. Modificar SecurityConfig para habilitar CSRF con SameSite
+@Bean
+@Order(2)
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/login", "/error", "/.well-known/**").permitAll()
+            .requestMatchers("/api/token").permitAll()
+            .anyRequest().authenticated())
+        .formLogin(Customizer.withDefaults())
+        .httpBasic(Customizer.withDefaults())
+        
+        // ✅ Habilitar CSRF con configuración personalizada
+        .csrf(csrf -> csrf
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .ignoringRequestMatchers("/api/token") // Solo para endpoint OAuth2
+        )
+        
+        // ✅ Configuración de sesiones con cookies seguras
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            .maximumSessions(1)
+            .maxSessionsPreventsLogin(false)
+        );
+
+    return http.build();
+}
+
+// 2. Crear configurador personalizado de cookies
+@Configuration
+public class CookieConfig {
+    
+    @Bean
+    public CookieSerializer cookieSerializer() {
+        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+        
+        // ✅ Configurar SameSite
+        serializer.setSameSite("Strict"); // Strict, Lax, o None
+        
+        // ✅ Configurar cookies seguras
+        serializer.setUseSecureCookie(true); // Solo HTTPS
+        serializer.setUseHttpOnlyCookie(true); // No accesible desde JavaScript
+        
+        // Configuración adicional
+        serializer.setCookieName("JSESSIONID");
+        serializer.setCookiePath("/");
+        serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
+        
+        return serializer;
+    }
+}
+
+// 3. Configurar en application.properties
+server.servlet.session.cookie.same-site=strict
+server.servlet.session.cookie.secure=true
+server.servlet.session.cookie.http-only=true
+server.servlet.session.cookie.max-age=3600
+server.servlet.session.cookie.name=OAUTH_SESSION
+server.servlet.session.timeout=20m
+
+// 4. Para APIs REST sin estado, usar CSRF con tokens en headers
+@Configuration
+public class CsrfSecurityConfig {
+    
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieCustomizer(cookie -> cookie
+            .sameSite("Strict")
+            .secure(true)
+            .httpOnly(true)
+            .path("/")
+        );
+        return repository;
+    }
+}
+
+// 5. Si se usa OAuth2 sin sesiones, implementar protección alternativa
+@Component
+public class CsrfTokenFilter extends OncePerRequestFilter {
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain chain) throws ServletException, IOException {
+        
+        // Para APIs REST stateless, validar custom header
+        String csrfHeader = request.getHeader("X-CSRF-Token");
+        String csrfCookie = getCsrfCookieValue(request);
+        
+        if (isProtectedMethod(request.getMethod())) {
+            if (csrfHeader == null || !csrfHeader.equals(csrfCookie)) {
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.getWriter().write("{\"error\":\"CSRF token missing or invalid\"}");
+                return;
+            }
+        }
+        
+        chain.doFilter(request, response);
+    }
+    
+    private boolean isProtectedMethod(String method) {
+        return !method.equals("GET") && 
+               !method.equals("HEAD") && 
+               !method.equals("OPTIONS");
+    }
+    
+    private String getCsrfCookieValue(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("XSRF-TOKEN".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+}
+
+// 6. Agregar dependencias necesarias
+// En pom.xml
+<dependency>
+    <groupId>org.springframework.session</groupId>
+    <artifactId>spring-session-core</artifactId>
+</dependency>
+```
+
+**Opciones de configuración SameSite:**
+
+```java
+// Strict: La cookie NO se envía en requests cross-site
+serializer.setSameSite("Strict"); 
+// Mejor protección, pero puede romper funcionalidad legítima
+
+// Lax: La cookie se envía en navegación top-level GET
+serializer.setSameSite("Lax");
+// Balance entre seguridad y usabilidad (recomendado)
+
+// None: La cookie se envía en todos los requests (requiere Secure)
+serializer.setSameSite("None");
+serializer.setUseSecureCookie(true); // Obligatorio con None
+// Solo si necesitas funcionalidad cross-site explícita
+```
+
+**Evidencias requeridas según documento:**
+- **Opc1:** Configuración del navegador mostrando cookie con atributo SameSite
+- **Opc2:** Captura de Postman/navegador con headers de cookies
+- **Opc3:** Código fuente de configuración de cookies
+
+**Notas importantes:**
+- Para OAuth2 client credentials flow (sin sesión), SameSite es menos relevante
+- Para authorization code flow o password flow, es CRÍTICO
+- El proyecto actual usa principalmente client credentials (stateless)
+
+---
+
+### ID 12: El uso de métodos HTTP como PUT o DELETE deben ser sustituidos por POST
+**⚠️ NO APLICA ACTUALMENTE / PENDIENTE IMPLEMENTACIÓN**
+**🟡 SEVERIDAD MEDIA**
+
+**Descripción del requisito:**
+Sustituir métodos HTTP PUT y DELETE por POST para todas las operaciones.
+
+**Ubicación verificada:**
+- **Archivo:** `TokenController.java`
+- **No existen otros controllers públicos**
+
+**Análisis actual:**
+```java
+// TokenController.java - Solo usa POST
+@RestController
+@RequestMapping("/api")
+public class TokenController {
+    
+    @PostMapping("/token")  // ✅ Ya usa POST
+    public ResponseEntity<?> getToken(@RequestBody OauthTokenRequest request) {
+        // ...
+    }
+}
+
+// SecurityConfig.java - No restringe métodos adicionales
+@Bean
+@Order(2)
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/token").permitAll()  // ⚠️ Permite todos los métodos
+            .anyRequest().authenticated())
+        // ...
+}
+```
+
+**Estado actual:**
+- ✅ El único endpoint público (`/api/token`) ya usa POST
+- ⚠️ No hay restricción explícita de métodos PUT/DELETE
+- ⚠️ Endpoints futuros podrían usar PUT/DELETE sin control
+
+**Problemas potenciales:**
+1. No hay validación de métodos HTTP permitidos
+2. PUT/DELETE podrían ser habilitados accidentalmente
+3. Sin documentación de política de métodos HTTP
+
+**Solución requerida:**
+
+```java
+// 1. Restringir métodos HTTP en SecurityConfig
+@Bean
+@Order(2)
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            // Permitir solo GET y POST
+            .requestMatchers(HttpMethod.GET, "/actuator/**", "/error").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/token", "/login").permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // CORS preflight
+            
+            // Denegar explícitamente PUT, DELETE, PATCH, HEAD
+            .requestMatchers(HttpMethod.PUT, "/**").denyAll()
+            .requestMatchers(HttpMethod.DELETE, "/**").denyAll()
+            .requestMatchers(HttpMethod.PATCH, "/**").denyAll()
+            .requestMatchers(HttpMethod.HEAD, "/**").denyAll()
+            
+            .anyRequest().authenticated())
+        // ...
+        
+        return http.build();
+}
+
+// 2. Crear filtro personalizado para validar métodos
+@Component
+@Order(0)
+public class HttpMethodValidationFilter extends OncePerRequestFilter {
+    
+    private static final Set<String> ALLOWED_METHODS = Set.of("GET", "POST", "OPTIONS");
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain chain) throws ServletException, IOException {
+        
+        String method = request.getMethod();
+        
+        // Validar método HTTP
+        if (!ALLOWED_METHODS.contains(method)) {
+            log.warn("Método HTTP no permitido: {} desde {}", 
+                    method, request.getRemoteAddr());
+            
+            response.setStatus(HttpStatus.METHOD_NOT_ALLOWED.value());
+            response.setHeader("Allow", "GET, POST, OPTIONS");
+            response.getWriter().write(
+                "{\"error\":\"method_not_allowed\"," +
+                "\"message\":\"Solo GET y POST están permitidos\"," +
+                "\"allowed_methods\":[\"GET\",\"POST\",\"OPTIONS\"]}"
+            );
+            return;
+        }
+        
+        chain.doFilter(request, response);
+    }
+}
+
+// 3. Si necesitas operaciones tipo UPDATE/DELETE, usar POST con acción
+@RestController
+@RequestMapping("/api/admin")
+public class AdminController {
+    
+    // ❌ Evitar esto
+    // @PutMapping("/clients/{id}")
+    // @DeleteMapping("/clients/{id}")
+    
+    // ✅ Usar esto en su lugar
+    @PostMapping("/clients/{id}/update")
+    public ResponseEntity<?> updateClient(@PathVariable String id, 
+                                         @RequestBody ClientUpdateRequest request) {
+        // Lógica de actualización
+        return ResponseEntity.ok(/* ... */);
+    }
+    
+    @PostMapping("/clients/{id}/delete")
+    public ResponseEntity<?> deleteClient(@PathVariable String id) {
+        // Lógica de eliminación
+        return ResponseEntity.ok(Map.of("deleted", true));
+    }
+    
+    // O usar un campo "action" en el body
+    @PostMapping("/clients/{id}")
+    public ResponseEntity<?> manageClient(@PathVariable String id,
+                                         @RequestBody ClientActionRequest request) {
+        switch (request.getAction()) {
+            case "update":
+                return updateClientInternal(id, request);
+            case "delete":
+                return deleteClientInternal(id);
+            default:
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", "invalid_action"));
+        }
+    }
+}
+
+// 4. Configurar Tomcat para deshabilitar métodos
+// En application.properties
+server.tomcat.relaxed-query-chars=<,>,[,\,],^,`,{,|}
+server.tomcat.reject-illegal-header=true
+
+# Deshabilitar métodos no deseados a nivel de Tomcat
+server.allowed-methods=GET,POST,OPTIONS
+
+// 5. Documentar en Swagger las restricciones
+@Configuration
+public class OpenApiConfig {
+    
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("OAuth2 Authorization Server API")
+                .version("1.0")
+                .description("**Métodos HTTP permitidos:** GET, POST, OPTIONS\n\n" +
+                            "**Métodos bloqueados:** PUT, DELETE, PATCH, HEAD"))
+            .servers(List.of(
+                new Server().url("https://localhost:9054")
+            ));
+    }
+}
+```
+
+**Justificación del requisito:**
+1. **Seguridad en Firewalls:** Algunos firewalls bloquean PUT/DELETE
+2. **Simplificación:** Menos métodos = menor superficie de ataque
+3. **Compatibilidad:** Mejor soporte en proxies y balanceadores
+4. **Auditoría:** Más fácil de auditar con menos métodos
+
+**Evidencias requeridas según documento:**
+- **Opc1:** Configuración del postmapping en código
+- **Opc2:** Capturas de Postman con peticiones mostrando que se utiliza POST
+- **Opc3:** Captura de error al intentar usar PUT/DELETE
+
+**Nota importante:**
+Si el cliente solicita explícitamente usar PUT/DELETE por estándares REST, documentar la justificación y obtener aprobación por escrito.
+
+---
+
+## PERFILADO DE API / AUTORIZACIÓN
+
+### ID 1: El perfilado de una API refiere al control de acceso entre el cliente/consumidor y la API - Esquema de 6 pasos
+**❌ NO IMPLEMENTADO COMPLETAMENTE**
+**🔴🔴 SEVERIDAD CRÍTICA**
+
+**Descripción del requisito:**
+Implementar un esquema de control de acceso de 6 pasos para validar permisos entre cliente y API.
+
+**Esquema de 6 pasos propuesto:**
+
+**Paso 1:** Cliente envía credenciales (client_id, client_secret, scope)
+**Paso 2:** Servidor valida credenciales y genera token de acceso
+**Paso 3:** Cliente envía token en cada request a la API
+**Paso 4:** API valida el token
+**Paso 5:** API valida que el scope del token incluye el permiso necesario
+**Paso 6:** API procesa la solicitud y retorna respuesta
+
+**Ubicación del problema:**
+- **Archivo:** `TokenController.java` (Pasos 1-2 parcialmente implementados)
+- **Archivo:** `SecurityConfig.java` (Pasos 3-6 no implementados)
+- **No existe middleware de validación de scopes**
+
+**Análisis por paso:**
+
+```java
+// ===== PASO 1: Cliente envía credenciales =====
+// ✅ IMPLEMENTADO PARCIALMENTE en TokenController
+
+@PostMapping("/token")
+public ResponseEntity<?> getToken(@RequestBody OauthTokenRequest request) {
+    // ✅ Recibe client_id, client_secret, scopes
+    RegisteredClient registeredClient = 
+        registeredClientRepository.findByClientId(request.getClientId());
+}
+
+// ❌ FALTA: Validación estructural del request
+// ❌ FALTA: Validación de grant_type
+// ❌ FALTA: Logging de intentos de autenticación
+
+// ===== PASO 2: Servidor valida y genera token =====
+// ⚠️ PARCIALMENTE IMPLEMENTADO
+
+// ✅ Valida credenciales básicas
+if (registeredClient == null ||
+    !registeredClient.getClientSecret().equals("{noop}" + request.getClientSecret())) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body("Invalid client credentials");
+}
+
+// ❌ FALTA: Validar que scopes solicitados están permitidos
+// ❌ FALTA: Validar grant_type autorizado para el cliente
+// ❌ FALTA: Generar jti y nonce
+
+JwtClaimsSet claims = JwtClaimsSet.builder()
+        .claim("scope", String.join(" ", registeredClient.getScopes()))
+        // ❌ FALTA: jti, nonce, roles, permisos
+        .build();
+
+// ===== PASO 3: Cliente envía token en request =====
+// ❌ NO IMPLEMENTADO - No hay endpoints protegidos aún
+
+// ===== PASO 4: API valida el token =====
+// ❌ NO IMPLEMENTADO - No hay validación JWT en endpoints
+
+// ===== PASO 5: API valida scopes =====
+// ❌ NO IMPLEMENTADO - No hay validación de scopes
+
+// ===== PASO 6: API procesa y retorna =====
+// ❌ NO IMPLEMENTADO - No hay endpoints de negocio
+```
+
+**Solución requerida - Implementación completa de 6 pasos:**
+
+```java
+// ========================================
+// PASO 1: Recibir y validar credenciales
+// ========================================
+
+@RestController
+@RequestMapping("/api")
+public class TokenController {
+    
+    @Autowired
+    private AuthenticationService authService;
+    
+    @Autowired
+    private AuditService auditService;
+    
+    @PostMapping("/token")
+    public ResponseEntity<?> getToken(@Valid @RequestBody OauthTokenRequest request,
+                                      BindingResult bindingResult,
+                                      HttpServletRequest httpRequest) {
+        
+        // ✅ PASO 1.1: Validar estructura del request
+        if (bindingResult.hasErrors()) {
+            auditService.logFailedAuthentication(
+                request.getClientId(), 
+                "invalid_request_structure",
+                httpRequest.getRemoteAddr()
+            );
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", "invalid_request",
+                "error_description", "Request validation failed"
+            ));
+        }
+        
+        // ✅ PASO 1.2: Validar grant_type
+        if (!"client_credentials".equals(request.getGrantType())) {
+            auditService.logFailedAuthentication(
+                request.getClientId(),
+                "unsupported_grant_type",
+                httpRequest.getRemoteAddr()
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "error", "unsupported_grant_type",
+                "error_description", "Solo client_credentials es soportado"
+            ));
+        }
+        
+        // Continuar al Paso 2...
+    }
+}
+
+// ========================================
+// PASO 2: Validar credenciales y generar token
+// ========================================
+
+@Service
+public class AuthenticationService {
+    
+    @Autowired
+    private RegisteredClientRepository clientRepository;
+    
+    @Autowired
+    private JwtEncoder jwtEncoder;
+    
+    @Autowired
+    private SecureIdentifierGenerator idGenerator;
+    
+    public TokenResponse authenticateAndGenerateToken(OauthTokenRequest request) {
+        
+        // ✅ PASO 2.1: Validar client_id existe
+        RegisteredClient client = clientRepository.findByClientId(request.getClientId());
+        if (client == null) {
+            throw new InvalidClientException("Cliente no encontrado");
+        }
+        
+        // ✅ PASO 2.2: Validar client_secret
+        if (!client.getClientSecret().equals("{noop}" + request.getClientSecret())) {
+            throw new InvalidClientException("Credenciales inválidas");
+        }
+        
+        // ✅ PASO 2.3: Validar scopes solicitados vs permitidos
+        Set<String> allowedScopes = client.getScopes();
+        for (String requestedScope : request.getScopes()) {
+            if (!allowedScopes.contains(requestedScope)) {
+                throw new InsufficientScopeException(
+                    "Scope no autorizado: " + requestedScope
+                );
+            }
+        }
+        
+        // ✅ PASO 2.4: Generar token con todos los claims necesarios
+        Instant now = Instant.now();
+        Instant expiresAt = now.plus(1, ChronoUnit.HOURS);
+        
+        String jti = idGenerator.generateUUID();
+        String nonce = idGenerator.generateNonce();
+        
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("https://localhost:9054")
+                .subject(request.getClientId())
+                .audience(List.of("api-gateway", "resource-server"))
+                .issuedAt(now)
+                .expiresAt(expiresAt)
+                .claim("scope", String.join(" ", request.getScopes()))
+                .claim("jti", jti)  // ✅ JWT ID único
+                .claim("nonce", nonce)  // ✅ Prevenir replay
+                .claim("client_id", request.getClientId())
+                .build();
+        
+        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims));
+        
+        return new TokenResponse(
+            jwt.getTokenValue(),
+            "Bearer",
+            ChronoUnit.SECONDS.between(now, expiresAt),
+            String.join(" ", request.getScopes())
+        );
+    }
+}
+
+// ========================================
+// PASO 3: Cliente envía token en headers
+// ========================================
+
+// Documentar en API docs cómo enviar el token:
+// Authorization: Bearer <token>
+
+// ========================================
+// PASO 4: API valida el token
+// ========================================
+
+@Component
+public class JwtValidationFilter extends OncePerRequestFilter {
+    
+    @Autowired
+    private JwtDecoder jwtDecoder;
+    
+    @Autowired
+    private TokenBlacklistService blacklistService;
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain chain) throws ServletException, IOException {
+        
+        // Extraer token del header
+        String token = extractToken(request);
+        
+        if (token == null && requiresAuthentication(request)) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("{\"error\":\"missing_token\"}");
+            return;
+        }
+        
+        if (token != null) {
+            try {
+                // ✅ PASO 4.1: Decodificar y validar firma
+                Jwt jwt = jwtDecoder.decode(token);
+                
+                // ✅ PASO 4.2: Validar expiración
+                if (jwt.getExpiresAt().isBefore(Instant.now())) {
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.getWriter().write("{\"error\":\"token_expired\"}");
+                    return;
+                }
+                
+                // ✅ PASO 4.3: Validar jti no está en blacklist
+                String jti = jwt.getClaimAsString("jti");
+                if (blacklistService.isRevoked(jti)) {
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.getWriter().write("{\"error\":\"token_revoked\"}");
+                    return;
+                }
+                
+                // ✅ PASO 4.4: Guardar JWT en contexto
+                request.setAttribute("jwt", jwt);
+                request.setAttribute("client_id", jwt.getSubject());
+                request.setAttribute("scopes", jwt.getClaimAsString("scope").split(" "));
+                
+            } catch (JwtException e) {
+                log.error("Token inválido: {}", e.getMessage());
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.getWriter().write("{\"error\":\"invalid_token\"}");
+                return;
+            }
+        }
+        
+        chain.doFilter(request, response);
+    }
+    
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
+    }
+    
+    private boolean requiresAuthentication(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return !path.equals("/api/token") && 
+               !path.equals("/login") && 
+               !path.startsWith("/error");
+    }
+}
+
+// ========================================
+// PASO 5: API valida scopes
+// ========================================
+
+@Component
+public class ScopeValidationInterceptor implements HandlerInterceptor {
+    
+    @Override
+    public boolean preHandle(HttpServletRequest request,
+                           HttpServletResponse response,
+                           Object handler) throws Exception {
+        
+        // Obtener scopes del token
+        String[] tokenScopes = (String[]) request.getAttribute("scopes");
+        
+        if (tokenScopes == null) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("{\"error\":\"no_scopes_in_token\"}");
+            return false;
+        }
+        
+        // Determinar scope requerido para el endpoint
+        String requiredScope = determineRequiredScope(request);
+        
+        // ✅ PASO 5.1: Validar que el token tiene el scope requerido
+        boolean hasScope = Arrays.asList(tokenScopes).contains(requiredScope);
+        
+        if (!hasScope) {
+            log.warn("Acceso denegado: scope requerido '{}', scopes disponibles: {}", 
+                    requiredScope, Arrays.toString(tokenScopes));
+            
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.getWriter().write(String.format(
+                "{\"error\":\"insufficient_scope\"," +
+                "\"error_description\":\"Scope requerido: %s\"," +
+                "\"scopes_available\":%s}",
+                requiredScope, Arrays.toString(tokenScopes)
+            ));
+            return false;
+        }
+        
+        return true;
+    }
+    
+    private String determineRequiredScope(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+        
+        // Mapeo de endpoints a scopes requeridos
+        if (path.startsWith("/api/clients")) {
+            if ("GET".equals(method)) return "client:read";
+            if ("POST".equals(method)) return "client:create";
+            if ("PUT".equals(method)) return "client:update";
+            if ("DELETE".equals(method)) return "client:delete";
+        }
+        
+        if (path.startsWith("/api/admin")) {
+            return "admin:manage";
+        }
+        
+        return "api:access"; // Scope default
+    }
+}
+
+// ========================================
+// PASO 6: API procesa y retorna respuesta
+// ========================================
+
+@RestController
+@RequestMapping("/api/clients")
+public class ClientController {
+    
+    @Autowired
+    private ClientService clientService;
+    
+    @Autowired
+    private AuditService auditService;
+    
+    // ✅ PASO 6: Procesar request autorizado
+    @GetMapping("/{clientId}")
+    public ResponseEntity<?> getClient(@PathVariable String clientId,
+                                      HttpServletRequest request) {
+        
+        // En este punto, el token ya fue validado (Paso 4)
+        // y los scopes fueron verificados (Paso 5)
+        
+        String requestingClientId = (String) request.getAttribute("client_id");
+        
+        // ✅ PASO 6.1: Ejecutar lógica de negocio
+        Client client = clientService.findById(clientId);
+        
+        if (client == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // ✅ PASO 6.2: Validar autorización adicional (si necesario)
+        if (!requestingClientId.equals(clientId) && 
+            !hasAdminScope(request)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "Solo puedes ver tu propio perfil"));
+        }
+        
+        // ✅ PASO 6.3: Auditar acceso
+        auditService.logResourceAccess(
+            requestingClientId,
+            "GET /api/clients/" + clientId,
+            "success"
+        );
+        
+        // ✅ PASO 6.4: Retornar respuesta
+        return ResponseEntity.ok(client);
+    }
+    
+    private boolean hasAdminScope(HttpServletRequest request) {
+        String[] scopes = (String[]) request.getAttribute("scopes");
+        return scopes != null && Arrays.asList(scopes).contains("admin:manage");
+    }
+}
+
+// ========================================
+// Configuración WebMvc para registrar interceptores
+// ========================================
+
+@Configuration
+public class WebMvcConfig implements WebMvcConfigurer {
+    
+    @Autowired
+    private ScopeValidationInterceptor scopeInterceptor;
+    
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(scopeInterceptor)
+                .addPathPatterns("/api/**")
+                .excludePathPatterns("/api/token", "/login", "/error");
+    }
+}
+```
+
+**Diagrama del esquema de 6 pasos:**
+
+```
+┌─────────────┐                                      ┌──────────────────┐
+│   Cliente   │                                      │ OAuth2 Server    │
+│ (Aplicación)│                                      │  (TokenController)│
+└──────┬──────┘                                      └────────┬─────────┘
+       │                                                      │
+       │ PASO 1: POST /token                                 │
+       │ { client_id, client_secret, scope, grant_type }     │
+       ├─────────────────────────────────────────────────────>│
+       │                                                      │
+       │                      PASO 2: Validar credenciales   │
+       │                             Validar scopes          │
+       │                             Generar JWT con jti     │
+       │                                                      │
+       │         PASO 2: Response 200 OK                     │
+       │         { access_token, token_type, expires_in }    │
+       │<─────────────────────────────────────────────────────┤
+       │                                                      │
+       │                                                      │
+       │                                      ┌───────────────┴─────────┐
+       │                                      │    API Resource         │
+       │ PASO 3: GET /api/clients            │    (ClientController)    │
+       │ Authorization: Bearer <token>        └───────────────┬─────────┘
+       ├─────────────────────────────────────────────────────>│
+       │                                                      │
+       │                      PASO 4: Validar token JWT      │
+       │                              Verificar firma        │
+       │                              Verificar expiración   │
+       │                              Verificar blacklist    │
+       │                                                      │
+       │                      PASO 5: Validar scopes         │
+       │                              Verificar permisos     │
+       │                              Verificar autorización │
+       │                                                      │
+       │                      PASO 6: Procesar request       │
+       │                              Ejecutar lógica        │
+       │                              Auditar acceso         │
+       │                                                      │
+       │         Response 200 OK                             │
+       │         { data... }                                 │
+       │<─────────────────────────────────────────────────────┤
+       │                                                      │
+```
+
+**Evidencias requeridas según documento:**
+
+**Paso 1:** Captura donde se vea client_id, secret_id, scope. Mostrar estructura del JWT
+**Paso 2:** Código donde se valida el token. Mostrar JWT y su configuración
+**Paso 3:** Postman del token de acceso mostrando longitud
+**Paso 4:** Código o BD donde está configurado y error que regresa
+**Paso 5:** Mensaje de error cuando token es inválido
+**Paso 6:** Log y postman de la respuesta
+
+---
+
+## SESIÓN / EXPIRACIÓN
+
+### ID 1: Para flujos de baja transaccionalidad, el consumo debe ser por sesión la cual se limita a 20 minutos
+**❌ NO IMPLEMENTADO**
+**🔴 SEVERIDAD ALTA**
+
+**Descripción del requisito:**
+Para APIs de baja transaccionalidad, configurar sesiones con timeout de 20 minutos.
+
+**Ubicación del problema:**
+- **Archivo:** `TokenController.java` (línea 48)
+- **Archivo:** `SecurityConfig.java`
+- **Archivo:** `application.properties`
+
+**Problema específico:**
+```java
+// TokenController.java - Token válido por 1 HORA (no 20 minutos)
+Instant now = Instant.now();
+Instant expiresAt = now.plus(1, ChronoUnit.HOURS); // ⚠️ 60 minutos, no 20
+
+JwtClaimsSet claims = JwtClaimsSet.builder()
+        .issuedAt(now)
+        .expiresAt(expiresAt)  // ⚠️ Expiración incorrecta
+        .build();
+```
+
+```properties
+# application.properties - Sin configuración de timeout de sesión
+# ⚠️ FALTA: Configuración de session timeout
+# ⚠️ FALTA: Diferenciación entre alta y baja transaccionalidad
+```
+
+```java
+// SecurityConfig.java - Sin gestión de sesiones
+@Bean
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(/* ... */)
+        // ⚠️ FALTA: Configuración de sessionManagement
+        .csrf(AbstractHttpConfigurer::disable);
+}
+```
+
+**Problemas identificados:**
+1. Token de acceso válido por 60 minutos (debería ser 20)
+2. No hay diferenciación entre flujos de alta/baja transaccionalidad
+3. No hay configuración de timeout de sesión
+4. No hay renovación automática de sesiones
+
+**Solución requerida:**
+
+```java
+// 1. Crear enum para tipos de transaccionalidad
+public enum TransactionType {
+    LOW("low", 20, ChronoUnit.MINUTES),      // Baja: 20 minutos
+    HIGH("high", 1, ChronoUnit.DAYS);        // Alta: 1 día
+    
+    private final String type;
+    private final long duration;
+    private final ChronoUnit unit;
+    
+    TransactionType(String type, long duration, ChronoUnit unit) {
+        this.type = type;
+        this.duration = duration;
+        this.unit = unit;
+    }
+    
+    public Instant calculateExpiration(Instant from) {
+        return from.plus(duration, unit);
+    }
+}
+
+// 2. Modificar OauthTokenRequest para incluir tipo de transacción
+@Data
+public class OauthTokenRequest {
+    private String clientId;
+    private String clientSecret;
+    private String grantType;
+    private List<String> scopes;
+    
+    @Schema(description = "Tipo de transaccionalidad: low o high")
+    @Pattern(regexp = "^(low|high)$", message = "Debe ser 'low' o 'high'")
+    private String transactionType = "low"; // ✅ Default: baja transaccionalidad
+}
+
+// 3. Modificar TokenController para usar timeout correcto
+@RestController
+@RequestMapping("/api")
+public class TokenController {
+    
+    @PostMapping("/token")
+    public ResponseEntity<?> getToken(@Valid @RequestBody OauthTokenRequest request) {
+        
+        // Validaciones previas...
+        
+        Instant now = Instant.now();
+        
+        // ✅ Determinar expiración según tipo de transaccionalidad
+        TransactionType txType = "high".equals(request.getTransactionType()) 
+            ? TransactionType.HIGH 
+            : TransactionType.LOW;
+        
+        Instant expiresAt = txType.calculateExpiration(now);
+        
+        long expiresInSeconds = ChronoUnit.SECONDS.between(now, expiresAt);
+        
+        log.info("Generando token para cliente {} con tipo {} (expira en {} segundos)",
+                request.getClientId(), txType, expiresInSeconds);
+        
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("https://localhost:9054")
+                .subject(request.getClientId())
+                .audience(List.of("api-gateway", "resource-server"))
+                .issuedAt(now)
+                .expiresAt(expiresAt)  // ✅ 20 minutos o 1 día
+                .claim("scope", String.join(" ", request.getScopes()))
+                .claim("jti", UUID.randomUUID().toString())
+                .claim("transaction_type", txType.name())  // ✅ Guardar tipo
+                .build();
+        
+        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims));
+        
+        return ResponseEntity.ok(Map.of(
+                "access_token", jwt.getTokenValue(),
+                "token_type", "Bearer",
+                "expires_in", expiresInSeconds,  // ✅ 1200 seg (20 min) o 86400 seg (1 día)
+                "scope", String.join(" ", request.getScopes()),
+                "transaction_type", txType.name()
+        ));
+    }
+}
+
+// 4. Configurar gestión de sesiones en SecurityConfig
+@Bean
+@Order(2)
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(/* ... */)
+        
+        // ✅ Configuración de sesiones
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            .invalidSessionUrl("/login?expired=true")
+            .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+                .expiredUrl("/login?expired=true")
+        );
+    
+    return http.build();
+}
+
+// 5. Configurar en application.properties
+# Sesión para flujos de baja transaccionalidad
+server.servlet.session.timeout=20m
+server.servlet.session.cookie.max-age=1200
+
+# Configuración de tokens
+oauth2.token.low-transaction.expiration=20m
+oauth2.token.high-transaction.expiration=1d
+
+// 6. Crear servicio para validar expiración
+@Service
+public class SessionValidationService {
+    
+    public boolean isTokenExpired(Jwt jwt) {
+        Instant expiresAt = jwt.getExpiresAt();
+        return expiresAt != null && expiresAt.isBefore(Instant.now());
+    }
+    
+    public boolean shouldRenewToken(Jwt jwt) {
+        Instant expiresAt = jwt.getExpiresAt();
+        Instant now = Instant.now();
+        
+        // Renovar si quedan menos de 5 minutos
+        long minutesRemaining = ChronoUnit.MINUTES.between(now, expiresAt);
+        return minutesRemaining < 5;
+    }
+    
+    public String getTransactionType(Jwt jwt) {
+        return jwt.getClaimAsString("transaction_type");
+    }
+}
+
+// 7. Crear filtro para validar expiración en cada request
+@Component
+public class SessionExpirationFilter extends OncePerRequestFilter {
+    
+    @Autowired
+    private SessionValidationService sessionService;
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain chain) throws ServletException, IOException {
+        
+        Jwt jwt = (Jwt) request.getAttribute("jwt");
+        
+        if (jwt != null) {
+            // Validar expiración
+            if (sessionService.isTokenExpired(jwt)) {
+                log.warn("Token expirado para cliente: {}", jwt.getSubject());
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.getWriter().write(
+                    "{\"error\":\"token_expired\"," +
+                    "\"error_description\":\"El token ha expirado. Solicite uno nuevo.\"}"
+                );
+                return;
+            }
+            
+            // Advertir si está próximo a expirar
+            if (sessionService.shouldRenewToken(jwt)) {
+                response.setHeader("X-Token-Expires-Soon", "true");
+                response.setHeader("X-Token-Renewal-Recommended", "true");
+            }
+        }
+        
+        chain.doFilter(request, response);
+    }
+}
+```
+
+**Tabla de configuración de timeouts:**
+
+| Tipo de Transaccionalidad | Timeout de Token | Uso Recomendado |
+|---------------------------|------------------|-----------------|
+| **Baja (LOW)** | 20 minutos | APIs de consulta, reportes, operaciones ocasionales |
+| **Alta (HIGH)** | 1 día | APIs transaccionales, procesamiento batch, integraciones continuas |
+
+**Evidencias requeridas según documento:**
+- Explicación de cómo está implementado
+- Indicar si son de alta o baja transaccionalidad
+- Captura de Postman con configuración del token mostrando expires_in
+
+---
+
+### ID 2: En el caso de una alta tasa transaccional, la sesión deberá ser por día. Los ataques de replay serán mitigados mediante la cabecera nonce
+**⚠️ PARCIALMENTE IMPLEMENTADO**
+**🔴 SEVERIDAD ALTA**
+
+**Descripción del requisito:**
+Para APIs de alta transaccionalidad, configurar sesión de 1 día y usar nonce en headers para prevenir replay attacks.
+
+**Ubicación del problema:**
+- **Archivo:** `TokenController.java`
+- **No hay implementación de nonce en headers**
+
+**Problema específico:**
+```java
+// TokenController.java - No genera nonce
+JwtClaimsSet claims = JwtClaimsSet.builder()
+        .expiresAt(expiresAt)
+        // ⚠️ FALTA: nonce en JWT
+        .build();
+
+// No hay validación de nonce en requests subsecuentes
+```
+
+**Solución requerida:**
+
+```java
+// 1. Modificar TokenController para incluir nonce
+@RestController
+@RequestMapping("/api")
+public class TokenController {
+    
+    @Autowired
+    private SecureIdentifierGenerator idGenerator;
+    
+    @Autowired
+    private NonceValidationService nonceService;
+    
+    @PostMapping("/token")
+    public ResponseEntity<?> getToken(@Valid @RequestBody OauthTokenRequest request) {
+        
+        // ... validaciones previas
+        
+        Instant now = Instant.now();
+        
+        // Determinar tipo de transacción
+        TransactionType txType = "high".equals(request.getTransactionType())
+            ? TransactionType.HIGH
+            : TransactionType.LOW;
+        
+        Instant expiresAt = txType.calculateExpiration(now);
+        
+        // ✅ Generar nonce único
+        String nonce = idGenerator.generateNonce();
+        String jti = idGenerator.generateUUID();
+        
+        // ✅ Guardar nonce en cache para validación futura
+        nonceService.storeNonce(nonce, jti, expiresAt);
+        
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("https://localhost:9054")
+                .subject(request.getClientId())
+                .issuedAt(now)
+                .expiresAt(expiresAt)
+                .claim("scope", String.join(" ", request.getScopes()))
+                .claim("jti", jti)
+                .claim("nonce", nonce)  // ✅ Incluir nonce
+                .claim("transaction_type", txType.name())
+                .build();
+        
+        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims));
+        
+        return ResponseEntity.ok(Map.of(
+                "access_token", jwt.getTokenValue(),
+                "token_type", "Bearer",
+                "expires_in", ChronoUnit.SECONDS.between(now, expiresAt),
+                "nonce", nonce,  // ✅ Retornar nonce al cliente
+                "transaction_type", txType.name()
+        ));
+    }
+}
+
+// 2. Crear servicio de validación de nonce
+@Service
+public class NonceValidationService {
+    
+    // Cache de nonces usados (expiración automática)
+    private final Cache<String, NonceInfo> nonceCache;
+    
+    public NonceValidationService() {
+        this.nonceCache = Caffeine.newBuilder()
+                .expireAfterWrite(1, TimeUnit.DAYS)  // Máximo 1 día
+                .maximumSize(100_000)
+                .build();
+    }
+    
+    /**
+     * Almacenar nonce generado
+     */
+    public void storeNonce(String nonce, String jti, Instant expiresAt) {
+        NonceInfo info = new NonceInfo(jti, false, Instant.now(), expiresAt);
+        nonceCache.put(nonce, info);
+        log.debug("Nonce almacenado: {} para jti: {}", nonce, jti);
+    }
+    
+    /**
+     * Validar que el nonce no ha sido usado (prevenir replay)
+     */
+    public ValidationResult validateNonce(String nonce, String jti) {
+        NonceInfo info = nonceCache.getIfPresent(nonce);
+        
+        // Nonce no existe = posible replay o token expirado
+        if (info == null) {
+            log.warn("Nonce no encontrado o expirado: {}", nonce);
+            return ValidationResult.invalid("Nonce inválido o expirado");
+        }
+        
+        // Validar que el jti coincida
+        if (!info.getJti().equals(jti)) {
+            log.error("Nonce válido pero jti no coincide. Posible ataque de replay");
+            return ValidationResult.invalid("Token manipulado");
+        }
+        
+        // Validar que no ha sido usado previamente
+        if (info.isUsed()) {
+            log.error("REPLAY ATTACK DETECTED: Nonce {} ya fue usado", nonce);
+            return ValidationResult.replayAttack("Nonce ya fue usado - posible replay attack");
+        }
+        
+        // ✅ Marcar nonce como usado
+        info.setUsed(true);
+        info.setLastUsedAt(Instant.now());
+        nonceCache.put(nonce, info);
+        
+        log.debug("Nonce validado y marcado como usado: {}", nonce);
+        return ValidationResult.valid();
+    }
+    
+    /**
+     * Verificar si el nonce ha expirado
+     */
+    public boolean isExpired(String nonce) {
+        NonceInfo info = nonceCache.getIfPresent(nonce);
+        return info == null || info.getExpiresAt().isBefore(Instant.now());
+    }
+}
+
+@Data
+class NonceInfo {
+    private final String jti;
+    private boolean used;
+    private Instant createdAt;
+    private Instant expiresAt;
+    private Instant lastUsedAt;
+    
+    public NonceInfo(String jti, boolean used, Instant createdAt, Instant expiresAt) {
+        this.jti = jti;
+        this.used = used;
+        this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
+    }
+}
+
+@Data
+class ValidationResult {
+    private final boolean valid;
+    private final String errorMessage;
+    private final boolean isReplayAttack;
+    
+    public static ValidationResult valid() {
+        return new ValidationResult(true, null, false);
+    }
+    
+    public static ValidationResult invalid(String message) {
+        return new ValidationResult(false, message, false);
+    }
+    
+    public static ValidationResult replayAttack(String message) {
+        return new ValidationResult(false, message, true);
+    }
+}
+
+// 3. Crear filtro para validar nonce en cada request
+@Component
+@Order(2)
+public class NonceValidationFilter extends OncePerRequestFilter {
+    
+    @Autowired
+    private NonceValidationService nonceService;
+    
+    @Autowired
+    private SecurityAuditService auditService;
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain chain) throws ServletException, IOException {
+        
+        // Obtener JWT del request
+        Jwt jwt = (Jwt) request.getAttribute("jwt");
+        
+        if (jwt != null) {
+            String nonce = jwt.getClaimAsString("nonce");
+            String jti = jwt.getClaimAsString("jti");
+            String transactionType = jwt.getClaimAsString("transaction_type");
+            
+            // ✅ Validar nonce para flujos de alta transaccionalidad
+            if ("HIGH".equals(transactionType)) {
+                
+                if (nonce == null || jti == null) {
+                    log.error("Token de alta transaccionalidad sin nonce o jti");
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    response.getWriter().write(
+                        "{\"error\":\"invalid_token\"," +
+                        "\"error_description\":\"Token debe incluir nonce y jti\"}"
+                    );
+                    return;
+                }
+                
+                // Validar nonce
+                ValidationResult result = nonceService.validateNonce(nonce, jti);
+                
+                if (!result.isValid()) {
+                    
+                    // Si es replay attack, auditar y alertar
+                    if (result.isReplayAttack()) {
+                        auditService.logReplayAttack(
+                            jwt.getSubject(),
+                            nonce,
+                            jti,
+                            request.getRemoteAddr(),
+                            request.getRequestURI()
+                        );
+                        
+                        response.setStatus(HttpStatus.FORBIDDEN.value());
+                        response.getWriter().write(
+                            "{\"error\":\"replay_attack_detected\"," +
+                            "\"error_description\":\"" + result.getErrorMessage() + "\"}"
+                        );
+                    } else {
+                        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                        response.getWriter().write(
+                            "{\"error\":\"invalid_nonce\"," +
+                            "\"error_description\":\"" + result.getErrorMessage() + "\"}"
+                        );
+                    }
+                    return;
+                }
+                
+                log.debug("Nonce validado correctamente para request de alta transaccionalidad");
+            }
+        }
+        
+        chain.doFilter(request, response);
+    }
+}
+
+// 4. Servicio de auditoría para replay attacks
+@Service
+public class SecurityAuditService {
+    
+    private static final Logger log = LoggerFactory.getLogger(SecurityAuditService.class);
+    
+    @Autowired
+    private AuditRepository auditRepository;
+    
+    @Autowired
+    private AlertService alertService;
+    
+    public void logReplayAttack(String clientId, String nonce, String jti,
+                               String ipAddress, String requestUri) {
+        
+        SecurityIncident incident = SecurityIncident.builder()
+                .timestamp(Instant.now())
+                .incidentType("REPLAY_ATTACK")
+                .severity("CRITICAL")
+                .clientId(clientId)
+                .nonce(nonce)
+                .jti(jti)
+                .sourceIp(ipAddress)
+                .requestUri(requestUri)
+                .build();
+        
+        // Guardar en BD
+        auditRepository.save(incident);
+        
+        // Log crítico
+        log.error("🚨 REPLAY ATTACK DETECTED: clientId={}, nonce={}, jti={}, ip={}, uri={}",
+                 clientId, nonce, jti, ipAddress, requestUri);
+        
+        // Enviar alerta al equipo de seguridad
+        alertService.sendSecurityAlert(incident);
+        
+        // Considerar bloqueo temporal del cliente
+        if (shouldBlockClient(clientId)) {
+            blockClientTemporarily(clientId);
+        }
+    }
+    
+    private boolean shouldBlockClient(String clientId) {
+        // Verificar si hay múltiples intentos de replay
+        long recentAttacks = auditRepository.countRecentAttacks(
+            clientId, 
+            Instant.now().minus(5, ChronoUnit.MINUTES)
+        );
+        return recentAttacks >= 3; // 3 intentos en 5 minutos = bloqueo
+    }
+    
+    private void blockClientTemporarily(String clientId) {
+        log.error("BLOQUEANDO CLIENTE {} por múltiples intentos de replay attack", clientId);
+        // Implementar lógica de bloqueo
+    }
+}
+
+// 5. Documentar uso del nonce para el cliente
+/**
+ * Para flujos de alta transaccionalidad (transaction_type=high):
+ * 
+ * 1. El cliente recibe el nonce en la respuesta del token:
+ *    {
+ *      "access_token": "eyJ...",
+ *      "nonce": "abc123...",
+ *      "transaction_type": "HIGH"
+ *    }
+ * 
+ * 2. El cliente debe incluir el nonce en CADA request subsecuente:
+ *    Authorization: Bearer eyJ...
+ *    X-Nonce: abc123...
+ * 
+ * 3. El servidor valida que:
+ *    - El nonce existe
+ *    - El nonce corresponde al jti del token
+ *    - El nonce NO ha sido usado previamente
+ * 
+ * 4. Si el nonce ya fue usado = REPLAY ATTACK = request bloqueado
+ * 
+ * IMPORTANTE: Cada token tiene un nonce único que solo puede usarse UNA VEZ
+ */
+```
+
+**Configuración de timeouts para alta transaccionalidad:**
+
+```properties
+# application.properties
+
+# Alta transaccionalidad: sesión de 1 día
+oauth2.token.high-transaction.expiration=1d
+oauth2.token.high-transaction.nonce-required=true
+
+# Configuración de cache de nonces
+caffeine.cache.nonce.max-size=100000
+caffeine.cache.nonce.expire-after-write=1d
+
+# Configuración de alertas de seguridad
+security.replay-attack.alert-threshold=3
+security.replay-attack.block-duration=30m
+```
+
+**Evidencias requeridas según documento:**
+- **Opc1:** Captura de Postman mostrando token con nonce
+- **Opc2:** Configuración en código del nonce
+
+---
+
+### ID 3: Manejo de excepciones
+**❌ NO IMPLEMENTADO**
+**🔴 SEVERIDAD ALTA**
+
+**Descripción del requisito:**
+Documentar y demostrar el manejo de excepciones de manera estructurada.
+
+**Ubicación del problema:**
+- **Archivo:** `TokenController.java`
+- **No existe manejo centralizado de excepciones**
+
+**Problema específico:**
+```java
+// TokenController.java - Manejo de errores básico sin estructura
+@PostMapping("/token")
+public ResponseEntity<?> getToken(@RequestBody OauthTokenRequest request) {
+    
+    if (registeredClient == null || !validSecret) {
+        // ⚠️ Respuesta simple sin estructura de error estándar
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body("Invalid client credentials");
+    }
+    
+    // ⚠️ No hay try-catch para excepciones inesperadas
+    // ⚠️ No hay logging estructurado de errores
+    // ⚠️ No hay códigos de error específicos
+}
+```
+
+**Problemas identificados:**
+1. No hay manejo centralizado de excepciones
+2. Respuestas de error inconsistentes
+3. No hay logging estructurado de errores
+4. Sin códigos de error específicos para cada tipo de falla
+5. No se documentan las excepciones posibles
+
+**Solución requerida:**
+
+```java
+// 1. Crear estructura estándar de errores
+@Data
+@Builder
+public class ErrorResponse {
+    private String error;
+    private String errorDescription;
+    private String errorCode;
+    private Instant timestamp;
+    private String path;
+    private Integer status;
+    private Map<String, String> details;
+}
+
+// 2. Crear excepciones personalizadas
+public class OAuth2Exception extends RuntimeException {
+    private final String errorCode;
+    private final HttpStatus httpStatus;
+    private final Map<String, String> details;
+    
+    public OAuth2Exception(String message, String errorCode, HttpStatus status) {
+        super(message);
+        this.errorCode = errorCode;
+        this.httpStatus = status;
+        this.details = new HashMap<>();
+    }
+}
+
+public class InvalidClientException extends OAuth2Exception {
+    public InvalidClientException(String message) {
+        super(message, "AUTH001", HttpStatus.UNAUTHORIZED);
+    }
+}
+
+public class InsufficientScopeException extends OAuth2Exception {
+    public InsufficientScopeException(String message) {
+        super(message, "AUTH002", HttpStatus.FORBIDDEN);
+    }
+}
+
+public class InvalidGrantTypeException extends OAuth2Exception {
+    public InvalidGrantTypeException(String message) {
+        super(message, "AUTH003", HttpStatus.BAD_REQUEST);
+    }
+}
+
+public class TokenExpiredException extends OAuth2Exception {
+    public TokenExpiredException(String message) {
+        super(message, "AUTH004", HttpStatus.UNAUTHORIZED);
+    }
+}
+
+public class ReplayAttackException extends OAuth2Exception {
+    public ReplayAttackException(String message) {
+        super(message, "SEC001", HttpStatus.FORBIDDEN);
+    }
+}
+
+// 3. Crear manejador global de excepciones
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    
+    /**
+     * Manejar excepciones de OAuth2
+     */
+    @ExceptionHandler(OAuth2Exception.class)
+    public ResponseEntity<ErrorResponse> handleOAuth2Exception(
+            OAuth2Exception ex,
+            HttpServletRequest request) {
+        
+        log.error("OAuth2 Error [{}]: {} en {}", 
+                 ex.getErrorCode(), ex.getMessage(), request.getRequestURI());
+        
+        ErrorResponse error = ErrorResponse.builder()
+                .error(ex.getErrorCode())
+                .errorDescription(ex.getMessage())
+                .errorCode(ex.getErrorCode())
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .status(ex.getHttpStatus().value())
+                .details(ex.getDetails())
+                .build();
+        
+        return ResponseEntity
+                .status(ex.getHttpStatus())
+                .body(error);
+    }
+    
+    /**
+     * Manejar errores de validación (Bean Validation)
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
+        
+        Map<String, String> validationErrors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+            validationErrors.put(error.getField(), error.getDefaultMessage())
+        );
+        
+        log.warn("Validation error en {}: {}", request.getRequestURI(), validationErrors);
+        
+        ErrorResponse error = ErrorResponse.builder()
+                .error("VAL001")
+                .errorDescription("Validación de request fallida")
+                .errorCode("VAL001")
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .details(validationErrors)
+                .build();
+        
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(error);
+    }
+    
+    /**
+     * Manejar errores JWT
+     */
+    @ExceptionHandler({JwtException.class, JwtValidationException.class})
+    public ResponseEntity<ErrorResponse> handleJwtException(
+            Exception ex,
+            HttpServletRequest request) {
+        
+        log.error("JWT Error en {}: {}", request.getRequestURI(), ex.getMessage());
+        
+        ErrorResponse error = ErrorResponse.builder()
+                .error("AUTH005")
+                .errorDescription("Token JWT inválido")
+                .errorCode("AUTH005")
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .build();
+        
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(error);
+    }
+    
+    /**
+     * Manejar errores de acceso denegado
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(
+            AccessDeniedException ex,
+            HttpServletRequest request) {
+        
+        log.warn("Acceso denegado en {}: {}", request.getRequestURI(), ex.getMessage());
+        
+        ErrorResponse error = ErrorResponse.builder()
+                .error("AUTH006")
+                .errorDescription("Acceso denegado")
+                .errorCode("AUTH006")
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .status(HttpStatus.FORBIDDEN.value())
+                .build();
+        
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(error);
+    }
+    
+    /**
+     * Manejar errores HTTP genéricos
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(
+            HttpRequestMethodNotSupportedException ex,
+            HttpServletRequest request) {
+        
+        log.warn("Método no soportado en {}: {}", request.getRequestURI(), ex.getMethod());
+        
+        ErrorResponse error = ErrorResponse.builder()
+                .error("HTTP001")
+                .errorDescription("Método HTTP no soportado: " + ex.getMethod())
+                .errorCode("HTTP001")
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .status(HttpStatus.METHOD_NOT_ALLOWED.value())
+                .build();
+        
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .header("Allow", String.join(", ", ex.getSupportedMethods()))
+                .body(error);
+    }
+    
+    /**
+     * Manejar cualquier excepción no controlada
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(
+            Exception ex,
+            HttpServletRequest request) {
+        
+        log.error("Error inesperado en {}: ", request.getRequestURI(), ex);
+        
+        ErrorResponse error = ErrorResponse.builder()
+                .error("SYS001")
+                .errorDescription("Error interno del servidor")
+                .errorCode("SYS001")
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .build();
+        
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(error);
+    }
+}
+
+// 4. Modificar TokenController para usar excepciones
+@RestController
+@RequestMapping("/api")
+public class TokenController {
+    
+    @PostMapping("/token")
+    public ResponseEntity<?> getToken(@Valid @RequestBody OauthTokenRequest request) {
+        
+        try {
+            // Validar client_id
+            RegisteredClient client = 
+                registeredClientRepository.findByClientId(request.getClientId());
+            
+            if (client == null) {
+                throw new InvalidClientException("Cliente no encontrado");
+            }
+            
+            // Validar client_secret
+            if (!client.getClientSecret().equals("{noop}" + request.getClientSecret())) {
+                throw new InvalidClientException("Credenciales inválidas");
+            }
+            
+            // Validar grant_type
+            if (!"client_credentials".equals(request.getGrantType())) {
+                throw new InvalidGrantTypeException(
+                    "Grant type no soportado: " + request.getGrantType()
+                );
+            }
+            
+            // Validar scopes
+            for (String scope : request.getScopes()) {
+                if (!client.getScopes().contains(scope)) {
+                    throw new InsufficientScopeException(
+                        "Scope no autorizado: " + scope
+                    );
+                }
+            }
+            
+            // Generar token
+            // ...
+            
+            return ResponseEntity.ok(/* token response */);
+            
+        } catch (OAuth2Exception e) {
+            // Las excepciones OAuth2 serán manejadas por GlobalExceptionHandler
+            throw e;
+        } catch (Exception e) {
+            // Cualquier otra excepción
+            log.error("Error inesperado generando token para {}: ", 
+                     request.getClientId(), e);
+            throw new RuntimeException("Error generando token", e);
+        }
+    }
+}
+
+// 5. Documentar códigos de error
+/**
+ * CÓDIGOS DE ERROR - OAUTH2 AUTHORIZATION SERVER
+ * 
+ * Autenticación (AUTH):
+ * - AUTH001: Cliente inválido o no encontrado
+ * - AUTH002: Scopes insuficientes
+ * - AUTH003: Grant type inválido
+ * - AUTH004: Token expirado
+ * - AUTH005: Token JWT inválido
+ * - AUTH006: Acceso denegado
+ * 
+ * Seguridad (SEC):
+ * - SEC001: Replay attack detectado
+ * - SEC002: Nonce inválido
+ * - SEC003: Cliente bloqueado
+ * 
+ * Validación (VAL):
+ * - VAL001: Validación de request fallida
+ * - VAL002: Parámetros requeridos faltantes
+ * 
+ * HTTP (HTTP):
+ * - HTTP001: Método HTTP no soportado
+ * - HTTP002: Recurso no encontrado
+ * 
+ * Sistema (SYS):
+ * - SYS001: Error interno del servidor
+ * - SYS002: Servicio no disponible
+ */
+```
+
+**Tabla de excepciones y códigos de error:**
+
+| Código | Excepción | HTTP Status | Descripción | Acción del Cliente |
+|--------|-----------|-------------|-------------|--------------------|
+| AUTH001 | InvalidClientException | 401 | Cliente no encontrado o credenciales inválidas | Verificar client_id y client_secret |
+| AUTH002 | InsufficientScopeException | 403 | Scopes solicitados no autorizados | Solicitar solo scopes permitidos |
+| AUTH003 | InvalidGrantTypeException | 400 | Grant type no soportado | Usar client_credentials |
+| AUTH004 | TokenExpiredException | 401 | Token ha expirado | Solicitar nuevo token |
+| AUTH005 | JwtException | 401 | Token JWT inválido o manipulado | Solicitar nuevo token |
+| SEC001 | ReplayAttackException | 403 | Nonce ya fue usado | Solicitar nuevo token |
+| VAL001 | ValidationException | 400 | Request no pasa validaciones | Corregir formato del request |
+
+**Evidencias requeridas según documento:**
+- **Opc1:** Código fuente del manejo de excepciones
+- **Opc2:** Configuración en tablas donde se vean las excepciones
+- **Opc3:** Capturas de Postman con diferentes tipos de errores
+
+---
+
+## Resumen Consolidado de Severidades
+
+| Dominio | ID | Requisito | Estado | Severidad | Impacto |
+|---------|----|-----------| -------|-----------|---------|
+| **Acceso/Consumo** | 11 | Cookie SameSite | ❌ No implementado | 🔴 **ALTA** | Vulnerable a CSRF |
+| **Acceso/Consumo** | 12 | Sustituir PUT/DELETE por POST | ⚠️ N/A actualmente | 🟡 **MEDIA** | Sin riesgo actual |
+| **Perfilado API** | 1 | Esquema 6 pasos | ❌ No implementado | 🔴🔴 **CRÍTICA** | Sin control de acceso |
+| **Sesión** | 1 | Timeout 20 minutos | ❌ No implementado | 🔴 **ALTA** | Sesiones muy largas |
+| **Sesión** | 2 | Sesión 1 día + nonce | ⚠️ Parcial | 🔴 **ALTA** | Vulnerable a replay |
+| **Sesión** | 3 | Manejo excepciones | ❌ No implementado | 🔴 **ALTA** | Errores sin estructura |
+
+## Prioridad de Corrección
+
+### 🔴🔴 **CRÍTICAS - Corregir INMEDIATAMENTE**
+1. **Perfilado ID 1:** Implementar esquema completo de 6 pasos
+   - Validación de credenciales (Paso 1-2)
+   - Validación de token (Paso 3-4)
+   - Validación de scopes (Paso 5)
+   - Procesamiento autorizado (Paso 6)
+
+### 🔴 **ALTAS - Bloquean producción**
+2. **Sesión ID 1:** Implementar timeout de 20 minutos para baja transaccionalidad
+3. **Sesión ID 2:** Implementar nonce y validación de replay para alta transaccionalidad
+4. **Sesión ID 3:** Crear manejo centralizado de excepciones con códigos de error
+5. **Acceso ID 11:** Configurar cookie SameSite (si se usa autenticación con sesión)
+
+### 🟡 **MEDIAS - Completar antes de producción**
+6. **Acceso ID 12:** Documentar restricción de métodos HTTP
+
+**Estado Global: CRÍTICO - NO APTO PARA PRODUCCIÓN** ⛔
+
+**Compliance: 0/6 requisitos cumplidos (0%)**
+
+---
+
+## Checklist de Implementación
+
+### Fase 1 - Críticos (Sprint 1):
+- [ ] Implementar esquema de 6 pasos completo (Perfilado ID 1)
+- [ ] Crear filtros de validación de JWT
+- [ ] Implementar validación de scopes por endpoint
+- [ ] Crear manejo centralizado de excepciones (Sesión ID 3)
+
+### Fase 2 - Altos (Sprint 2):
+- [ ] Configurar timeouts diferenciados (20 min vs 1 día)
+- [ ] Implementar generación y validación de nonce
+- [ ] Crear cache de nonces con Caffeine
+- [ ] Agregar auditoría de replay attacks
+- [ ] Configurar cookie SameSite si aplica
+
+### Fase 3 - Verificación:
+- [ ] Tests de flujo completo de 6 pasos
+- [ ] Tests de expiración de sesiones
+- [ ] Tests de replay attack con nonce
+- [ ] Tests de manejo de excepciones
+- [ ] Documentación completa de errores
+
+**Tiempo estimado de corrección:** 2-3 sprints para todos los requisitos críticos.
