@@ -5282,26 +5282,2403 @@ public class TokenController {
 
 ---
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Análisis Detallado de Requisitos de Seguridad (Administración de API y Respuesta del Servidor)
+
+---
+
+## ADMINISTRACIÓN DE API
+
+### ID 1: Las APIs deben ser consumidas únicamente a través del API Gateway/servidor de autorización
+**⚠️ NO VERIFICABLE / REQUIERE ARQUITECTURA**
+**🔴 SEVERIDAD ALTA**
+
+**Descripción del requisito:**
+Las APIs solo deben ser accesibles a través del API Gateway. Ambientes de test deben tener su propio gateway separado.
+
+**Ubicación verificada:**
+- **Archivo:** `application.properties`
+- **Archivo:** `AuthorizationServerApplication.java`
+- **Configuración de red:** No visible en código
+
+**Análisis actual:**
+```properties
+# application.properties
+spring.application.name=ServidorOauth
+server.port=9054
+
+# Eureka - Se registra en service discovery
+eureka.client.serviceUrl.defaultZone=https://localhost:9100/eureka/
+eureka.instance.secure-port=9054
+eureka.instance.non-secure-port-enabled=false
+
+# ⚠️ FALTA: Configuración de API Gateway
+# ⚠️ FALTA: Restricción de acceso directo
+# ⚠️ FALTA: Configuración de ambientes separados
+```
+
+```java
+// AuthorizationServerApplication.java
+@SpringBootApplication
+@EnableDiscoveryClient  // ✅ Se registra en Eureka
+public class AuthorizationServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(AuthorizationServerApplication.class, args);
+    }
+}
+
+// ⚠️ No hay validación de origen de requests
+// ⚠️ No hay verificación de que requests vengan del gateway
+```
+
+**Problemas identificados:**
+1. No hay evidencia de API Gateway en el código
+2. No hay validación de que requests provengan del gateway
+3. No hay restricción de acceso directo al servidor OAuth2
+4. No hay configuración de ambientes separados (dev/test/prod)
+5. Falta documentación de arquitectura de red
+
+**Solución requerida:**
+
+```java
+// 1. Crear filtro para validar origen desde API Gateway
+@Component
+@Order(0)
+public class ApiGatewayValidationFilter extends OncePerRequestFilter {
+    
+    @Value("${api.gateway.secret-header:X-Gateway-Secret}")
+    private String gatewaySecretHeaderName;
+    
+    @Value("${api.gateway.secret-value}")
+    private String expectedGatewaySecret;
+    
+    @Value("${api.gateway.enabled:true}")
+    private boolean gatewayValidationEnabled;
+    
+    @Value("${api.gateway.allowed-ips}")
+    private Set<String> allowedGatewayIps;
+    
+    private static final Set<String> BYPASS_PATHS = Set.of(
+        "/actuator/health",
+        "/error"
+    );
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain chain) throws ServletException, IOException {
+        
+        String requestPath = request.getRequestURI();
+        
+        // Permitir ciertos paths sin validación
+        if (BYPASS_PATHS.contains(requestPath)) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        if (gatewayValidationEnabled) {
+            
+            // ✅ Validación 1: Header secreto del gateway
+            String gatewaySecret = request.getHeader(gatewaySecretHeaderName);
+            
+            if (gatewaySecret == null || !gatewaySecret.equals(expectedGatewaySecret)) {
+                log.warn("Request sin header de gateway válido desde: {}", 
+                        request.getRemoteAddr());
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.getWriter().write(
+                    "{\"error\":\"direct_access_forbidden\"," +
+                    "\"message\":\"Las APIs solo pueden ser consumidas a través del API Gateway\"}"
+                );
+                return;
+            }
+            
+            // ✅ Validación 2: IP del gateway
+            String clientIp = getClientIP(request);
+            
+            if (!allowedGatewayIps.contains(clientIp)) {
+                log.error("Request desde IP no autorizada: {} (esperadas: {})", 
+                         clientIp, allowedGatewayIps);
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.getWriter().write(
+                    "{\"error\":\"ip_not_authorized\"," +
+                    "\"message\":\"IP no autorizada para acceso directo\"}"
+                );
+                return;
+            }
+            
+            // ✅ Validación 3: Header X-Forwarded-For presente (indica proxy)
+            String forwardedFor = request.getHeader("X-Forwarded-For");
+            if (forwardedFor == null) {
+                log.warn("Request sin X-Forwarded-For, posible acceso directo");
+            }
+        }
+        
+        chain.doFilter(request, response);
+    }
+    
+    private String getClientIP(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        
+        String xRealIP = request.getHeader("X-Real-IP");
+        if (xRealIP != null && !xRealIP.isEmpty()) {
+            return xRealIP;
+        }
+        
+        return request.getRemoteAddr();
+    }
+}
+
+// 2. Configurar en application.properties por ambiente
+# application-dev.properties
+api.gateway.enabled=false
+api.gateway.validation.strict=false
+environment.name=DEVELOPMENT
+api.gateway.url=https://gateway-dev.empresa.com
+
+# application-test.properties
+api.gateway.enabled=true
+api.gateway.validation.strict=true
+api.gateway.secret-value=${GATEWAY_SECRET_TEST}
+api.gateway.allowed-ips=10.0.1.100,10.0.1.101
+environment.name=TEST
+api.gateway.url=https://gateway-test.empresa.com
+
+# application-prod.properties
+api.gateway.enabled=true
+api.gateway.validation.strict=true
+api.gateway.secret-value=${GATEWAY_SECRET_PROD}
+api.gateway.allowed-ips=10.0.2.100,10.0.2.101,10.0.2.102
+environment.name=PRODUCTION
+api.gateway.url=https://gateway.empresa.com
+
+# 3. Configurar Security para bloquear acceso directo
+@Bean
+@Order(2)
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/actuator/health").permitAll()
+            .requestMatchers("/error").permitAll()
+            // Todos los demás endpoints requieren header de gateway
+            .anyRequest().authenticated())
+        
+        // ✅ Agregar filtro de validación de gateway
+        .addFilterBefore(
+            apiGatewayValidationFilter(), 
+            UsernamePasswordAuthenticationFilter.class
+        );
+    
+    return http.build();
+}
+
+// 4. Crear servicio para verificar ambiente
+@Service
+public class EnvironmentService {
+    
+    @Value("${environment.name:UNKNOWN}")
+    private String environmentName;
+    
+    @Value("${api.gateway.url}")
+    private String gatewayUrl;
+    
+    public boolean isProduction() {
+        return "PRODUCTION".equals(environmentName);
+    }
+    
+    public boolean isTest() {
+        return "TEST".equals(environmentName);
+    }
+    
+    public boolean isDevelopment() {
+        return "DEVELOPMENT".equals(environmentName);
+    }
+    
+    public String getGatewayUrl() {
+        return gatewayUrl;
+    }
+    
+    public String getEnvironmentName() {
+        return environmentName;
+    }
+}
+
+// 5. Configurar firewall a nivel de red (documentar en arquitectura)
+/**
+ * CONFIGURACIÓN DE RED REQUERIDA:
+ * 
+ * PRODUCCIÓN:
+ * - OAuth2 Server: 10.0.2.50:9054
+ * - API Gateway: 10.0.2.100-102:443
+ * - Firewall: Solo permitir tráfico desde IPs del Gateway
+ * 
+ * TEST:
+ * - OAuth2 Server: 10.0.1.50:9054
+ * - API Gateway: 10.0.1.100-101:443
+ * - Firewall: Solo permitir tráfico desde IPs del Gateway
+ * 
+ * DESARROLLO:
+ * - OAuth2 Server: localhost:9054
+ * - Sin API Gateway (acceso directo permitido)
+ * 
+ * REGLAS DE FIREWALL:
+ * iptables -A INPUT -p tcp --dport 9054 -s 10.0.2.100 -j ACCEPT
+ * iptables -A INPUT -p tcp --dport 9054 -s 10.0.2.101 -j ACCEPT
+ * iptables -A INPUT -p tcp --dport 9054 -s 10.0.2.102 -j ACCEPT
+ * iptables -A INPUT -p tcp --dport 9054 -j DROP
+ */
+
+// 6. Documentar en Swagger la arquitectura
+@Configuration
+public class OpenApiConfig {
+    
+    @Value("${environment.name}")
+    private String environment;
+    
+    @Value("${api.gateway.url}")
+    private String gatewayUrl;
+    
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("OAuth2 Authorization Server")
+                .version("1.0.0")
+                .description(String.format(
+                    "**Ambiente:** %s\n\n" +
+                    "**⚠️ IMPORTANTE:** Esta API solo debe ser consumida a través del API Gateway\n\n" +
+                    "**API Gateway URL:** %s\n\n" +
+                    "**Acceso Directo:** Bloqueado en ambientes de TEST y PRODUCCIÓN\n\n" +
+                    "Todas las peticiones deben incluir el header secreto del gateway.",
+                    environment, gatewayUrl
+                ))
+            )
+            .servers(List.of(
+                new Server()
+                    .url(gatewayUrl)
+                    .description("API Gateway - " + environment)
+            ))
+            .addSecurityItem(new SecurityRequirement().addList("gateway-secret"))
+            .components(new Components()
+                .addSecuritySchemes("gateway-secret", 
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.APIKEY)
+                        .in(SecurityScheme.In.HEADER)
+                        .name("X-Gateway-Secret")
+                )
+            );
+    }
+}
+```
+
+**Diagrama de arquitectura requerido:**
+
+```
+┌─────────────┐
+│   Cliente   │
+│(Aplicación) │
+└──────┬──────┘
+       │
+       │ HTTPS
+       │
+       ▼
+┌──────────────────────────────────────────┐
+│         API GATEWAY                       │
+│  (Spring Cloud Gateway / Kong / Nginx)   │
+│                                           │
+│  - Rate Limiting                          │
+│  - Autenticación                          │
+│  - Logging                                │
+│  - Agregación de respuestas              │
+│  - Inyecta: X-Gateway-Secret             │
+└──────────────┬───────────────────────────┘
+               │
+               │ HTTPS + Header Secreto
+               │ X-Gateway-Secret: xxx
+               │
+        ┌──────┴───────┐
+        │              │
+        ▼              ▼
+┌──────────────┐  ┌──────────────┐
+│OAuth2 Server │  │   Resource   │
+│   (9054)     │  │   Servers    │
+│              │  │              │
+│ ✅ Valida    │  │ ✅ Valida    │
+│ header       │  │ header       │
+│ secreto      │  │ secreto      │
+└──────────────┘  └──────────────┘
+
+AMBIENTES SEPARADOS:
+- DEV:  Sin gateway, acceso directo permitido
+- TEST: Gateway obligatorio (gateway-test.empresa.com)
+- PROD: Gateway obligatorio (gateway.empresa.com)
+```
+
+**Evidencias requeridas según documento:**
+- **Opc1:** Diagrama mostrando API Gateway
+- **Opc2:** Captura de Postman o configuración mostrando que se usa gateway
+- **Opc3:** Correo indicando si se ocupa o no
+
+**Notas importantes:**
+- Este requisito requiere coordinación con infraestructura y arquitectura
+- Debe documentarse en diseño técnico y arquitectura de solución
+- Firewall de red es crítico como segunda capa de protección
+
+---
+
+### ID 2: La definición de cada API (entradas y salidas) deberá ser documentada en un catálogo para auditorías posteriores
+**⚠️ PARCIALMENTE IMPLEMENTADO**
+**🟡 SEVERIDAD MEDIA**
+
+**Descripción del requisito:**
+Documentar todas las APIs con sus entradas, salidas, métodos, headers, y códigos de error en un catálogo auditable.
+
+**Ubicación verificada:**
+- **Archivo:** `pom.xml` (línea 43-47)
+- **Swagger configurado pero sin personalización**
+
+**Análisis actual:**
+```xml
+<!-- pom.xml - Swagger/OpenAPI configurado -->
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.6.0</version>
+</dependency>
+```
+
+```java
+// OauthTokenRequest.java - Con anotaciones @Schema básicas
+@Data
+public class OauthTokenRequest {
+    @Schema(description="ClientId que se utiliza en la boveda de Cyberark")
+    private String clientId;
+    
+    @Schema(description="Secret guardado en la boveda de Cyberark")
+    private String clientSecret;
+    
+    @Schema(description="Scopes del ClientId")
+    private List<String> scopes;
+}
+
+// ⚠️ FALTA: Ejemplos de valores
+// ⚠️ FALTA: Documentación de errores
+// ⚠️ FALTA: Documentación completa de endpoints
+```
+
+**Problemas identificados:**
+1. Swagger instalado pero sin configuración personalizada
+2. No hay documentación completa de errores
+3. No hay ejemplos de requests/responses
+4. No hay documentación de headers requeridos
+5. No hay versionamiento de API documentado
+6. Falta catálogo centralizado para auditoría
+
+**Solución requerida:**
+
+```java
+// 1. Configurar OpenAPI con información completa
+@Configuration
+public class OpenApiConfig {
+    
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("OAuth2 Authorization Server API")
+                .version("v1.0.0")
+                .description(buildDescription())
+                .contact(new Contact()
+                    .name("Equipo de Desarrollo")
+                    .email("desarrollo@empresa.com")
+                )
+                .license(new License()
+                    .name("Interno - Uso Empresarial")
+                )
+            )
+            .servers(List.of(
+                new Server().url("https://localhost:9054").description("Local"),
+                new Server().url("https://oauth-test.empresa.com").description("TEST"),
+                new Server().url("https://oauth.empresa.com").description("PRODUCCIÓN")
+            ))
+            .components(new Components()
+                .addSchemas("ErrorResponse", createErrorResponseSchema())
+                .addSecuritySchemes("client_credentials", createOAuth2Scheme())
+            );
+    }
+    
+    private String buildDescription() {
+        return """
+            # OAuth2 Authorization Server
+            
+            ## Descripción
+            Servidor de autorización OAuth 2.0 que emite tokens de acceso JWT para autenticación 
+            y autorización de clientes.
+            
+            ## Flujo de Autenticación
+            1. Cliente solicita token con credenciales (client_id, client_secret)
+            2. Servidor valida credenciales y scopes
+            3. Servidor emite JWT con duración configurada
+            4. Cliente usa JWT en header Authorization para acceder a recursos
+            
+            ## Grant Types Soportados
+            - `client_credentials`: Para aplicaciones server-to-server
+            
+            ## Transaccionalidad
+            - **Baja (LOW)**: Token válido por 20 minutos
+            - **Alta (HIGH)**: Token válido por 1 día + nonce obligatorio
+            
+            ## Seguridad
+            - TLS 1.3/1.2 obligatorio
+            - Validación de scopes por endpoint
+            - Rate limiting habilitado
+            - Replay attack protection con nonce
+            
+            ## Ambientes
+            - **Desarrollo**: Acceso directo permitido
+            - **Test/Producción**: Solo a través de API Gateway
+            """;
+    }
+    
+    private Schema<?> createErrorResponseSchema() {
+        return new Schema<>()
+            .type("object")
+            .description("Estructura estándar de errores")
+            .addProperty("error", new Schema<>().type("string").description("Código de error"))
+            .addProperty("errorDescription", new Schema<>().type("string").description("Descripción del error"))
+            .addProperty("errorCode", new Schema<>().type("string").description("Código interno"))
+            .addProperty("timestamp", new Schema<>().type("string").format("date-time"))
+            .addProperty("path", new Schema<>().type("string").description("Path del request"))
+            .addProperty("status", new Schema<>().type("integer").description("HTTP status code"));
+    }
+    
+    private SecurityScheme createOAuth2Scheme() {
+        return new SecurityScheme()
+            .type(SecurityScheme.Type.OAUTH2)
+            .description("OAuth2 Client Credentials Flow")
+            .flows(new OAuthFlows()
+                .clientCredentials(new OAuthFlow()
+                    .tokenUrl("https://localhost:9054/api/token")
+                    .scopes(new Scopes()
+                        .addString("client:read", "Leer información de clientes")
+                        .addString("client:create", "Crear clientes")
+                        .addString("client:update", "Actualizar clientes")
+                        .addString("client:delete", "Eliminar clientes")
+                        .addString("admin:manage", "Gestión administrativa")
+                    )
+                )
+            );
+    }
+}
+
+// 2. Documentar endpoint de token completamente
+@RestController
+@RequestMapping("/api")
+@Tag(
+    name = "Autenticación", 
+    description = "Endpoints de autenticación OAuth2"
+)
+public class TokenController {
+    
+    @Operation(
+        summary = "Solicitar token de acceso",
+        description = """
+            Genera un token JWT de acceso usando client credentials.
+            
+            **Flujo:**
+            1. Validar client_id y client_secret
+            2. Validar scopes solicitados
+            3. Validar grant_type
+            4. Generar JWT con claims necesarios
+            5. Retornar token con metadata
+            
+            **Duración del token:**
+            - Baja transaccionalidad: 20 minutos
+            - Alta transaccionalidad: 1 día
+            
+            **Rate Limit:** 100 requests/minuto por client_id
+            """,
+        tags = {"Autenticación"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Token generado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = TokenResponse.class),
+                examples = @ExampleObject(
+                    name = "Token exitoso",
+                    value = """
+                        {
+                          "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+                          "token_type": "Bearer",
+                          "expires_in": 1200,
+                          "scope": "client:read client:create",
+                          "transaction_type": "LOW"
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Request inválido - Validación fallida",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(
+                    name = "Validación fallida",
+                    value = """
+                        {
+                          "error": "invalid_request",
+                          "errorDescription": "Validación fallida",
+                          "errorCode": "VAL001",
+                          "timestamp": "2025-11-14T10:30:00Z",
+                          "path": "/api/token",
+                          "status": 400,
+                          "details": {
+                            "clientId": "Client ID es requerido",
+                            "grantType": "Grant type es requerido"
+                          }
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Credenciales inválidas",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(
+                    name = "Credenciales incorrectas",
+                    value = """
+                        {
+                          "error": "invalid_client",
+                          "errorDescription": "Cliente no encontrado o credenciales inválidas",
+                          "errorCode": "AUTH001",
+                          "timestamp": "2025-11-14T10:30:00Z",
+                          "path": "/api/token",
+                          "status": 401
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Scopes insuficientes",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = """
+                        {
+                          "error": "insufficient_scope",
+                          "errorDescription": "Scope no autorizado: admin:manage",
+                          "errorCode": "AUTH002",
+                          "status": 403
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "429",
+            description = "Rate limit excedido",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = """
+                        {
+                          "error": "rate_limit_exceeded",
+                          "errorDescription": "Límite de peticiones excedido",
+                          "status": 429
+                        }
+                        """
+                )
+            )
+        )
+    })
+    @PostMapping("/token")
+    public ResponseEntity<?> getToken(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Credenciales del cliente y configuración del token",
+            required = true,
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = OauthTokenRequest.class),
+                examples = {
+                    @ExampleObject(
+                        name = "Baja transaccionalidad",
+                        value = """
+                            {
+                              "clientId": "app-mobile-v1",
+                              "clientSecret": "secret123456789",
+                              "grantType": "client_credentials",
+                              "scopes": ["client:read", "client:create"],
+                              "transactionType": "low"
+                            }
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "Alta transaccionalidad",
+                        value = """
+                            {
+                              "clientId": "integration-service",
+                              "clientSecret": "secret987654321",
+                              "grantType": "client_credentials",
+                              "scopes": ["admin:manage"],
+                              "transactionType": "high"
+                            }
+                            """
+                    )
+                }
+            )
+        )
+        @Valid @RequestBody OauthTokenRequest request
+    ) {
+        // Implementación...
+    }
+}
+
+// 3. Enriquecer DTOs con ejemplos
+@Data
+@Schema(description = "Request para solicitar un token de acceso OAuth2")
+public class OauthTokenRequest {
+    
+    @Schema(
+        description = "Identificador del cliente registrado en CyberArk",
+        example = "app-mobile-v1",
+        required = true,
+        minLength = 5,
+        maxLength = 100
+    )
+    @NotBlank(message = "Client ID es requerido")
+    @Size(min = 5, max = 100)
+    private String clientId;
+    
+    @Schema(
+        description = "Secret del cliente almacenado en CyberArk",
+        example = "secret123456789",
+        required = true,
+        minLength = 32,
+        maxLength = 512
+    )
+    @NotBlank(message = "Client secret es requerido")
+    @Size(min = 32, max = 512)
+    private String clientSecret;
+    
+    @Schema(
+        description = "Tipo de grant OAuth2. Solo se soporta 'client_credentials'",
+        example = "client_credentials",
+        required = true,
+        allowableValues = {"client_credentials"}
+    )
+    @NotBlank(message = "Grant type es requerido")
+    @Pattern(regexp = "^client_credentials$")
+    private String grantType;
+    
+    @Schema(
+        description = "Lista de scopes solicitados. El cliente debe tener autorización para estos scopes",
+        example = "[\"client:read\", \"client:create\"]",
+        required = true,
+        minItems = 1,
+        maxItems = 10
+    )
+    @NotNull
+    @Size(min = 1, max = 10)
+    private List<String> scopes;
+    
+    @Schema(
+        description = "Tipo de transaccionalidad: 'low' (20 min) o 'high' (1 día)",
+        example = "low",
+        defaultValue = "low",
+        allowableValues = {"low", "high"}
+    )
+    @Pattern(regexp = "^(low|high)$")
+    private String transactionType = "low";
+}
+
+@Data
+@Schema(description = "Respuesta exitosa con token de acceso")
+public class TokenResponse {
+    
+    @Schema(
+        description = "Token JWT de acceso",
+        example = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhcHAtbW9iaWxlLXYxIiwic2NvcGUiOiJjbGllbnQ6cmVhZCBjbGllbnQ6Y3JlYXRlIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3MDAwMDEyMDB9..."
+    )
+    private String accessToken;
+    
+    @Schema(
+        description = "Tipo de token (siempre 'Bearer')",
+        example = "Bearer"
+    )
+    private String tokenType;
+    
+    @Schema(
+        description = "Tiempo de expiración en segundos",
+        example = "1200"
+    )
+    private Long expiresIn;
+    
+    @Schema(
+        description = "Scopes incluidos en el token",
+        example = "client:read client:create"
+    )
+    private String scope;
+    
+    @Schema(
+        description = "Tipo de transaccionalidad del token",
+        example = "LOW"
+    )
+    private String transactionType;
+}
+
+// 4. Crear catálogo de APIs en formato JSON/YAML
+@RestController
+@RequestMapping("/api/catalog")
+public class ApiCatalogController {
+    
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<ApiCatalog> getApiCatalog() {
+        
+        ApiCatalog catalog = ApiCatalog.builder()
+            .version("1.0.0")
+            .lastUpdated(Instant.now())
+            .environment(environmentService.getEnvironmentName())
+            .apis(List.of(
+                ApiDefinition.builder()
+                    .name("POST /api/token")
+                    .description("Generar token de acceso OAuth2")
+                    .method("POST")
+                    .path("/api/token")
+                    .requestBody(RequestBodyDefinition.builder()
+                        .contentType("application/json")
+                        .required(true)
+                        .schema("OauthTokenRequest")
+                        .fields(List.of(
+                            FieldDefinition.of("clientId", "string", true, "5-100 chars"),
+                            FieldDefinition.of("clientSecret", "string", true, "32-512 chars"),
+                            FieldDefinition.of("grantType", "string", true, "client_credentials"),
+                            FieldDefinition.of("scopes", "array", true, "1-10 items"),
+                            FieldDefinition.of("transactionType", "string", false, "low/high")
+                        ))
+                        .build())
+                    .responses(List.of(
+                        ResponseDefinition.of(200, "Success", "TokenResponse"),
+                        ResponseDefinition.of(400, "Validation Error", "ErrorResponse"),
+                        ResponseDefinition.of(401, "Invalid Credentials", "ErrorResponse"),
+                        ResponseDefinition.of(403, "Insufficient Scope", "ErrorResponse"),
+                        ResponseDefinition.of(429, "Rate Limit", "ErrorResponse")
+                    ))
+                    .headers(List.of(
+                        HeaderDefinition.of("Content-Type", "application/json", true),
+                        HeaderDefinition.of("X-Gateway-Secret", "string", true, "En PROD/TEST")
+                    ))
+                    .errorCodes(List.of(
+                        "AUTH001 - Cliente inválido",
+                        "AUTH002 - Scopes insuficientes",
+                        "AUTH003 - Grant type inválido",
+                        "VAL001 - Validación fallida"
+                    ))
+                    .rateLimit("100 requests/minuto por client_id")
+                    .authentication("None (endpoint público)")
+                    .build()
+            ))
+            .build();
+        
+        return ResponseEntity.ok(catalog);
+    }
+    
+    @GetMapping(value = "/export", produces = "text/csv")
+    public ResponseEntity<String> exportCatalogCsv() {
+        // Exportar catálogo en CSV para auditoría
+        String csv = generateCatalogCsv();
+        return ResponseEntity.ok()
+            .header("Content-Disposition", "attachment; filename=api-catalog.csv")
+            .body(csv);
+    }
+}
+
+// 5. Habilitar Swagger UI en ambientes no productivos
+@Configuration
+public class SwaggerConfig {
+    
+    @Value("${springdoc.swagger-ui.enabled:true}")
+    private boolean swaggerEnabled;
+    
+    @Value("${environment.name}")
+    private String environment;
+    
+    @Bean
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+            .group("oauth2-api")
+            .pathsToMatch("/api/**")
+            .build();
+    }
+    
+    @PostConstruct
+    public void logSwaggerStatus() {
+        if (swaggerEnabled) {
+            log.info("Swagger UI habilitado en ambiente: {}", environment);
+            log.info("Swagger UI disponible en: /swagger-ui.html");
+            log.info("OpenAPI JSON disponible en: /v3/api-docs");
+        }
+    }
+}
+
+// application-prod.properties
+# Deshabilitar Swagger en producción
+springdoc.swagger-ui.enabled=false
+springdoc.api-docs.enabled=false
+
+// application-test.properties
+# Habilitar Swagger en test (protegido)
+springdoc.swagger-ui.enabled=true
+springdoc.swagger-ui.path=/swagger-ui.html
+```
+
+**Estructura del catálogo de APIs:**
+
+| Campo | Descripción | Ejemplo |
+|-------|-------------|---------|
+| **Método** | HTTP method | POST |
+| **Path** | Ruta del endpoint | /api/token |
+| **Headers** | Headers requeridos | Content-Type, X-Gateway-Secret |
+| **Request** | Estructura del body | OauthTokenRequest |
+| **Response 2xx** | Respuesta exitosa | TokenResponse |
+| **Response 4xx** | Errores del cliente | ErrorResponse |
+| **Response 5xx** | Errores del servidor | ErrorResponse |
+| **Códigos de Error** | Lista de códigos | AUTH001, AUTH002, VAL001 |
+| **Rate Limit** | Límite de peticiones | 100/min |
+| **Autenticación** | Requerimientos | None / OAuth2 / API Key |
+| **Ambiente** | Disponibilidad | DEV, TEST, PROD |
+
+**Evidencias requeridas según documento:**
+- Swagger publicado con documentación completa
+- Especificaciones de entradas y salidas
+- Tabla de códigos de error por endpoint
+- Exportación CSV del catálogo para auditoría
+
+---
+
+### ID 3: Versiones obsoletas de una API no deben ser publicadas a internet
+**⚠️ NO APLICA ACTUALMENTE / REQUIERE PROCESO**
+**🟡 SEVERIDAD MEDIA**
+
+**Descripción del requisito:**
+Las versiones antiguas de APIs no deben estar accesibles en internet. Proceso de deprecación controlado.
+
+**Ubicación verificada:**
+- **Archivo:** `pom.xml` - Version 0.0.1-SNAPSHOT
+- **No hay versionamiento de API visible**
+
+**Análisis actual:**
+```xml
+<!-- pom.xml -->
+<artifactId>ServidorOauth2</artifactId>
+<version>0.0.1-SNAPSHOT</version>
+
+<!-- ⚠️ No hay versionamiento en URLs de API -->
+<!-- ⚠️ No hay estrategia de deprecación -->
+```
+
+```java
+// TokenController.java - Sin versión en path
+@RestController
+@RequestMapping("/api")  // ⚠️ Sin /v1/ o /v2/
+public class TokenController {
+    @PostMapping("/token")
+    public ResponseEntity<?> getToken(...) { }
+}
+```
+
+**Problemas identificados:**
+1. No hay versionamiento en URLs de API
+2. No hay estrategia de deprecación documentada
+3. No hay headers de deprecación
+4. No existe proceso de notificación a consumidores
+5. Sin control de acceso por versión
+
+**Solución requerida:**
+
+```java
+// 1. Implementar versionamiento en URLs
+@RestController
+@RequestMapping("/api/v1")  // ✅ Versión en path
+public class TokenControllerV1 {
+    
+    @PostMapping("/token")
+    @Operation(
+        summary = "Solicitar token (v1)",
+        description = "**Versión:** 1.0.0\n**Estado:** ESTABLE\n**Deprecación:** N/A"
+    )
+    public ResponseEntity<?> getToken(@Valid @RequestBody OauthTokenRequest request) {
+        // Implementación v1
+    }
+}
+
+// 2. Si hay versión v2, marcar v1 como deprecated
+@RestController
+@RequestMapping("/api/v1")
+@Deprecated  // ✅ Marcar como deprecated
+public class TokenControllerV1 {
+    
+    @PostMapping("/token")
+    @Operation(
+        summary = "Solicitar token (v1) - DEPRECATED",
+        description = """
+            ⚠️ **DEPRECATED**: Esta versión será removida el 2026-06-01
+            
+            Por favor migrar a [/api/v2/token](#/Autenticación/getToken_v2)
+            
+            **Razón de deprecación:** Mejoras de seguridad en v2
+            **Fecha de deprecación:** 2025-12-01
+            **Fecha de remoción:** 2026-06-01
+            """,
+        deprecated = true
+    )
+    public ResponseEntity<?> getToken(@Valid @RequestBody OauthTokenRequest request) {
+        
+        // Agregar headers de deprecación
+        return ResponseEntity.ok()
+            .header("Deprecation", "true")
+            .header("Sunset", "Sat, 01 Jun 2026 00:00:00 GMT")
+            .header("Link", "</api/v2/token>; rel=\"successor-version\"")
+            .body(tokenResponse);
+    }
+}
+
+// 3. Crear servicio de gestión de versiones
+@Service
+public class ApiVersionService {
+    
+    private final Map<String, ApiVersion> versions = new ConcurrentHashMap<>();
+    
+    @PostConstruct
+    public void initializeVersions() {
+        versions.put("v1", ApiVersion.builder()
+            .version("v1")
+            .status(VersionStatus.DEPRECATED)
+            .deprecatedSince(LocalDate.of(2025, 12, 1))
+            .sunsetDate(LocalDate.of(2026, 6, 1))
+            .reason("Mejoras de seguridad en v2")
+            .migrationGuide("https://docs.empresa.com/oauth2/migration-v1-to-v2")
+            .build());
+        
+        versions.put("v2", ApiVersion.builder()
+            .version("v2")
+            .status(VersionStatus.STABLE)
+            .releaseDate(LocalDate.of(2025, 11, 1))
+            .build());
+    }
+    
+    public boolean isVersionDeprecated(String version) {
+        ApiVersion apiVersion = versions.get(version);
+        return apiVersion != null && apiVersion.getStatus() == VersionStatus.DEPRECATED;
+    }
+    
+    public boolean isVersionSunset(String version) {
+        ApiVersion apiVersion = versions.get(version);
+        if (apiVersion == null || apiVersion.getSunsetDate() == null) {
+            return false;
+        }
+        return LocalDate.now().isAfter(apiVersion.getSunsetDate());
+    }
+    
+    public Optional<LocalDate> getSunsetDate(String version) {
+        ApiVersion apiVersion = versions.get(version);
+        return apiVersion != null 
+            ? Optional.ofNullable(apiVersion.getSunsetDate()) 
+            : Optional.empty();
+    }
+}
+
+@Data
+@Builder
+class ApiVersion {
+    private String version;
+    private VersionStatus status;
+    private LocalDate releaseDate;
+    private LocalDate deprecatedSince;
+    private LocalDate sunsetDate;
+    private String reason;
+    private String migrationGuide;
+}
+
+enum VersionStatus {
+    BETA,
+    STABLE,
+    DEPRECATED,
+    SUNSET
+}
+
+// 4. Crear filtro para bloquear versiones obsoletas
+@Component
+@Order(1)
+public class ApiVersionFilter extends OncePerRequestFilter {
+    
+    @Autowired
+    private ApiVersionService versionService;
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain chain) throws ServletException, IOException {
+        
+        String path = request.getRequestURI();
+        String version = extractVersion(path);
+        
+        if (version != null) {
+            
+            // ✅ Bloquear versiones sunset
+            if (versionService.isVersionSunset(version)) {
+                log.warn("Request a versión SUNSET: {} desde {}", 
+                        version, request.getRemoteAddr());
+                
+                response.setStatus(HttpStatus.GONE.value());
+                response.setHeader("Deprecation", "true");
+                response.getWriter().write(String.format(
+                    "{\"error\":\"version_sunset\"," +
+                    "\"message\":\"La versión %s ya no está disponible\"," +
+                    "\"current_version\":\"v2\"," +
+                    "\"migration_guide\":\"https://docs.empresa.com/migration\"}",
+                    version
+                ));
+                return;
+            }
+            
+            // ✅ Advertir sobre versiones deprecated
+            if (versionService.isVersionDeprecated(version)) {
+                Optional<LocalDate> sunsetDate = versionService.getSunsetDate(version);
+                
+                response.setHeader("Deprecation", "true");
+                sunsetDate.ifPresent(date -> 
+                    response.setHeader("Sunset", date.toString())
+                );
+                response.setHeader("Link", "</api/v2/token>; rel=\"successor-version\"");
+                
+                log.warn("Request a versión DEPRECATED: {} desde {}", 
+                        version, request.getRemoteAddr());
+            }
+        }
+        
+        chain.doFilter(request, response);
+    }
+    
+    private String extractVersion(String path) {
+        // Extraer versión del path: /api/v1/token -> v1
+        Pattern pattern = Pattern.compile("/api/(v\\d+)/");
+        Matcher matcher = pattern.matcher(path);
+        return matcher.find() ? matcher.group(1) : null;
+    }
+}
+
+// 5. Endpoint para consultar versiones disponibles
+@RestController
+@RequestMapping("/api")
+public class VersionController {
+    
+    @Autowired
+    private ApiVersionService versionService;
+    
+    @GetMapping("/versions")
+    @Operation(
+        summary = "Listar versiones de API disponibles",
+        description = "Obtener información sobre todas las versiones de la API"
+    )
+    public ResponseEntity<List<ApiVersion>> getVersions() {
+        return ResponseEntity.ok(versionService.getAllVersions());
+    }
+    
+    @GetMapping("/version/current")
+    @Operation(
+        summary = "Obtener versión actual recomendada",
+        description = "Retorna la versión estable más reciente"
+    )
+    public ResponseEntity<Map<String, String>> getCurrentVersion() {
+        return ResponseEntity.ok(Map.of(
+            "current_version", "v2",
+            "api_url", "/api/v2/token",
+            "status", "STABLE"
+        ));
+    }
+}
+
+// 6. Documentar proceso de deprecación
+/**
+ * PROCESO DE DEPRECACIÓN DE VERSIONES DE API
+ * 
+ * FASE 1: ANUNCIO (T-6 meses)
+ * - Notificar a consumidores vía email
+ * - Actualizar documentación
+ * - Marcar versión como DEPRECATED en código
+ * - Agregar headers Deprecation y Sunset
+ * 
+ * FASE 2: DEPRECACIÓN (T-3 meses)
+ * - Versión marcada oficialmente como deprecated
+ * - Guía de migración publicada
+ * - Soporte limitado (solo bugs críticos)
+ * - Logs de uso para identificar clientes
+ * 
+ * FASE 3: SUNSET (T-0)
+ * - Versión bloqueada completamente
+ * - HTTP 410 Gone para todas las peticiones
+ * - Redirección a documentación de migración
+ * 
+ * FASE 4: REMOCIÓN (T+1 mes)
+ * - Código removido del repositorio
+ * - Documentación archivada
+ * 
+ * NOTIFICACIONES:
+ * 1. Email a consumidores registrados (T-6, T-3, T-1 meses)
+ * 2. Banner en Swagger UI (T-6 meses)
+ * 3. Headers HTTP en responses (T-3 meses)
+ * 4. Logs de advertencia (T-1 mes)
+ */
+
+// 7. Configurar en application.properties
+api.versioning.enabled=true
+api.versioning.current=v2
+api.versioning.default=v2
+
+# Control de acceso por versión en producción
+api.versioning.v1.enabled=false  # Deshabilitar v1 en prod
+api.versioning.v2.enabled=true
+
+// 8. Agregar en README.md y documentación
+/**
+ * VERSIONAMIENTO DE API
+ * 
+ * Esta API usa versionamiento en la URL.
+ * 
+ * VERSIONES DISPONIBLES:
+ * - v1: ⚠️ DEPRECATED - Será removida el 2026-06-01
+ * - v2: ✅ STABLE - Versión actual recomendada
+ * 
+ * BREAKING CHANGES EN V2:
+ * - Nonce obligatorio para alta transaccionalidad
+ * - Validación estricta de grant_type
+ * - Nuevos códigos de error estructurados
+ * 
+ * GUÍA DE MIGRACIÓN: https://docs.empresa.com/oauth2/migration
+ */
+```
+
+**Evidencias requeridas según documento:**
+- Indicar que es API nueva y no es pública en internet
+- Describir cómo se accede (a través de gateway)
+- Captura del versionador (Git)
+- Texto donde se indique que en caso de nueva versión se notificará a seguridad
+
+**Proceso de notificación para nueva versión:**
+```
+CHECKLIST - NUEVA VERSIÓN DE API:
+
+□ Actualizar versión en pom.xml
+□ Crear nuevo controller con path versionado (/api/v{N}/)
+□ Actualizar documentación Swagger
+□ Crear guía de migración
+□ Notificar a equipo de Seguridad (SDI)
+□ Notificar a consumidores registrados
+□ Actualizar catálogo de APIs
+□ Publicar release notes
+□ Marcar versión anterior como deprecated (si aplica)
+```
+
+---
+
+### ID 4: Ciclo de vida de la API
+**❌ NO DOCUMENTADO**
+**🟡 SEVERIDAD MEDIA**
+
+**Descripción del requisito:**
+Documentar y gestionar el ciclo de vida completo de la API: desarrollo, versionamiento, deprecación, monitoreo y decomiso.
+
+**Problemas identificados:**
+1. No hay proceso documentado de ciclo de vida
+2. No hay versionamiento en código
+3. No existe estrategia de decomiso
+4. Sin plan de monitoreo post-deprecación
+5. Falta identificación de componentes dependientes
+
+**Solución requerida:**
+
+```markdown
+# CICLO DE VIDA DE API - OAuth2 Authorization Server
+
+## 1. DESARROLLO Y LANZAMIENTO
+
+### 1.1 Planificación
+- Identificar necesidad y casos de uso
+- Definir SLA y requisitos de performance
+- Documentar dependencias y componentes
+- Aprobar diseño con Arquitectura y Seguridad
+
+### 1.2 Desarrollo
+```java
+// Agregar versión al código
+@RestController
+@RequestMapping("/api/v1")
+public class TokenControllerV1 {
+    
+    private static final String API_VERSION = "1.0.0";
+    private static final LocalDate RELEASE_DATE = LocalDate.of(2025, 11, 14);
+    
+    @GetMapping("/version")
+    public ResponseEntity<ApiVersionInfo> getVersionInfo() {
+        return ResponseEntity.ok(ApiVersionInfo.builder()
+            .version(API_VERSION)
+            .releaseDate(RELEASE_DATE)
+            .status("STABLE")
+            .build());
+    }
+}
+```
+
+### 1.3 Testing
+- Tests unitarios (>80% coverage)
+- Tests de integración
+- Tests de seguridad (OWASP, penetration testing)
+- Performance testing (load, stress)
+
+### 1.4 Documentación
+- Swagger/OpenAPI completo
+- Guías de integración
+- Ejemplos de uso (Postman collections)
+- Códigos de error documentados
+
+### 1.5 Deployment
+- Desplegar en DEV → TEST → PROD
+- Smoke tests post-deployment
+- Notificar a consumidores
+- Actualizar inventario de APIs
+
+## 2. OPERACIÓN Y MANTENIMIENTO
+
+### 2.1 Monitoreo
+```java
+@Component
+public class ApiHealthMonitor {
+    
+    @Scheduled(fixedRate = 60000) // Cada minuto
+    public void monitorApiHealth() {
+        ApiMetrics metrics = ApiMetrics.builder()
+            .timestamp(Instant.now())
+            .requestsPerMinute(metricsService.getRequestRate())
+            .errorRate(metricsService.getErrorRate())
+            .avgResponseTime(metricsService.getAvgResponseTime())
+            .activeClients(metricsService.getActiveClients())
+            .build();
+        
+        if (metrics.getErrorRate() > 5.0) {
+            alertService.sendAlert("Error rate alto: " + metrics.getErrorRate() + "%");
+        }
+        
+        metricsRepository.save(metrics);
+    }
+}
+```
+
+### 2.2 Métricas Clave
+- Requests por minuto (RPM)
+- Tasa de error (%)
+- Latencia (p50, p95, p99)
+- Disponibilidad (uptime %)
+- Clientes activos
+
+### 2.3 SLA
+- Disponibilidad: 99.9% uptime
+- Latencia: p95 < 200ms
+- Tasa de error: < 1%
+
+## 3. VERSIONAMIENTO
+
+### 3.1 Estrategia de Versiones
+```
+v1.0.0 (MAJOR.MINOR.PATCH)
+
+MAJOR: Breaking changes (incompatible con versión anterior)
+MINOR: Nuevas funcionalidades (compatible con versión anterior)
+PATCH: Bug fixes (compatible con versión anterior)
+```
+
+### 3.2 Ejemplo de Versionamiento
+```java
+// v1.0.0 - Release inicial
+@PostMapping("/api/v1/token")
+public ResponseEntity<TokenResponse> getToken() { }
+
+// v1.1.0 - Agregar soporte para refresh token (compatible)
+@PostMapping("/api/v1/token/refresh")
+public ResponseEntity<TokenResponse> refreshToken() { }
+
+// v2.0.0 - Cambios incompatibles (nueva versión mayor)
+@PostMapping("/api/v2/token")
+public ResponseEntity<TokenResponseV2> getToken() {
+    // Nueva estructura de response
+}
+```
+
+## 4. DEPRECACIÓN
+
+### 4.1 Proceso de Deprecación (6 meses)
+
+#### Mes 1-2: ANUNCIO
+```java
+@PostMapping("/api/v1/token")
+@Deprecated
+@Operation(deprecated = true, description = "DEPRECATED: Migrar a v2")
+public ResponseEntity<?> getToken() {
+    return ResponseEntity.ok()
+        .header("Deprecation", "true")
+        .header("Sunset", "2026-06-01")
+        .header("Link", "</api/v2/token>; rel=\"successor-version\"")
+        .body(response);
+}
+```
+
+**Acciones:**
+- [ ] Email a consumidores notificando deprecación
+- [ ] Banner en Swagger UI
+- [ ] Actualizar documentación
+- [ ] Publicar guía de migración
+
+#### Mes 3-4: DEPRECACIÓN ACTIVA
+- Agregar logs de advertencia
+- Monitorear uso de versión deprecated
+- Contactar clientes que aún usan v1
+- Ofrecer soporte para migración
+
+#### Mes 5: ÚLTIMAS ADVERTENCIAS
+- Email final a consumidores restantes
+- Incrementar nivel de logs a WARNING
+- Preparar documentación de sunset
+
+#### Mes 6: SUNSET
+```java
+@PostMapping("/api/v1/token")
+public ResponseEntity<?> getToken() {
+    // Versión sunset - Bloqueada
+    return ResponseEntity.status(HttpStatus.GONE)
+        .header("Deprecation", "true")
+        .body(Map.of(
+            "error", "version_sunset",
+            "message", "Esta versión ya no está disponible",
+            "migration_guide", "https://docs.empresa.com/migration"
+        ));
+}
+```
+
+### 4.2 Identificar Componentes Dependientes
+```java
+@Service
+public class DependencyTracker {
+    
+    public List<ApiConsumer> getConsumersOfVersion(String version) {
+        // Obtener de logs, monitoreo o base de datos
+        return consumerRepository.findByApiVersion(version);
+    }
+    
+    public void notifyConsumers(String version, String message) {
+        List<ApiConsumer> consumers = getConsumersOfVersion(version);
+        
+        consumers.forEach(consumer -> {
+            emailService.sendDeprecationNotice(
+                consumer.getEmail(),
+                version,
+                message
+            );
+        });
+    }
+}
+```
+
+## 5. MONITOREO POST-DEPRECACIÓN (1-3 meses)
+
+### 5.1 Métricas a Monitorear
+```java
+@Service
+public class DeprecationMonitoringService {
+    
+    @Scheduled(cron = "0 0 9 * * *") // Diario a las 9am
+    public void generateDeprecationReport() {
+        
+        DeprecationMetrics metrics = DeprecationMetrics.builder()
+            .date(LocalDate.now())
+            .v1Requests(metricsService.getRequestCountV1())
+            .v1UniqueClients(metricsService.getUniqueClientsV1())
+            .v1ErrorRate(metricsService.getErrorRateV1())
+            .build();
+        
+        if (metrics.getV1Requests() > 0) {
+            log.warn("⚠️ Versión v1 deprecated aún recibe {} requests", 
+                    metrics.getV1Requests());
+            
+            // Notificar al equipo
+            alertService.sendDeprecationAlert(metrics);
+        }
+        
+        // Guardar para análisis de tendencia
+        metricsRepository.save(metrics);
+    }
+}
+```
+
+### 5.2 Dashboard de Monitoreo
+- Requests por versión (v1 vs v2)
+- Clientes únicos por versión
+- Tasa de migración (%)
+- Tiempo hasta sunset
+
+## 6. DECOMISO EN PRODUCCIÓN
+
+### 6.1 Checklist de Decomiso
+```
+□ Confirmar 0 requests a versión deprecated en últimos 30 días
+□ Notificación final a stakeholders
+□ Backup de código y documentación
+□ Remover código de versión deprecated
+□ Actualizar load balancers / API Gateway
+□ Remover endpoints de monitoreo
+□ Actualizar documentación
+□ Actualizar inventario de APIs
+□ Archivar documentación histórica
+□ Post-mortem y lecciones aprendidas
+```
+
+### 6.2 Código de Decomiso
+```java
+// Remover completamente el controller deprecated
+// ANTES DEL DECOMISO, ARCHIVAR:
+// - Código fuente (Git tag)
+// - Documentación
+// - Logs de uso
+// - Lista de consumidores históricos
+
+// Actualizar routing
+@Configuration
+public class ApiRoutingConfig {
+    
+    @Bean
+    public RouterFunction<ServerResponse> apiRoutes() {
+        return route()
+            // v1 removida - redirigir a v2
+            .GET("/api/v1/**", request -> 
+                ServerResponse.permanentRedirect(
+                    URI.create("/api/v2" + request.path().substring(7))
+                ).build()
+            )
+            .build();
+    }
+}
+```
+
+### 6.3 Post-Decomiso
+- Monitorear errores 404 en paths de v1
+- Documentar lecciones aprendidas
+- Actualizar proceso para futuras versiones
+
+## 7. INVENTARIO DE APIs
+
+### 7.1 Registro de API
+```java
+@Entity
+public class ApiInventoryRecord {
+    
+    @Id
+    private String apiId;
+    
+    private String name;
+    private String version;
+    private String environment; // DEV, TEST, PROD
+    private String accessType; // INTERNET, MPLS, INTERNAL
+    private List<String> consumers; // ["app-mobile", "integration-service"]
+    private VersionStatus status; // BETA, STABLE, DEPRECATED, SUNSET
+    private LocalDate releaseDate;
+    private LocalDate deprecationDate;
+    private LocalDate sunsetDate;
+    private String owner;
+    private String contactEmail;
+    private String documentation;
+    private String repository;
+}
+```
+
+### 7.2 Mantener Inventario Actualizado
+```java
+@Service
+public class ApiInventoryService {
+    
+    @Scheduled(cron = "0 0 0 * * SUN") // Cada domingo
+    public void updateInventory() {
+        
+        ApiInventoryRecord record = ApiInventoryRecord.builder()
+            .apiId("oauth2-server")
+            .name("OAuth2 Authorization Server")
+            .version("v2.0.0")
+            .environment("PRODUCTION")
+            .accessType("INTERNAL") // Solo a través de API Gateway
+            .consumers(Arrays.asList(
+                "api-gateway",
+                "mobile-app-ios",
+                "mobile-app-android",
+                "integration-platform"
+            ))
+            .status(VersionStatus.STABLE)
+            .releaseDate(LocalDate.of(2025, 11, 14))
+            .owner("Equipo de Seguridad")
+            .contactEmail("desarrollo@empresa.com")
+            .documentation("https://docs.empresa.com/oauth2")
+            .repository("https://github.com/empresa/oauth2-server")
+            .build();
+        
+        inventoryRepository.save(record);
+    }
+    
+    @GetMapping("/api/inventory")
+    public ResponseEntity<List<ApiInventoryRecord>> getInventory() {
+        return ResponseEntity.ok(inventoryRepository.findAll());
+    }
+}
+```
+
+## 8. DIAGRAMA DE CICLO DE VIDA
+
+```
+┌─────────────┐
+│ PLANIFICACIÓN│
+│  - Diseño   │
+│  - Aprobación│
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ DESARROLLO  │
+│  - Código   │
+│  - Tests    │
+│  - Docs     │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ LANZAMIENTO │
+│  v1.0.0     │
+│  (STABLE)   │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐     ┌─────────────┐
+│  OPERACIÓN  │────>│ VERSIONADO  │
+│  - Monitoreo│     │  v1.1.0     │
+│  - Métricas │     │  v1.2.0     │
+│  - SLA      │     │  v2.0.0     │
+└──────┬──────┘     └──────┬──────┘
+       │                   │
+       ▼                   ▼
+┌─────────────┐     ┌─────────────┐
+│ MANTENIMIENTO│    │ DEPRECACIÓN │
+│  - Bug fixes│     │ (6 meses)   │
+│  - Updates  │     │ - Anuncio   │
+└─────────────┘     │ - Migración │
+                    │ - Sunset    │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │  MONITOREO  │
+                    │ (1-3 meses) │
+                    │ - Métricas  │
+                    │ - Alertas   │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │  DECOMISO   │
+                    │ - Remover   │
+                    │ - Archivar  │
+                    └─────────────┘
+```
+
+## 9. RESPONSABILIDADES
+
+| Fase | Responsable | Actividades |
+|------|-------------|-------------|
+| Planificación | Arquitectura + PM | Diseño, requisitos, aprobación |
+| Desarrollo | Desarrollo | Código, tests, documentación |
+| Lanzamiento | DevOps + Desarrollo | Deploy, smoke tests |
+| Operación | DevOps + SRE | Monitoreo, incidentes, SLA |
+| Versionamiento | Desarrollo + Arquitectura | Nuevas versiones, breaking changes |
+| Deprecación | Desarrollo + PM | Notificaciones, soporte a migración |
+| Decomiso | DevOps + Desarrollo | Remover código, actualizar infra |
+
+## 10. MÉTRICAS DE ÉXITO
+
+- Time to Market: < 3 meses para nueva versión
+- Uptime: > 99.9%
+- Migración exitosa: > 95% clientes migrados antes de sunset
+- Tiempo de deprecación: 6 meses estándar
+- Incidentes post-decomiso: 0
+
+**Evidencias requeridas según documento:**
+- Documento interno indicando ciclo de vida
+- Matriz de gestión de APIs (creación, cambios, actualizaciones, deshabilitación)
+```
+
+---
+
+### ID 5: Se debe realizar un inventario de todas las API
+**❌ NO IMPLEMENTADO**
+**🟡 SEVERIDAD MEDIA**
+
+**Descripción del requisito:**
+Mantener inventario actualizado de todas las APIs con información de: ambiente, acceso, consumidores, versión, vulnerabilidades.
+
+**Problemas identificados:**
+1. No existe inventario centralizado
+2. No hay registro de consumidores
+3. No hay tracking de versiones
+4. Sin información de ambientes
+5. Falta análisis de vulnerabilidades
+
+**Solución requerida:**
+
+```java
+// 1. Crear modelo de inventario
+@Entity
+@Table(name = "api_inventory")
+@Data
+@Builder
+public class ApiInventoryEntry {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    
+    // Identificación
+    private String apiName;
+    private String apiId;
+    private String version;
+    private String description;
+    
+    // Ambiente
+    @Enumerated(EnumType.STRING)
+    private Environment environment; // DEV, TEST, UAT, PROD
+    
+    // Acceso
+    @Enumerated(EnumType.STRING)
+    private AccessType accessType; // INTERNET, MPLS, INTERNAL, VPN
+    
+    private String gatewayUrl;
+    private String directUrl;
+    private boolean publicInternet; // ¿Expuesta a internet?
+    
+    // Consumidores
+    @ElementCollection
+    private List<String> consumers; // ["app-mobile", "erp-system"]
+    
+    @ElementCollection
+    private List<String> consumerEmails; // Contactos
+    
+    // Versión y Estado
+    @Enumerated(EnumType.STRING)
+    private VersionStatus versionStatus; // BETA, STABLE, DEPRECATED, SUNSET
+    
+    private LocalDate releaseDate;
+    private LocalDate deprecationDate;
+    private LocalDate sunsetDate;
+    
+    // Seguridad y Vulnerabilidades
+    @ElementCollection
+    private List<String> vulnerabilities; // ["CVE-2024-1234"]
+    
+    private LocalDate lastSecurityScan;
+    private String securityScanResult; // PASS, FAIL, WARNING
+    
+    @ElementCollection
+    private List<String> securityControls; // ["OAuth2", "Rate Limiting", "HTTPS"]
+    
+    // Propietario
+    private String ownerTeam;
+    private String ownerEmail;
+    private String technicalContact;
+    
+    // Documentación
+    private String swaggerUrl;
+    private String documentationUrl;
+    private String repositoryUrl;
+    
+    // Métricas
+    private Long averageRequestsPerDay;
+    private Double averageResponseTimeMs;
+    private Double uptimePercentage;
+    
+    // Auditoría
+    private Instant createdAt;
+    private Instant lastUpdatedAt;
+    private String lastUpdatedBy;
+}
+
+enum Environment {
+    DEVELOPMENT("DEV"),
+    TEST("TEST"),
+    UAT("UAT"),
+    PRODUCTION("PROD");
+    
+    private final String code;
+    Environment(String code) { this.code = code; }
+}
+
+enum AccessType {
+    INTERNET("Internet público"),
+    MPLS("Red MPLS privada"),
+    INTERNAL("Red interna"),
+    VPN("VPN corporativa");
+    
+    private final String description;
+    AccessType(String description) { this.description = description; }
+}
+
+// 2. Servicio de gestión de inventario
+@Service
+public class ApiInventoryService {
+    
+    @Autowired
+    private ApiInventoryRepository repository;
+    
+    @Autowired
+    private SecurityScannerService scannerService;
+    
+    /**
+     * Registrar nueva API en inventario
+     */
+    public ApiInventoryEntry registerApi(ApiRegistrationRequest request) {
+        
+        ApiInventoryEntry entry = ApiInventoryEntry.builder()
+            .apiName(request.getApiName())
+            .apiId(generateApiId(request.getApiName()))
+            .version(request.getVersion())
+            .description(request.getDescription())
+            .environment(request.getEnvironment())
+            .accessType(request.getAccessType())
+            .gatewayUrl(request.getGatewayUrl())
+            .consumers(request.getConsumers())
+            .consumerEmails(request.getConsumerEmails())
+            .versionStatus(VersionStatus.BETA)
+            .releaseDate(LocalDate.now())
+            .ownerTeam(request.getOwnerTeam())
+            .ownerEmail(request.getOwnerEmail())
+            .swaggerUrl(request.getSwaggerUrl())
+            .repositoryUrl(request.getRepositoryUrl())
+            .createdAt(Instant.now())
+            .lastUpdatedAt(Instant.now())
+            .lastUpdatedBy(request.getRegisteredBy())
+            .build();
+        
+        return repository.save(entry);
+    }
+    
+    /**
+     * Actualizar información de API
+     */
+    public ApiInventoryEntry updateApi(UUID id, ApiUpdateRequest request) {
+        ApiInventoryEntry entry = repository.findById(id)
+            .orElseThrow(() -> new NotFoundException("API no encontrada"));
+        
+        entry.setVersion(request.getVersion());
+        entry.setVersionStatus(request.getVersionStatus());
+        entry.setConsumers(request.getConsumers());
+        entry.setLastUpdatedAt(Instant.now());
+        entry.setLastUpdatedBy(request.getUpdatedBy());
+        
+        return repository.save(entry);
+    }
+    
+    /**
+     * Actualizar escaneo de seguridad
+     */
+    public void updateSecurityScan(UUID id) {
+        ApiInventoryEntry entry = repository.findById(id)
+            .orElseThrow();
+        
+        SecurityScanResult scanResult = scannerService.scan(entry.getDirectUrl());
+        
+        entry.setLastSecurityScan(LocalDate.now());
+        entry.setSecurityScanResult(scanResult.getStatus());
+        entry.setVulnerabilities(scanResult.getVulnerabilities());
+        
+        repository.save(entry);
+        
+        // Alertar si hay vulnerabilidades críticas
+        if (!scanResult.getCriticalVulnerabilities().isEmpty()) {
+            alertService.sendCriticalVulnerabilityAlert(entry, scanResult);
+        }
+    }
+    
+    /**
+     * Obtener inventario filtrado
+     */
+    public List<ApiInventoryEntry> getInventory(InventoryFilter filter) {
+        return repository.findAll().stream()
+            .filter(entry -> matchesFilter(entry, filter))
+            .collect(Collectors.toList());
+    }
+    
+    /**
+     * Exportar inventario a CSV para auditoría
+     */
+    public String exportInventoryCsv() {
+        List<ApiInventoryEntry> entries = repository.findAll();
+        
+        StringBuilder csv = new StringBuilder();
+        csv.append("API ID,Nombre,Versión,Ambiente,Acceso,Consumidores,Estado,Vulnerabilidades,Owner\n");
+        
+        entries.forEach(entry -> {
+            csv.append(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                entry.getApiId(),
+                entry.getApiName(),
+                entry.getVersion(),
+                entry.getEnvironment(),
+                entry.getAccessType(),
+                String.join(";", entry.getConsumers()),
+                entry.getVersionStatus(),
+                entry.getVulnerabilities().size(),
+                entry.getOwnerEmail()
+            ));
+        });
+        
+        return csv.toString();
+    }
+    
+    private String generateApiId(String apiName) {
+        return apiName.toLowerCase()
+            .replaceAll("[^a-z0-9]", "-")
+            .replaceAll("-+", "-");
+    }
+}
+
+// 3. Controller para gestión de inventario
+@RestController
+@RequestMapping("/api/admin/inventory")
+@PreAuthorize("hasRole('ADMIN')")
+public class ApiInventoryController {
+    
+    @Autowired
+    private ApiInventoryService inventoryService;
+    
+    @PostMapping
+    @Operation(summary = "Registrar nueva API en inventario")
+    public ResponseEntity<ApiInventoryEntry> registerApi(
+            @Valid @RequestBody ApiRegistrationRequest request) {
+        return ResponseEntity.ok(inventoryService.registerApi(request));
+    }
+    
+    @GetMapping
+    @Operation(summary = "Obtener inventario completo")
+    public ResponseEntity<List<ApiInventoryEntry>> getInventory(
+            @RequestParam(required = false) Environment environment,
+            @RequestParam(required = false) VersionStatus status) {
+        
+        InventoryFilter filter = InventoryFilter.builder()
+            .environment(environment)
+            .status(status)
+            .build();
+        
+        return ResponseEntity.ok(inventoryService.getInventory(filter));
+    }
+    
+    @GetMapping("/export")
+    @Operation(summary = "Exportar inventario a CSV")
+    public ResponseEntity<String> exportInventory() {
+        String csv = inventoryService.exportInventoryCsv();
+        
+        return ResponseEntity.ok()
+            .header("Content-Disposition", "attachment; filename=api-inventory.csv")
+            .header("Content-Type", "text/csv")
+            .body(csv);
+    }
+    
+    @GetMapping("/{id}/vulnerabilities")
+    @Operation(summary = "Obtener vulnerabilidades de una API")
+    public ResponseEntity<List<String>> getVulnerabilities(@PathVariable UUID id) {
+        return ResponseEntity.ok(inventoryService.getVulnerabilities(id));
+    }
+    
+    @PostMapping("/{id}/scan")
+    @Operation(summary = "Ejecutar escaneo de seguridad")
+    public ResponseEntity<Void> scanSecurity(@PathVariable UUID id) {
+        inventoryService.updateSecurityScan(id);
+        return ResponseEntity.ok().build();
+    }
+}
+
+// 4. Job para actualizar inventario automáticamente
+@Component
+public class InventoryMaintenanceJob {
+    
+    @Autowired
+    private ApiInventoryService inventoryService;
+    
+    @Scheduled(cron = "0 0 2 * * *") // Diario a las 2am
+    public void updateInventory() {
+        log.info("Ejecutando mantenimiento de inventario");
+        
+        // Actualizar métricas de uso
+        inventoryService.updateUsageMetrics();
+        
+        // Escanear vulnerabilidades
+        inventoryService.scanAllApis();
+        
+        // Verificar APIs deprecated que deben ser sunset
+        inventoryService.checkDeprecatedApis();
+        
+        // Generar reporte
+        inventoryService.generateInventoryReport();
+    }
+}
+
+// 5. Ejemplo de entrada en inventario para OAuth2 Server
+@PostConstruct
+public void registerOAuth2ServerInInventory() {
+    
+    ApiRegistrationRequest request = ApiRegistrationRequest.builder()
+        .apiName("OAuth2 Authorization Server")
+        .version("v2.0.0")
+        .description("Servidor de autorización OAuth 2.0 para autenticación de clientes")
+        .environment(Environment.PRODUCTION)
+        .accessType(AccessType.INTERNAL)
+        .gatewayUrl("https://gateway.empresa.com/oauth2")
+        .directUrl("https://oauth2.empresa.com")
+        .publicInternet(false) // NO expuesta directamente
+        .consumers(Arrays.asList(
+            "api-gateway",
+            "mobile-app-ios-v2",
+            "mobile-app-android-v2",
+            "erp-integration-service",
+            "reporting-dashboard"
+        ))
+        .consumerEmails(Arrays.asList(
+            "mobile-team@empresa.com",
+            "integration-team@empresa.com"
+        ))
+        .ownerTeam("Equipo de Seguridad")
+        .ownerEmail("desarrollo@empresa.com")
+        .technicalContact("tech-lead@empresa.com")
+        .swaggerUrl("https://oauth2.empresa.com/swagger-ui.html")
+        .documentationUrl("https://docs.empresa.com/oauth2")
+        .repositoryUrl("https://github.com/empresa/oauth2-server")
+        .securityControls(Arrays.asList(
+            "OAuth 2.0",
+            "JWT",
+            "TLS 1.3",
+            "Rate Limiting",
+            "IP Whitelist",
+            "Nonce (replay protection)"
+        ))
+        .registeredBy("admin@empresa.com")
+        .build();
+    
+    inventoryService.registerApi(request);
+}
+```
+
+**Tabla de inventario:**
+
+| Campo | Valor | Descripción |
+|-------|-------|-------------|
+| **API ID** | oauth2-authorization-server | Identificador único |
+| **Nombre** | OAuth2 Authorization Server | Nombre descriptivo |
+| **Versión** | v2.0.0 | Versión actual |
+| **Ambiente** | PRODUCTION | DEV, TEST, PROD |
+| **Acceso** | INTERNAL | Solo red interna/gateway |
+| **Internet Público** | NO | No expuesta directamente |
+| **Consumers** | api-gateway, mobile-apps, erp | Lista de consumidores |
+| **Estado** | STABLE | BETA, STABLE, DEPRECATED |
+| **Vulnerabilidades** | 0 | CVEs detectados |
+| **Último Scan** | 2025-11-14 | Fecha de escaneo |
+| **Owner** | Equipo de Seguridad | Responsable |
+| **Contacto** | desarrollo@empresa.com | Email de contacto |
+
+**Evidencias requeridas según documento:**
+- Concentrado/inventario indicando versión de APIs
+- Documentado en diseño técnico
+- Captura de correo mostrando registro en inventario de Juan Carlos (PMO)
+
+---
+
+### ID 6: El framework de programación para APIs validado por seguridad es SPRING
+**✅ CUMPLE**
+**🟢 SIN RIESGO**
+
+**Descripción del requisito:**
+Usar Spring Framework para desarrollo de APIs. Si se usa otro framework, informar a Seguridad.
+
+**Análisis actual:**
+```xml
+<!-- pom.xml - Usa Spring Boot -->
+<parent>
+    <groupId>com.eglobal.sicarem.sicarem_api</groupId>
+    <artifactId>seguridad</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</parent>
+
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-oauth2-authorization-server</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+```
+
+```java
+// AuthorizationServerApplication.java - Spring Boot Application
+@SpringBootApplication
+@EnableDiscoveryClient
+public class AuthorizationServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(AuthorizationServerApplication.class, args);
+    }
+}
+```
+
+**Estado:**
+✅ **CUMPLE** - El proyecto usa Spring Boot 3.x con Java 21
+
+**Framework y versiones:**
+- **Framework:** Spring Boot
+- **Versión Spring:** (heredada del parent POM)
+- **Java Version:** 21
+- **Spring Security OAuth2:** Authorization Server
+
+**Evidencias requeridas según documento:**
+- Informar el framework usado
+- Captura donde se identifique que se usa Spring Framework
+
+**Documentación requerida:**
+
+```markdown
+# DECLARACIÓN DE FRAMEWORK
+
+## Framework Utilizado
+- **Framework Principal:** Spring Boot 3.x
+- **Lenguaje:** Java 21
+- **Build Tool:** Maven
+
+## Componentes de Spring Utilizados
+- Spring Boot Starter Web
+- Spring Boot Starter OAuth2 Authorization Server
+- Spring Boot Actuator
+- Spring Security
+- Spring Cloud Discovery Client (Eureka)
+
+## Justificación
+Spring Framework es el framework validado por Seguridad para desarrollo de APIs 
+en la empresa por las siguientes razones:
+
+1. **Seguridad Robusta:** Spring Security es líder en la industria
+2. **Soporte Largo Plazo:** LTS con actualizaciones regulares
+3. **Cumplimiento:** Fácil implementación de estándares OAuth2, JWT, HTTPS
+4. **Comunidad:** Gran comunidad y documentación
+5. **Auditoría:** Ampliamente usado y auditado
+
+## Aprobación
+✅ Framework aprobado por Seguridad de la Información
+```
+
+---
+
+## RESPUESTA DEL SERVIDOR
+
+### ID 1: Enviar la cabecera X-Content-Type-Options: nosniff
+**❌ NO IMPLEMENTADO**
+**🔴 SEVERIDAD ALTA**
+
+**Descripción del requisito:**
+Agregar header X-Content-Type-Options: nosniff para prevenir MIME type sniffing.
+
+**Ubicación del problema:**
+- **Archivo:** `SecurityConfig.java`
+
+**Problema específico:**
+```java
+// SecurityConfig.java - Sin configuración de headers de seguridad
+@Bean
+@Order(2)
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(/* ... */)
+        .csrf(AbstractHttpConfigurer::disable);
+    // ⚠️ FALTA: Configuración de headers de seguridad
+    return http.build();
+}
+```
+
+**Solución requerida:**
+
+```java
+@Bean
+@Order(2)
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(/* ... */)
+        
+        // ✅ Configurar headers de seguridad
+        .headers(headers -> headers
+            // ID 1: X-Content-Type-Options
+            .contentTypeOptions(Customizer.withDefaults()) // nosniff
+        );
+    
+    return http.build();
+}
+```
+
+**Evidencias requeridas:** Captura de Postman mostrando el header en la respuesta
+
+---
+
+### ID 2: Enviar la cabecera X-Frame-Options: deny
+**❌ NO IMPLEMENTADO**
+**🔴 SEVERIDAD ALTA**
+
+**Solución requerida:**
+
+```java
+.headers(headers -> headers
+    // ID 2: X-Frame-Options
+    .frameOptions(frame -> frame.deny()) // DENY
+)
+```
+
+**Evidencias requeridas:** Captura de Postman mostrando el header
+
+---
+
+### ID 3: Enviar la cabecera Content-Security-Policy: default-src 'none'
+**❌ NO IMPLEMENTADO**
+**🔴 SEVERIDAD ALTA**
+
+**Solución requerida:**
+
+```java
+.headers(headers -> headers
+    // ID 3: Content-Security-Policy
+    .contentSecurityPolicy(csp -> csp
+        .policyDirectives("default-src 'none'; " +
+                         "form-action 'self'; " +
+                         "upgrade-insecure-requests")
+    )
+)
+```
+
+**Evidencias requeridas:** Captura de Postman mostrando el header
+
+---
+
+### ID 4: Remover todas las cabeceras que permitan identificar las tecnologías que usa el servidor
+**❌ NO IMPLEMENTADO**
+**🔴 SEVERIDAD ALTA**
+
+**Problema:**
+Headers como `Server`, `X-Powered-By`, `X-AspNet-Version` exponen información del servidor.
+
+**Solución requerida:**
+
+```java
+// 1. Configurar en SecurityConfig
+.headers(headers -> headers
+    // Remover header Server
+    .httpStrictTransportSecurity(hsts -> hsts
+        .includeSubDomains(true)
+        .maxAgeInSeconds(31536000)
+    )
+)
+
+// 2. Configurar en application.properties
+server.server-header= 
+# Dejar vacío para no enviar header Server
+
+// 3. Crear filtro para remover headers adicionales
+@Component
+public class ServerHeaderRemovalFilter extends OncePerRequestFilter {
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain chain) throws ServletException, IOException {
+        
+        // Remover headers que exponen tecnología
+        HttpServletResponseWrapper wrapper = new HttpServletResponseWrapper(response) {
+            @Override
+            public void setHeader(String name, String value) {
+                if (shouldRemoveHeader(name)) {
+                    return; // No agregar el header
+                }
+                super.setHeader(name, value);
+            }
+            
+            @Override
+            public void addHeader(String name, String value) {
+                if (shouldRemoveHeader(name)) {
+                    return;
+                }
+                super.addHeader(name, value);
+            }
+        };
+        
+        chain.doFilter(request, wrapper);
+    }
+    
+    private boolean shouldRemoveHeader(String name) {
+        return name.equalsIgnoreCase("Server") ||
+               name.equalsIgnoreCase("X-Powered-By") ||
+               name.equalsIgnoreCase("X-AspNet-Version") ||
+               name.equalsIgnoreCase("X-AspNetMvc-Version") ||
+               name.equalsIgnoreCase("X-Application-Context");
+    }
+}
+```
+
+**Configuración completa de headers de seguridad:**
+
+```java
+@Bean
+@Order(2)
+public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/login", "/error", "/.well-known/**").permitAll()
+            .requestMatchers("/api/token").permitAll()
+            .anyRequest().authenticated())
+        .formLogin(Customizer.withDefaults())
+        .httpBasic(Customizer.withDefaults())
+        .csrf(AbstractHttpConfigurer::disable)
+        
+        // ✅ HEADERS DE SEGURIDAD COMPLETOS
+        .headers(headers -> headers
+            // ID 1: X-Content-Type-Options: nosniff
+            .contentTypeOptions(Customizer.withDefaults())
+            
+            // ID 2: X-Frame-Options: DENY
+            .frameOptions(frame -> frame.deny())
+            
+            // ID 3: Content-Security-Policy
+            .contentSecurityPolicy(csp -> csp
+                .policyDirectives(
+                    "default-src 'none'; " +
+                    "script-src 'self'; " +
+                    "connect-src 'self'; " +
+                    "img-src 'self'; " +
+                    "style-src 'self'; " +
+                    "frame-ancestors 'none'; " +
+                    "form-action 'self'; " +
+                    "upgrade-insecure-requests"
+                )
+            )
+            
+            // Headers adicionales de seguridad
+            .xssProtection(xss -> xss
+                .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
+            )
+            .httpStrictTransportSecurity(hsts -> hsts
+                .includeSubDomains(true)
+                .maxAgeInSeconds(31536000)
+                .preload(true)
+            )
+            .referrerPolicy(referrer -> referrer
+                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+            )
+            .permissionsPolicy(permissions -> permissions
+                .policy("geolocation=(), microphone=(), camera=()")
+            )
+        )
+        
+        .requiresChannel(channel -> channel
+            .anyRequest().requiresSecure()
+        );
+
+    return http.build();
+}
+```
+
+**Evidencias requeridas:** Captura de Postman mostrando todos los headers de seguridad y ausencia de headers de tecnología
+
+---
+
+## Resumen Consolidado de Severidades
+
+| Dominio | ID | Requisito | Estado | Severidad | Impacto |
+|---------|----|-----------| -------|-----------|---------|
+| **Administración** | 1 | Solo a través de Gateway | ⚠️ No verificable | 🔴 **ALTA** | Acceso directo posible |
+| **Administración** | 2 | Documentar en catálogo | ⚠️ Parcial | 🟡 **MEDIA** | Swagger básico |
+| **Administración** | 3 | No publicar versiones obsoletas | ⚠️ N/A | 🟡 **MEDIA** | API nueva |
+| **Administración** | 4 | Ciclo de vida documentado | ❌ No documentado | 🟡 **MEDIA** | Falta proceso |
+| **Administración** | 5 | Inventario de APIs | ❌ No implementado | 🟡 **MEDIA** | Sin registro |
+| **Administración** | 6 | Framework Spring | ✅ Cumple | 🟢 **OK** | - |
+| **Respuesta Servidor** | 1 | X-Content-Type-Options | ❌ No implementado | 🔴 **ALTA** | MIME sniffing |
+| **Respuesta Servidor** | 2 | X-Frame-Options | ❌ No implementado | 🔴 **ALTA** | Clickjacking |
+| **Respuesta Servidor** | 3 | Content-Security-Policy | ❌ No implementado | 🔴 **ALTA** | XSS, injection |
+| **Respuesta Servidor** | 4 | Remover headers tecnología | ❌ No implementado | 🔴 **ALTA** | Info disclosure |
+
+## Prioridad de Corrección
+
+### 🔴 **ALTAS - Implementar INMEDIATAMENTE**
+1. **Respuesta Servidor IDs 1-4:** Configurar todos los headers de seguridad
+2. **Administración ID 1:** Validar que requests vienen del gateway
+
+### 🟡 **MEDIAS - Antes de producción**
+3. **Administración ID 2:** Completar documentación Swagger con ejemplos
+4. **Administración ID 4:** Documentar ciclo de vida de API
+5. **Administración ID 5:** Implementar inventario de APIs
+
+**Estado Global: CRÍTICO - Headers de seguridad faltantes** ⛔
+
+**Compliance: 1/10 requisitos cumplidos (10%)**
+
+---
+
 ## Checklist de Implementación
 
-### Fase 1 - Críticos (Sprint 1):
-- [ ] Implementar esquema de 6 pasos completo (Perfilado ID 1)
-- [ ] Crear filtros de validación de JWT
-- [ ] Implementar validación de scopes por endpoint
-- [ ] Crear manejo centralizado de excepciones (Sesión ID 3)
+### Fase 1 - Críticos:
+- [ ] Configurar headers de seguridad en SecurityConfig
+- [ ] Crear filtro para remover headers de tecnología
+- [ ] Implementar validación de gateway
+- [ ] Configurar HSTS completo
 
-### Fase 2 - Altos (Sprint 2):
-- [ ] Configurar timeouts diferenciados (20 min vs 1 día)
-- [ ] Implementar generación y validación de nonce
-- [ ] Crear cache de nonces con Caffeine
-- [ ] Agregar auditoría de replay attacks
-- [ ] Configurar cookie SameSite si aplica
+### Fase 2 - Documentación:
+- [ ] Completar documentación Swagger/OpenAPI
+- [ ] Crear catálogo de APIs exportable
+- [ ] Documentar ciclo de vida
+- [ ] Implementar sistema de inventario
 
-### Fase 3 - Verificación:
-- [ ] Tests de flujo completo de 6 pasos
-- [ ] Tests de expiración de sesiones
-- [ ] Tests de replay attack con nonce
-- [ ] Tests de manejo de excepciones
-- [ ] Documentación completa de errores
+### Fase 3 - Versionamiento:
+- [ ] Implementar versionamiento en URLs
+- [ ] Crear proceso de deprecación
+- [ ] Sistema de notificaciones a consumidores
 
-**Tiempo estimado de corrección:** 2-3 sprints para todos los requisitos críticos.
+**Tiempo estimado: 1-2 sprints**
