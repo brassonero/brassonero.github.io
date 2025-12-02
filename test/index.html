@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación HITSS - Desarrollo Seguro 2024</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --bg-card: #161f2e;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #2d3748;
+            --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.3);
+            --glow-purple: 0 0 20px rgba(139, 92, 246, 0.3);
+            --glow-green: 0 0 20px rgba(16, 185, 129, 0.3);
+            --glow-red: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-cyan));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p { color: var(--text-secondary); font-size: 1.1rem; margin-top: 0.5rem; }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover { border-color: var(--accent-cyan); box-shadow: var(--glow-cyan); }
+        .stat-card.correct-stat { border-color: var(--accent-green); }
+        .stat-card.incorrect-stat { border-color: var(--accent-red); }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .stat-value.correct { color: var(--accent-green); }
+        .stat-value.incorrect { color: var(--accent-red); }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.3rem;
+        }
+
+        .progress-container {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover { border-color: rgba(6, 182, 212, 0.3); }
+        .question-card.answered-correct { border-color: var(--accent-green); box-shadow: var(--glow-green); }
+        .question-card.answered-incorrect { border-color: var(--accent-red); box-shadow: var(--glow-red); }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .question-category {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .options-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        .option.correct {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.15);
+            box-shadow: var(--glow-green);
+        }
+
+        .option.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.15);
+            box-shadow: var(--glow-red);
+        }
+
+        .option.disabled { cursor: not-allowed; opacity: 0.7; }
+        .option.show-correct { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+
+        .option-letter {
+            width: 36px; height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .option:hover:not(.disabled) .option-letter { background: var(--accent-cyan); color: white; }
+        .option.correct .option-letter { background: var(--accent-green); color: white; }
+        .option.incorrect .option-letter { background: var(--accent-red); color: white; }
+        .option.show-correct .option-letter { background: var(--accent-green); color: white; }
+
+        .option-text { flex: 1; color: var(--text-primary); }
+
+        .option-feedback {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-feedback.correct { color: var(--accent-green); }
+        .option-feedback.incorrect { color: var(--accent-red); }
+
+        .feedback-message {
+            margin-top: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-message.correct {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .feedback-message.incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .feedback-icon { font-size: 1.5rem; }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.9rem 2rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-cyan); }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover { border-color: var(--accent-cyan); background: var(--bg-secondary); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .question-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+            gap: 0.35rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .nav-btn {
+            width: 38px; height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .nav-btn.current { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border-color: transparent; color: white; }
+        .nav-btn.correct { background: var(--accent-green); border-color: transparent; color: white; }
+        .nav-btn.incorrect { background: var(--accent-red); border-color: transparent; color: white; }
+
+        .results-container { text-align: center; padding: 3rem; }
+
+        .results-score {
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .results-grade { font-size: 2rem; margin-bottom: 2rem; }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .result-stat { background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; }
+
+        .result-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .result-stat-value.correct { color: var(--accent-green); }
+        .result-stat-value.incorrect { color: var(--accent-red); }
+        .result-stat-value.unanswered { color: var(--accent-yellow); }
+
+        .start-screen { text-align: center; padding: 3rem; }
+        .start-screen h2 { font-size: 2rem; margin-bottom: 1.5rem; }
+
+        .start-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .info-item {
+            background: var(--bg-tertiary);
+            padding: 1.2rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-icon {
+            width: 45px; height: 45px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .info-text h4 { font-size: 0.9rem; color: var(--text-muted); font-weight: 400; }
+        .info-text p { font-size: 1.1rem; color: var(--text-primary); font-weight: 500; }
+
+        .category-selector { margin: 2rem 0; }
+        .category-selector h3 { margin-bottom: 1rem; color: var(--text-secondary); }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.8rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .category-chip {
+            padding: 0.8rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .category-chip:hover { border-color: var(--accent-cyan); }
+        .category-chip.selected { border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.1); }
+        .category-chip-name { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; }
+        .category-chip-count { font-size: 0.8rem; color: var(--text-muted); }
+
+        .question-limit {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .question-limit label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); }
+
+        .question-limit input {
+            width: 100px;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .header h1 { font-size: 1.6rem; }
+            .question-text { font-size: 1rem; }
+            .start-info { grid-template-columns: 1fr; }
+            .results-stats { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+
+        .option.correct { animation: pulse-green 0.5s ease; }
+        .option.incorrect { animation: pulse-red 0.5s ease; }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🔐</div>
+                <div>
+                    <h1>Evaluación Desarrollo Seguro</h1>
+                    <p>HITSS 2024 - Guía de Certificación (291 Preguntas)</p>
+                </div>
+            </div>
+        </header>
+
+        <div id="startScreen" class="question-card start-screen">
+            <h2>Bienvenido a la Evaluación</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Esta evaluación contiene las 291 preguntas de la Guía HITSS de Desarrollo Seguro 2024.<br>
+                Recibirás retroalimentación inmediata en cada respuesta.
+            </p>
+
+            <div class="start-info">
+                <div class="info-item">
+                    <div class="info-icon">📝</div>
+                    <div class="info-text">
+                        <h4>Total disponible</h4>
+                        <p>291 preguntas</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">⚡</div>
+                    <div class="info-text">
+                        <h4>Retroalimentación</h4>
+                        <p>Inmediata</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">✅</div>
+                    <div class="info-text">
+                        <h4>Para aprobar</h4>
+                        <p>70% mínimo</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🎲</div>
+                    <div class="info-text">
+                        <h4>Modo</h4>
+                        <p>Aleatorio</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-limit">
+                <label>Número de preguntas para el examen:</label>
+                <input type="number" id="questionLimit" min="10" max="291" value="291">
+                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-291)</span>
+            </div>
+
+            <div class="category-selector">
+                <h3>Filtrar por categorías (opcional):</h3>
+                <div class="category-grid" id="categoryGrid"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="startExam()" style="margin-top: 1rem; padding: 1rem 3rem;">
+                🚀 Comenzar Evaluación
+            </button>
+        </div>
+
+        <div id="examScreen" class="hidden">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" id="currentQuestion">1</div>
+                    <div class="stat-label">Actual</div>
+                </div>
+                <div class="stat-card correct-stat">
+                    <div class="stat-value correct" id="correctCount">0</div>
+                    <div class="stat-label">Correctas</div>
+                </div>
+                <div class="stat-card incorrect-stat">
+                    <div class="stat-value incorrect" id="incorrectCount">0</div>
+                    <div class="stat-label">Incorrectas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalQuestions">291</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <div class="question-nav" id="questionNav"></div>
+
+            <div class="question-card fade-in" id="questionCard">
+                <div class="question-header">
+                    <span class="question-number" id="questionNumber">Pregunta 1</span>
+                    <span class="question-category" id="questionCategory">Categoría</span>
+                </div>
+                <p class="question-text" id="questionText">Texto de la pregunta...</p>
+                <div class="options-list" id="optionsList"></div>
+                <div id="feedbackContainer"></div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">← Anterior</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Siguiente →</button>
+                <button class="btn btn-primary hidden" id="finishBtn" onclick="finishExam()">🏁 Finalizar</button>
+            </div>
+        </div>
+
+        <div id="resultsScreen" class="hidden">
+            <div class="question-card results-container">
+                <h2 style="margin-bottom: 1rem;">Resultados de la Evaluación</h2>
+                <div class="results-score" id="finalScore">0%</div>
+                <div class="results-grade" id="gradeText">Calificación</div>
+                
+                <div class="results-stats">
+                    <div class="result-stat">
+                        <div class="result-stat-value correct" id="finalCorrectCount">0</div>
+                        <div class="stat-label">Correctas</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value incorrect" id="finalIncorrectCount">0</div>
+                        <div class="stat-label">Incorrectas</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value unanswered" id="finalUnansweredCount">0</div>
+                        <div class="stat-label">Sin responder</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="reviewAnswers()">📋 Revisar Respuestas</button>
+                    <button class="btn btn-primary" onclick="restartExam()">🔄 Nuevo Examen</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviewScreen" class="hidden">
+            <div class="question-card" style="margin-bottom: 1rem;">
+                <h2 style="margin-bottom: 0.5rem;">Revisión de Respuestas</h2>
+                <p style="color: var(--text-secondary);">Las respuestas correctas se muestran en verde</p>
+            </div>
+            <div id="reviewContainer"></div>
+            <div class="navigation">
+                <button class="btn btn-primary" onclick="backToResults()">← Volver a Resultados</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Complete Question Database - All 291 questions
+        const allQuestions = [
+            // Questions 1-50
+            {id:1,category:"Gestión de Riesgos",question:"¿Qué estrategia de manejo de riesgos implica descontinuar el uso de un software vulnerable?",options:["Evitar el riesgo","Ignorar el riesgo","Mitigar el riesgo","Aceptar el riesgo"],correct:0},
+            {id:2,category:"Gestión de Configuraciones",question:"¿Qué actividad inicial se realiza en la gestión de configuraciones de software (SMC)?",options:["Identificación de artículos de configuración","Registro de solicitudes de cambio","Análisis de vulnerabilidades","Auditorías técnicas"],correct:0},
+            {id:3,category:"Modelado de Amenazas",question:"¿Qué permite el modelado de amenazas durante el desarrollo de software?",options:["Evitar revisiones manuales","Identificar problemas de seguridad en diseño","Aumentar el tiempo de desarrollo","Ignorar vulnerabilidades de baja probabilidad"],correct:1},
+            {id:4,category:"Manejo de Errores",question:"Una aplicación LAMP ha personalizado las pantallas de error y gestiona errores de manera correcta de tal forma que no revela ningún detalle de la aplicación. ¿Qué requerimiento de seguridad se está cumpliendo?",options:["Requerimiento de manejo de sesión","Requerimiento de seguimiento","Requerimiento de gestión de cambio","Requerimientos de manejo de errores"],correct:3},
+            {id:5,category:"Agentes de Amenaza",question:"Un usuario que interactúa con un punto de venta descubre accidentalmente que una serie de pasos aplica un descuento del 100%. ¿Qué tipo de agente de amenaza se identifica?",options:["Amenaza interna","Hacktivista","Cracker","Descubridor accidental"],correct:3},
+            {id:6,category:"Inyección SQL",question:"¿Qué medida ayuda a prevenir ataques de inyección SQL al manejar las entradas de los usuarios?",options:["Uso de cifrado de datos","Validación de entrada","Uso de consultas parametrizadas","Codificación de contraseñas"],correct:2},
+            {id:7,category:"Validación de Entrada",question:"¿Qué se recomienda al realizar validación de entradas para evitar ataques de inyección?",options:["No validar entradas de usuarios","Validar sólo en el cliente","Validar tanto en cliente como en servidor","Validar sólo en el servidor"],correct:2},
+            {id:8,category:"Herramientas de Seguridad",question:"¿Cómo se deben proteger las herramientas de seguridad?",options:["Con un firewall","Con políticas claras sobre su uso","Configurando alertas automáticas","Utilizando una contraseña fuerte"],correct:1},
+            {id:9,category:"DREAD",question:"¿Qué clasifica la 'explotabilidad' en el modelo DREAD?",options:["El tipo de tecnología utilizada","La facilidad de explotar la amenaza","El número de sistemas afectados","La visibilidad de la amenaza"],correct:1},
+            {id:10,category:"Bases de Datos",question:"Una estrategia común al trabajar con bases de datos relacionales es usar un esquema primario-secundario / maestro-esclavo. ¿Qué se busca lograr?",options:["Seguridad","Confidencialidad","Disponibilidad","Integridad"],correct:2},
+            {id:11,category:"Bases de Datos",question:"¿Qué pueden hacer los hackers con las vulnerabilidades del software de base de datos?",options:["Mejorar la funcionalidad","Evitar que se ejecuten parches","Hacer que el software sea más eficiente","Encontrar y apuntar a vulnerabilidades"],correct:3},
+            {id:12,category:"Aplicaciones Web",question:"¿Qué mejoran las aplicaciones web de acceso restringido?",options:["Gestiones internas en una empresa","Productos en línea","Sitios web personalizados","Acceso a cualquier usuario de internet"],correct:0},
+            {id:13,category:"Validación de Entrada",question:"¿Cuál es el objetivo de un ataque de validación de entrada?",options:["Crear contraseñas seguras","Obtener acceso de administrador","Inyectar una entrada maliciosa en un sistema","Mejorar la seguridad"],correct:2},
+            {id:14,category:"Diseño Inseguro",question:"Para prevenir una amenaza de Diseño inseguro, decides reforzar la validación de entrada y usar consultas parametrizadas. ¿Esto logrará impedir que se materialice la amenaza?",options:["Falso","Verdadero"],correct:0},
+            {id:15,category:"SSRF",question:"Para prevenir la amenaza SSRF, decides realizar una lista blanca de rutas permitidas y deshabilitar las redirecciones HTTP. ¿Esto logrará impedir que se materialice la amenaza?",options:["Falso","Verdadero"],correct:1},
+            {id:16,category:"Buffer Overflow",question:"Cuando un usuario malintencionado logra sobrescribir la dirección de retorno en memoria para ejecutar código malicioso, ¿qué tipo de amenaza se describe?",options:["Inyección SQL","Buffer Overflow","XSS","CSRF"],correct:1},
+            {id:17,category:"XSS",question:"Considerando una aplicación con validación de entrada pobre (sin sustituir valores, eliminar caracteres especiales o literalizar la entrada), ¿qué tipo de amenazas podrían considerarse?",options:["Mensajes de error detallados","Fuerza bruta","XSS (Cross-Site Scripting)","Inyección SQL"],correct:2},
+            {id:18,category:"Criptografía",question:"Un atacante se aprovecha de un cifrado débil utilizado para proteger datos en la aplicación móvil. ¿A qué vulnerabilidad corresponde?",options:["Autenticación insegura","Configuración incorrecta de seguridad","Validación insuficiente","Criptografía insuficiente"],correct:3},
+            {id:19,category:"Almacenamiento de Datos",question:"En una aplicación móvil, los datos sensibles son almacenados en un directorio público accesible para otras aplicaciones. ¿Qué vulnerabilidad está presente?",options:["Autenticación insegura","Protección binaria","Comunicación insegura","Almacenamiento inseguro de datos"],correct:3},
+            {id:20,category:"Cadena de Suministro",question:"Un atacante explota una vulnerabilidad en una biblioteca de software externa para inyectar código malicioso. ¿A qué vulnerabilidad se refiere?",options:["Almacenamiento inseguro de datos","Autenticación insegura","Criptografía insuficiente","Seguridad inadecuada de la cadena de suministro"],correct:3},
+            {id:21,category:"Validación de Entrada",question:"Un desarrollador no valida correctamente las entradas de los usuarios, lo que permite un ataque de inyección SQL. ¿Qué vulnerabilidad está presente?",options:["Autenticación insegura","Protección binaria insuficiente","Comunicación insegura","Validación insuficiente"],correct:3},
+            {id:22,category:"MASVS",question:"¿Qué control intenta garantizar la integridad de la funcionalidad prevista de la aplicación evitando modificaciones en el código?",options:["MASVS-AUTH","MASVS-NETWORK","MASVS-DEVOPS","MASVS-RESILIENCE"],correct:3},
+            {id:23,category:"Ingeniería Inversa",question:"Un atacante aplica ingeniería inversa a un juego móvil para evadir la verificación de pago. ¿Qué amenaza se describe?",options:["Autenticación / autorización insegura","Comunicación insegura","Protecciones binarias insuficientes","Uso inadecuado de credenciales"],correct:2},
+            {id:24,category:"API Gateway",question:"¿Cómo ayuda la API Gateway a mejorar la seguridad?",options:["Permitiendo accesos no autenticados","Filtrando las solicitudes maliciosas y realizando validaciones","No tiene impacto en la seguridad","Proporcionando múltiples puntos de entrada"],correct:1},
+            {id:25,category:"DDoS",question:"¿Qué se debe hacer para proteger las APIs de posibles ataques DDoS?",options:["Permitir solicitudes ilimitadas a la API","Configurar una API Gateway con limitación de velocidad","No permitir ningún tipo de autenticación","Evitar el uso de encriptación TLS"],correct:1},
+            {id:26,category:"Autenticación de APIs",question:"Un servicio API tiene un mecanismo de autenticación débil, permitiendo el acceso no autorizado. ¿Qué vulnerabilidad está siendo explotada?",options:["Autenticación rota","Consumo de recursos sin restricción","Acceso no autorizado a flujos sensibles","Autorización de nivel de propiedad rota"],correct:0},
+            {id:27,category:"Autorización de APIs",question:"Un desarrollador ha configurado una API de manera que cualquier usuario puede acceder a objetos de datos sin autorización. ¿A qué vulnerabilidad está expuesto?",options:["Autorización de objeto rota","Consumo de recursos sin restricción","Acceso no autorizado a flujos sensibles","Autenticación rota"],correct:0},
+            {id:28,category:"SSRF",question:"Implementar validación y filtrado de URLs para bloquear URLs maliciosas son ejemplos de soluciones ante cuál tipo de amenaza?",options:["Autorización de nivel de propiedad de objeto roto","Falsificación de solicitudes del lado del servidor (SSRF)","Autorización de nivel de función rota","Configuración incorrecta de seguridad"],correct:1},
+            {id:29,category:"Flujos Comerciales",question:"Es crucial considerar cuidadosamente los flujos de negocio que expone un endpoint de API. ¿A qué tipo de amenaza hace referencia?",options:["Gestión inadecuada del inventario","Autorización de nivel de propiedad de objeto roto","Configuración incorrecta de seguridad","Acceso sin restricciones a flujos comerciales sensibles"],correct:3},
+            {id:30,category:"DAST",question:"Un equipo DevOps detecta una vulnerabilidad en producción. ¿Qué herramienta se debe utilizar para abordar el problema?",options:["Ignorar la vulnerabilidad","Herramientas de pruebas dinámicas de seguridad (DAST)","Realizar pruebas solo en desarrollo","Dejar el problema para una próxima actualización"],correct:1},
+            {id:31,category:"SAST",question:"Un desarrollador no está seguro de si su código contiene errores de seguridad. ¿Qué herramienta debería utilizar?",options:["Desplegar el código sin revisión","Hacer pruebas después del lanzamiento","Revisar manualmente sin herramientas","Herramientas de pruebas estáticas de seguridad (SAST)"],correct:3},
+            {id:32,category:"Gestión de Secretos",question:"¿Qué son los 'secretos' en el contexto de la gestión de secretos?",options:["Contraseñas, claves de cifrado y elementos de autenticación","Protocolos de seguridad de la red","Herramientas de desarrollo de software","Información sobre clientes"],correct:0},
+            {id:33,category:"Contenedores",question:"Al implementar un contenedor en producción, ¿cuál es la medida esencial de seguridad?",options:["Usar contenedores sin control de acceso","Monitorear constantemente el contenedor en busca de actividades sospechosas","Desplegar sin monitoreo","Desactivar las herramientas de monitoreo"],correct:1},
+            {id:34,category:"IaC",question:"Un equipo necesita controlar los cambios en su infraestructura y evitar inconsistencias. ¿Qué beneficio de IaC resuelve este desafío?",options:["Eliminar la necesidad de scripts automatizados","Desplegar recursos sin control de acceso","Crear configuraciones auditables y controladas por versiones","Implementar herramientas de análisis dinámico"],correct:2},
+            {id:35,category:"EaC",question:"Un equipo tiene dificultades para mantener la consistencia en los entornos de TI. ¿Qué solución se puede aplicar?",options:["Implementar herramientas para cambios manuales","No almacenar ninguna configuración","Crear entornos manualmente","Usar 'Todo como código' (EaC) para almacenar configuraciones"],correct:3},
+            {id:36,category:"Consentimiento",question:"Una empresa utiliza una plataforma de gestión de consentimiento para almacenar permisos de usuarios. ¿Qué beneficio tiene?",options:["Elimina la necesidad de revisar la privacidad","Permite compartir datos sin restricciones","Ayuda a gestionar el consentimiento de forma segura y conforme a regulaciones","Facilita la recopilación de datos sin consentimientos"],correct:2},
+            {id:37,category:"GDPR",question:"Según el GDPR, ¿qué derecho permite a los usuarios solicitar la eliminación de sus datos personales?",options:["Derecho de oposición","Derecho de supresión","Derecho de acceso / portabilidad","Derecho de corrección"],correct:1},
+            {id:38,category:"IA - Privacidad",question:"¿Qué proceso identifica y mitiga riesgos relacionados con el manejo de datos en el desarrollo de modelos de IA?",options:["Análisis de impacto de privacidad (PIA)","Almacenamiento masivo de datos","Monitoreo de métricas clave","Validación continua del modelo"],correct:0},
+            {id:39,category:"IA - Transparencia",question:"Según OWASP, ¿cómo afecta la transparencia en IA la confianza de los usuarios?",options:["Reduce el sesgo","Permite mantener el almacenamiento seguro","Aumenta la confianza en la seguridad del sistema","Disminuye la cantidad de datos recolectados"],correct:2},
+            {id:40,category:"IA - Seguridad",question:"Un equipo ha integrado medidas de seguridad desde la recopilación de datos hasta la implementación del modelo de IA. ¿Qué enfoque están siguiendo?",options:["Uso de herramientas de detección de anomalías","Entrenamiento adversarial","Integración de seguridad en el ciclo de vida del modelo","Pruebas de caja blanca"],correct:2},
+            {id:41,category:"IA - Robustez",question:"Un modelo de clasificación de correos electrónicos falla al identificar spam debido a cambios sutiles en el formato. ¿Cuál es la causa probable?",options:["Exposición a datos adversariales","Envenenamiento de datos","Baja robustez del modelo","Pruebas de vulnerabilidad"],correct:2},
+            {id:42,category:"Controles de Seguridad",question:"¿Qué representan los controles de seguridad?",options:["Sólo medidas para servidores locales","Parámetros para proteger activos","Políticas para manejo de datos","Estrategias para aumentar ventas"],correct:1},
+            {id:43,category:"Controles de Seguridad",question:"¿Cómo se debe priorizar la implementación de controles de seguridad?",options:["Por la complejidad técnica","Por el impacto en la confianza del cliente","Por rangos cualitativos o según la gravedad (SRA)","Por el costo de implementación"],correct:2},
+            {id:44,category:"Dispositivos Móviles",question:"¿Qué tipo de aplicaciones suelen dejar de funcionar en dispositivos rooteados o con jailbreak?",options:["Apps de pago y financieras","Herramientas de comunicación","Juegos","Redes sociales"],correct:0},
+            {id:45,category:"WAF",question:"¿Qué dispositivo puede inspeccionar y bloquear paquetes de datos perjudiciales para proteger las aplicaciones web?",options:["Un analizador de red","Un router convencional","Un firewall de aplicaciones web","Un servidor proxy"],correct:2},
+            {id:46,category:"Fase de Pruebas",question:"¿Cuáles serían las tareas de seguridad durante la fase de pruebas?",options:["Análisis de código dinámico sobre la aplicación","Documentación de la superficie de ataque","Realización de plan de incidentes","Aplicación de estándares de desarrollo"],correct:0},
+            {id:47,category:"MFA",question:"Una aplicación solicita dos mecanismos de autenticación (conocimiento + posesión). ¿Qué logramos con implementar estas medidas?",options:["No repudio","Reducir la superficie de ataque","Privacidad","Autenticación"],correct:3},
+            {id:48,category:"Modelado de Amenazas",question:"Durante la fase de diseño, ¿cuál metodología permite identificar requerimientos de seguridad desde el punto de vista del atacante?",options:["COCOMO","Diagrama de caso de abuso / mal uso","Historias de usuario","STRIDE"],correct:1},
+            {id:49,category:"S-SDLC",question:"¿Qué metodología se utiliza para comprobar los requisitos de seguridad en todas las etapas del desarrollo?",options:["DEVOPS","COCOMO","S-SDLC","DREAD"],correct:2},
+            {id:50,category:"Malware",question:"¿Qué tipo de ataque puede hacer que un dispositivo pierda el control y los datos sean encriptados?",options:["Troyano","Denegación del servicio (DoS)","Phishing","Ransomware"],correct:3},
+            // Questions 51-100
+            {id:51,category:"Contraseñas",question:"¿Qué práctica de codificación asegura que las contraseñas se mantengan seguras?",options:["Utilizar contraseñas simples","Autenticación de múltiples factores","Codificación en texto plano","Cifrado de contraseñas"],correct:3},
+            {id:52,category:"Administración de Riesgos",question:"Al decidir qué controles implementar considerando el valor de los activos y el costo de implementación, ¿qué actividad se describe?",options:["Priorización de amenazas","Administración de riesgos","Hardening","Modelado de amenazas"],correct:1},
+            {id:53,category:"Lenguajes de Programación",question:"Cuando trabajamos con lenguajes de programación, ¿cómo qué tipo de lenguaje puede ser considerado C# de .Net?",options:["Ensamblador","Lenguaje de bajo nivel","Lenguaje compilado","Lenguaje interpretado"],correct:2},
+            {id:54,category:"Monitoreo",question:"¿Cómo prevenir fallas en monitoreo?",options:["No configurar alertas","Usar bases de datos sin integridad","Permitir modificaciones no controladas","Generando registros en un formato procesable"],correct:3},
+            {id:55,category:"Manejo de Errores",question:"¿Qué ataque puede aprovecharse de mensajes de error mal gestionados?",options:["Ataques de validación de entrada","Fallas de manejo de excepciones","Inyección SQL","Cross site scripting"],correct:1},
+            {id:56,category:"Componentes Vulnerables",question:"Para prevenir componentes vulnerables y obsoletos, se decide hacer un inventario de componentes y versiones. ¿Esto logrará impedir que se materialice la amenaza?",options:["Falso","Verdadero"],correct:1},
+            {id:57,category:"Configuración de Seguridad",question:"Para prevenir cierto tipo de vulnerabilidad, se decide eliminar todos los servicios y procesos innecesarios. ¿Qué tipo de amenaza se previene?",options:["Diseño inseguro","Inyección","SSRF","Configuración incorrecta de seguridad"],correct:3},
+            {id:58,category:"Configuración de Seguridad",question:"Para prevenir configuración incorrecta de seguridad, las pruebas deben validar mensajes de error para asegurarse de que no revelen detalles innecesarios.",options:["Verdadero","Falso"],correct:0},
+            {id:59,category:"Privacidad Móvil",question:"Una aplicación móvil expone información personal debido a controles de privacidad débiles. ¿Qué vulnerabilidad se está explotando?",options:["Criptografía insuficiente","Autenticación / autorización insegura","Comunicación insegura","Controles de privacidad inadecuados"],correct:3},
+            {id:60,category:"Plataformas Móviles",question:"¿Por qué es esencial que las aplicaciones se ejecuten en una versión actualizada de la plataforma?",options:["Para reducir el consumo de batería","Para mejorar la experiencia del usuario","Para nuevas características de diseño","Para tener las protecciones de seguridad más recientes"],correct:3},
+            {id:61,category:"Desarrollo Móvil",question:"Un desarrollador quiere que una app funcione con muchos usuarios sin afectar el rendimiento del dispositivo. ¿Cuál es la mejor solución?",options:["Usar procesamiento en la nube","Limitar las funcionalidades de la app","Aumentar la capacidad del dispositivo","Optimizar el código en el dispositivo"],correct:0},
+            {id:62,category:"MASTG",question:"¿Cuál es un manual completo que cubre los procesos, técnicas y herramientas para el análisis de seguridad de aplicaciones móviles?",options:["MASVS","PCI DSS","OWASP Top 10","MASTG"],correct:3},
+            {id:63,category:"Configuración de Seguridad",question:"¿Cuál de las siguientes acciones ayuda a prevenir configuraciones erróneas de seguridad?",options:["Usar servicios de autenticación de terceros","Hacer cambios frecuentes sin validación","Utilizar contraseñas por defecto","Actualizar y aplicar parches regularmente"],correct:3},
+            {id:64,category:"APIs",question:"¿Cómo se puede reducir la superficie de ataque de una API?",options:["Limitar el número de solicitantes a la API","Exponer todas las funciones de la API","Hacer uso de una sola clave de API para todo el sistema","Permitiendo todos los puntos de acceso sin restricciones"],correct:0},
+            {id:65,category:"Autorización de APIs",question:"Un servicio API permite acceder a objetos que deberían estar restringidos por ciertos usuarios. ¿Qué tipo de problema está ocurriendo?",options:["Autenticación rota","Autorización de objeto rota","Consumo de recursos sin restricción","Función de autorización rota"],correct:1},
+            {id:66,category:"Flujos Comerciales",question:"Un servidor de API no aplica medidas de seguridad adecuadas para proteger los flujos comerciales confidenciales. ¿Qué vulnerabilidad está siendo explotada?",options:["Autenticación rota","Autorización de objeto rota","Consumo de recursos sin restricción","Acceso sin restricciones a flujos comerciales sensibles"],correct:3},
+            {id:67,category:"Configuración de APIs",question:"Deshabilitar características innecesarias e implementar manejo de errores adecuado son soluciones ante qué tipo de amenaza?",options:["Autorización de nivel de función rota","Autorización de nivel de propiedad de objeto roto","Acceso sin restricciones a flujos comerciales sensibles","Configuración incorrecta de seguridad"],correct:3},
+            {id:68,category:"DevOps",question:"Un desarrollador está buscando mejorar la velocidad de integración del código. ¿Qué proceso DevOps debería adoptar?",options:["Integración continua (CI)","Desplegar solo una vez al final del proyecto","Depender de las pruebas manuales","Ignorar la automatización"],correct:0},
+            {id:69,category:"Contenedores",question:"Un desarrollador está a punto de realizar un cambio en un contenedor. ¿Qué debe verificar primero?",options:["Si el contenedor tiene configuraciones personalizadas","Si las credenciales de API están incluídas en el código","Si la imagen contiene vulnerabilidades conocidas","Si la imagen base es confiable y actualizada"],correct:3},
+            {id:70,category:"Nube",question:"¿Qué debe protegerse estrictamente en la consola de gestión de la nube?",options:["Los scripts de automatización","El acceso con privilegios para evitar ataques","El tráfico de red","Los datos de usuario"],correct:1},
+            {id:71,category:"DevSecOps",question:"En un pipeline de DevSecOps, ¿qué herramientas son utilizadas en la fase de construcción para detectar fallas en el código?",options:["Plataformas de análisis de vulnerabilidades","Consolas de administración SaaS","Herramientas de prueba dinámica (DAST)","Herramientas de prueba estática (SAST)"],correct:3},
+            {id:72,category:"GDPR",question:"Un cliente solicita una copia de todos sus datos personales en un formato interpretable. ¿Qué derecho está ejerciendo?",options:["Derecho de oposición","Derecho de supresión","Derecho de acceso / portabilidad","Derecho de corrección"],correct:2},
+            {id:73,category:"OWASP IA",question:"¿Qué práctica enfatiza OWASP para asegurar que cada paso en el proceso de toma de decisiones pueda ser revisado?",options:["Supervisión constante","Cifrado de datos","Trazabilidad","Auditorías de código"],correct:2},
+            {id:74,category:"Minimización de Datos",question:"Según OWASP, ¿qué busca el principio de minimización de datos?",options:["Evitar el almacenamiento en la nube","Mantener todos los datos posibles","Mejorar la precisión de los modelos","Reducir los datos recolectados a lo necesario"],correct:3},
+            {id:75,category:"Datos Sintéticos",question:"Una organización desarrolla un modelo de IA utilizando datos anonimizados en lugar de datos reales. ¿Qué técnica está utilizando?",options:["Plataforma de gestión de consentimiento","Derecho de corrección","Entrenamiento adversarial","Uso de datos sintéticos"],correct:3},
+            {id:76,category:"Ataque Adversarial",question:"Un atacante modifica sutilmente imágenes para que un sistema de reconocimiento facial no reconozca usuarios autorizados. ¿Qué tipo de ataque es?",options:["Ataque adversarial","Ataque de inyección SQL","Robo de datos","Envenenamiento de datos"],correct:0},
+            {id:77,category:"Configuración de Ambiente",question:"¿Qué enfoque debe utilizarse para configurar un ambiente seguro?",options:["Eliminar servicios innecesarios","Otorgar derechos explícitos a todos los usuarios","Dar acceso administrativo por defecto","Mantener cuentas predeterminadas activas"],correct:0},
+            {id:78,category:"S-SDLC",question:"¿Cuáles son las características fundamentales que deben tener los ciclos de vida de desarrollo de software seguros (S-SDLC)?",options:["Simplificación de todas las fases del proyecto","Confidencialidad, integridad y disponibilidad","Eliminar todas las vulnerabilidades","Alto nivel de complejidad"],correct:1},
+            {id:79,category:"Integridad",question:"Pensando en asegurar que no se introduzcan cambios no autorizados durante el desarrollo, ¿qué tipo de requerimiento se está describiendo?",options:["Requerimientos de manejo de configuraciones","Requerimientos de confidencialidad","Requerimientos de manejo de errores","Requerimientos de integridad"],correct:3},
+            {id:80,category:"Confidencialidad",question:"¿Qué requisito de seguridad protege contra la divulgación no autorizada de información sensible?",options:["Integridad","Transparencia","Confidencialidad","Disponibilidad"],correct:2},
+            {id:81,category:"Malware",question:"¿Qué tipo de ataque puede usar una aplicación que parece legítima para tomar control de un dispositivo?",options:["Inyección SQL","Troyano","Denegación de servicio","Phishing"],correct:1},
+            {id:82,category:"Spyware",question:"¿Qué tipo de malware recopila información sensible del usuario, como números de tarjetas de crédito?",options:["Spyware","Troyano","Inyección SQL","Ransomware"],correct:0},
+            {id:83,category:"Escalabilidad",question:"Para garantizar alta disponibilidad con escalabilidad horizontal, ¿cuál es una posible solución?",options:["Agregar configuración Maestro-Esclavo","Agregar más capacidad a un solo nodo","Usar instancias que almacenan en caché recursos","Usar varias instancias iguales para atender la demanda"],correct:3},
+            {id:84,category:"Cuantificación de Riesgos",question:"¿Cuál metodología cuantitativa toma el valor de la pérdida de un activo de manera anualizada?",options:["STRIDE","CIAAAA","Modelado de amenazas","ALE (Annual Loss Expectancy)"],correct:3},
+            {id:85,category:"Autenticación",question:"Gracias a este tipo de requerimientos, se puede establecer que una entidad es quien dice ser. ¿A qué tipo de requerimiento se refiere?",options:["Requerimientos de autenticación","Requerimientos de manejo de errores","Requerimientos de manejo de configuraciones","Requerimientos de autorización"],correct:0},
+            {id:86,category:"Lenguajes Interpretados",question:"¿En qué tipo de lenguajes de programación el código fuente no se compila ni se convierte en códigos de instrucciones específicos del procesador?",options:["Lenguaje ensamblador","Lenguajes de bajo nivel","Lenguajes compilados","Lenguajes interpretados"],correct:3},
+            {id:87,category:"Análisis de Código",question:"¿Qué tipo de análisis busca vulnerabilidades en código fuente?",options:["Análisis de diccionario","Escaneo dinámico","Escaneo estático","Revisión de pares"],correct:2},
+            {id:88,category:"Aplicaciones Web",question:"¿Qué aspecto permite que las aplicaciones web sean accesibles?",options:["Requieren instalación local","Utilizan dispositivos de entrada avanzados","Su diseño incluye acceso remoto","Son exclusivos para usuarios con conocimientos avanzados"],correct:2},
+            {id:89,category:"Componentes Vulnerables",question:"Para prevenir componentes vulnerables y obsoletos, decides usar herramientas preconfiguradas con valores predeterminados. ¿Esto logrará impedir que se materialice la amenaza?",options:["Verdadero","Falso"],correct:1},
+            {id:90,category:"Revisión de Código",question:"Un análisis manual exhaustivo realizado por un individuo distinto al que desarrolló el código para detectar problemas y vulnerabilidades. ¿A qué tipo de análisis se refiere?",options:["Pruebas de penetración","Pruebas de rendimiento","Fuzzing","Revisión de código"],correct:3},
+            {id:91,category:"Errores de Código",question:"Considerando la amenaza que se produce al no gestionar correctamente los cambios en el código, reintroduciendo errores previamente corregidos. ¿Cuál es el tipo de error?",options:["Exploit","Errores de día cero","Errores casuales","Errores regenerativos"],correct:3},
+            {id:92,category:"Desarrollo Móvil",question:"Una tienda de alimentos quiere que los usuarios puedan escanear códigos de barras con la cámara del teléfono. ¿Qué tipo de desarrollo sería más adecuado?",options:["Híbrido","Aplicación web simple","Basado en la nube","Nativo"],correct:3},
+            {id:93,category:"Validación de Entrada",question:"Un atacante inyecta datos no validados a través de un formulario de entrada en una aplicación móvil. ¿Cuál es la vulnerabilidad explotada?",options:["Criptografía insuficiente","Validación de entrada / salida insuficiente","Almacenamiento inseguro de datos","Seguridad inadecuada de la cadena de suministro"],correct:1},
+            {id:94,category:"Criptografía",question:"Un atacante utiliza un algoritmo de cifrado obsoleto para acceder a información confidencial. ¿Qué vulnerabilidad está siendo explotada?",options:["Configuración incorrecta de seguridad","Comunicación insegura","Criptografía insuficiente","Autenticación insegura"],correct:2},
+            {id:95,category:"Inyección en APIs",question:"¿Qué es un ataque de inyección en el contexto de APIs?",options:["Un ataque que inserta comandos maliciosos a través de entradas de la API","Un ataque que deshabilita un servidor","Un ataque que busca robar claves API","Un ataque que realiza solicitudes a un servidor interno"],correct:0},
+            {id:96,category:"TLS/SSL",question:"¿Qué protocolo es recomendado para cifrar los datos transmitidos entre una API y sus consumidores?",options:["TLS / SSL","FTP","HTTP","SSH"],correct:0},
+            {id:97,category:"Autenticación",question:"¿Qué tipo de vulnerabilidad es la 'autenticación rota'?",options:["Un ataque físico a la infraestructura","Un error en la codificación de las claves de seguridad","Un defecto que permite el acceso sin autenticar a los usuarios","Un fallo en la gestión de sesiones"],correct:2},
+            {id:98,category:"Consumo de Recursos",question:"Sin las limitaciones adecuadas, los atacantes pueden saturar las APIs. ¿A qué categoría de amenaza hace referencia?",options:["Acceso sin restricciones a flujos comerciales sensibles","Configuración incorrecta de seguridad","Autorización de nivel de propiedad de objeto roto","Consumo de recursos sin restricciones"],correct:3},
+            {id:99,category:"Nube",question:"Un equipo detecta un acceso no autorizado a la consola de gestión en la nube. ¿Qué debe hacer inmediatamente?",options:["Controlar y monitorear estrictamente el acceso a la consola","Ignorar el acceso hasta que haya un informe detallado","Cambiar todas las contraseñas sin mayor acción","Permitir el acceso a otros usuarios para investigar"],correct:0},
+            {id:100,category:"DevOps",question:"¿Cuál es el propósito principal de las herramientas utilizadas en DevOps para gestionar riesgos y vulnerabilidades?",options:["Detectar y marcar los riesgos y vulnerabilidades para su investigación","Asegurar la infraestructura en la nube","Mejorar la eficiencia del proceso de desarrollo","Automatizar el proceso de entrega continua"],correct:0},
+            // Questions 101-150
+            {id:101,category:"Expansión de Secretos",question:"¿Cuál es un ejemplo de 'expansión de secretos' en un entorno de desarrollo?",options:["El almacenamiento de secretos en ubicaciones no seguras como computadoras portátiles","La automatización de la entrega continua sin validación","El uso de contraseñas encriptadas en código abierto","La eliminación de claves SSH de los repositorios"],correct:0},
+            {id:102,category:"Kubernetes",question:"Un equipo de DevOps está utilizando un servicio de Kubernetes en la nube. ¿Qué es esencial para la seguridad?",options:["No usar ninguna política de seguridad","Utilizar una única cuenta de usuario para todas las operaciones","Dejar el acceso sin restricciones","Aplicar control de acceso basado en roles (RBAC)"],correct:3},
+            {id:103,category:"Testing Continuo",question:"Un equipo de TI está lidiando con múltiples errores que se detectan tarde en el ciclo de desarrollo. ¿Qué proceso deben adoptar?",options:["Esperar hasta el final del ciclo para realizar pruebas","Hacer pruebas solo en el entorno de producción","Realizar sólo pruebas de integración","Implementar pruebas automáticas durante el desarrollo (Continuous Testing)"],correct:3},
+            {id:104,category:"GDPR",question:"¿Qué derecho permite a los usuarios rechazar el uso de sus datos para fines específicos, como el entrenamiento de modelos?",options:["Derecho de eliminación","Derecho de oposición","Derecho de acceso / portabilidad","Derecho de corrección"],correct:1},
+            {id:105,category:"GDPR",question:"Una empresa quiere utilizar datos personales de los usuarios en su modelo de IA. ¿Qué debe hacer para cumplir con el GDPR?",options:["Informar a los usuarios solo después de usar sus datos","Recoger los datos sin necesidad de consentimiento","Utilizar los datos sin el consentimiento explícito","Obtener el consentimiento explícito de los usuarios antes de procesar sus datos"],correct:3},
+            {id:106,category:"IA - Monitoreo",question:"Una empresa necesita rastrear métricas clave como precisión y tasa de error en tiempo real. ¿Qué herramienta se debería implementar?",options:["Realizar pruebas adversariales periódicas","Entrenar el modelo con más datos","Aplicar pruebas de caja negra","Desarrollar un dashboard de supervisión"],correct:3},
+            {id:107,category:"Entrenamiento Adversarial",question:"Un equipo entrena el modelo con ejemplos que contienen pequeñas manipulaciones diseñadas para engañarlo. ¿Qué práctica de protección están implementando?",options:["Análisis de vulnerabilidades","Entrenamiento adversarial","Evaluación de riesgos","Redundancia de modelos"],correct:1},
+            {id:108,category:"Envenenamiento de Datos",question:"Un sistema de detección de fraudes muestra falsos negativos porque los datos de entrenamiento fueron manipulados. ¿Qué tipo de vulnerabilidad sufrió el modelo?",options:["Envenenamiento de datos","Exposición a datos sensibles","Ataque adversarial","Ataque DDoS"],correct:0},
+            {id:109,category:"CLASP",question:"¿Qué propone CLASP para gestionar el desarrollo seguro de software?",options:["Centrarse en etapas finales del desarrollo","Usar métricas para medir rendimiento","Implementar roles y actividades específicas","Externalizar la seguridad"],correct:2},
+            {id:110,category:"Nube",question:"¿Qué elemento caracteriza los controles de seguridad en la nube?",options:["Control de acceso exclusivo mediante cerraduras","Control local de contraseñas","Exclusión de regulaciones locales","Medidas colaborativas con proveedores de la nube"],correct:3},
+            {id:111,category:"Gestión de Riesgos",question:"En un proceso de gestión de riesgos, ¿cuál es la estrategia donde no se hace nada?",options:["Mitigar el riesgo","Evitar el riesgo","Ignorar el riesgo","Aceptar el riesgo"],correct:3},
+            {id:112,category:"Auditoría de Configuraciones",question:"¿Qué acción incluye la actividad de auditoría de configuraciones?",options:["Registrar solicitudes de cambio","Crear estándares de documentación","Validar versiones, consistencia y calidad","Identificar componentes del sistema"],correct:2},
+            {id:113,category:"JEA",question:"Una aplicación está configurada para que un usuario tenga permisos mínimos y pueda asumir permisos elevados por periodos. ¿Qué características hace referencia?",options:["Atomicidad","JEA (Just Enough Administration)","No repudio","Integridad"],correct:1},
+            {id:114,category:"Codificación Segura",question:"¿Cuál principio de codificación segura define la apariencia del código para que un revisor que no lo haya escrito pueda entenderlo?",options:["Usar un estilo de codificación coherente","Revisar el código durante y después de la codificación","Hacer que el código sea rastreable","Mantener el código simple y pequeño"],correct:0},
+            {id:115,category:"Autenticación",question:"¿Qué tipo de autenticación se recomienda para mejorar la seguridad?",options:["Autenticación única","Sólo contraseña","Autenticación multifactor (MFA)","Autenticación por IP"],correct:2},
+            {id:116,category:"HTTPS",question:"¿Qué protocolo debe usarse para transmitir información confidencial a través de la red de forma segura?",options:["Telnet","FTP","HTTPS","HTTP"],correct:2},
+            {id:117,category:"Menor Privilegio",question:"En tu organización se te otorgan permisos basados en tu puesto. ¿Qué tipo de principio de seguridad se está siguiendo?",options:["Defensa a profundidad","Economía de mecanismos","Menor privilegio","Diseño abierto"],correct:2},
+            {id:118,category:"Seguridad de Información",question:"¿Qué enfoque debe tener la seguridad de la información?",options:["Una serie de acciones puntuales","Depender sólo de herramientas automáticas","Una mejora continua","Un estado finito"],correct:2},
+            {id:119,category:"Claves de Cifrado",question:"¿Qué debe hacerse con las claves de cifrado?",options:["Compartirlas con todos los usuarios","No aplicar las mejores prácticas de manejo","Manejarlas de acuerdo con las directrices de mejores prácticas","Usarlas indefinidamente"],correct:2},
+            {id:120,category:"SLE",question:"¿Cuál metodología cuantitativa toma el valor de la pérdida de un activo al realizarse una operación específica?",options:["CIAAAA","DREAD","STRIDE","SLE (Single Loss Expectancy)"],correct:3},
+            {id:121,category:"Diccionario",question:"¿Qué técnica derivada de un ataque de fuerza bruta utiliza listas predefinidas para adivinar credenciales?",options:["Ataque de secuencias","Cross site scripting","Ataque de diccionario","Ataque de búsqueda"],correct:2},
+            {id:122,category:"Validación",question:"¿Cuál es el enfoque para asegurar entradas de usuarios antes de procesarlas?",options:["Validación del lado del cliente","Validación del lado del servidor","Administración de sesiones","Smart fuzzing"],correct:1},
+            {id:123,category:"Gestión de Memoria",question:"La gestión automática de memoria en lenguajes nuevos puede prevenir ataques de denegación del servicio.",options:["Verdadero","Falso"],correct:0},
+            {id:124,category:"Diseño Inseguro",question:"Para prevenir Diseño inseguro, introduces metodologías de desarrollo seguro incluyendo modelado de amenazas. ¿Esto logrará impedir la amenaza?",options:["Falso","Verdadero"],correct:1},
+            {id:125,category:"Monitoreo",question:"Omitir el uso de herramientas de escalamiento con métricas de desempeño puede considerarse una amenaza de errores de registro y supervisión.",options:["Falso","Verdadero"],correct:1},
+            {id:126,category:"Desarrollo Web",question:"Un desarrollador debe crear una aplicación sencilla que sólo muestre información estática. ¿Qué tipo de aplicación sería la más eficiente?",options:["Desarrollo en la nube","Aplicación web","Desarrollo híbrido","Desarrollo nativo"],correct:1},
+            {id:127,category:"Autorización",question:"Un usuario obtiene acceso a funcionalidades del sistema móvil sin tener permisos adecuados. ¿Qué vulnerabilidad está presentando?",options:["Protección binaria insuficiente","Autenticación / autorización insegura","Almacenamiento inseguro de datos","Criptografía insuficiente"],correct:1},
+            {id:128,category:"Sincronización en la Nube",question:"Un desarrollador crea una app que interactúa con una base de datos remota sin sobrecargar el dispositivo. ¿Qué opción sería más eficiente?",options:["Guardar todos los datos en el dispositivo","Sincronización con la nube","No almacenar ningún dato","Usar almacenamiento en caché local"],correct:1},
+            {id:129,category:"Fuerza Bruta",question:"Un atacante obtiene acceso a una aplicación móvil mediante un ataque de fuerza bruta. ¿Qué vulnerabilidad está siendo explotada?",options:["Configuración incorrecta de seguridad","Protección binaria insuficiente","Almacenamiento inseguro de datos","Autenticación insegura"],correct:3},
+            {id:130,category:"MASVS-RESILIENCE",question:"¿Qué control tiene como objetivo dificultar al máximo el análisis dinámico?",options:["MASVS-CRYPTO","MASVS-RESILIENCE","MASVS-DEVOPS","MASVS-STORAGE"],correct:1},
+            {id:131,category:"Credenciales",question:"Un atacante obtiene acceso físico al dispositivo y extrae las credenciales almacenadas. ¿Qué amenaza se describe?",options:["Uso inadecuado de credenciales","Comunicación insegura","Validación de entrada / salida insuficiente","Seguridad inadecuada de la cadena de suministro"],correct:0},
+            {id:132,category:"APIs",question:"¿Cómo garantiza un servidor API que un consumidor tenga permisos para acceder a un recurso?",options:["Validando las respuestas incorrectas","Permitiendo acceso sin verificar los permisos","Autenticando mediante contraseñas simples","Verificando la clave API del consumidor"],correct:3},
+            {id:133,category:"SSRF",question:"¿Cómo puede un ataque de SSRF comprometer los sistemas internos de una API?",options:["Haciendo uso de claves API robadas","Manipulando la URL para acceder a servidores internos","Accediendo sin validación a las respuestas de la API","Utilizando contraseñas débiles"],correct:1},
+            {id:134,category:"Gestión de Inventario",question:"Algunos ejemplos de vulnerabilidades incluyen el uso de múltiples versiones de API y exposición de API de desarrollo. ¿A qué tipo de vulnerabilidad se refiere?",options:["Configuración incorrecta de seguridad","Acceso sin restricciones a flujos comerciales sensibles","Gestión inadecuada del inventario","Falsificación de solicitudes del lado del servidor"],correct:2},
+            {id:135,category:"SSRF",question:"Se produce cuando las APIs procesan solicitudes de direcciones URL controladas por el usuario sin validar. ¿A qué tipo de amenaza se refiere?",options:["Falsificación de solicitudes del lado del servidor (SSRF)","Autorización de nivel de función rota","Configuración incorrecta de seguridad","Autorización de nivel de propiedad de objeto roto"],correct:0},
+            {id:136,category:"Nube",question:"Un proveedor de nube ha implementado medidas de seguridad en la infraestructura. ¿Qué debe hacer el cliente para asegurar sus datos?",options:["Dejar la protección de datos en manos del proveedor","Descartar las aplicaciones no críticas","Sólo asegurar los servicios de almacenamiento","Proteger las aplicaciones y datos en la nube"],correct:3},
+            {id:137,category:"DevOps",question:"Durante el ciclo de vida de un proyecto DevOps, un equipo quiere minimizar errores en las fases iniciales. ¿Qué estrategia se debe implementar?",options:["Implementar pruebas automatizadas y monitoreo en todas las fases","Ignorar la automatización hasta que el proyecto esté terminado","Hacer revisiones de código sólo al final","Sólo hacer pruebas al final del ciclo de vida"],correct:0},
+            {id:138,category:"Contenedores",question:"Un equipo está implementando un servicio en la nube sin considerar el aislamiento del contenedor. ¿Cuál es el riesgo?",options:["La infraestructura se volverá más accesible","Vulnerabilidades que pueden comprometer la infraestructura","El servicio no se podrá ejecutar correctamente","El acceso al servicio será más rápido"],correct:1},
+            {id:139,category:"DAST",question:"Un desarrollador está intentando probar un sistema para detectar vulnerabilidades en tiempo de ejecución. ¿Qué tipo de prueba se debería utilizar?",options:["Pruebas unitarias","Pruebas de seguridad dinámicas (DAST)","Pruebas de seguridad estáticas (SAST)","Pruebas de rendimiento"],correct:1},
+            {id:140,category:"Consentimiento",question:"Un equipo de desarrollo de IA actualiza las políticas de privacidad para un nuevo propósito. ¿Qué deben hacer?",options:["Anonimizar los datos sin necesidad de notificación","Continuar usando los datos bajo el consentimiento previo","Modificar el consentimiento de manera automática","Notificar a los usuarios y solicitar que confirmen nuevamente su consentimiento"],correct:3},
+            {id:141,category:"Limpieza de Datos",question:"Un equipo aplica técnicas de normalización y elimina valores atípicos antes del entrenamiento del modelo de IA. ¿Qué buena práctica están aplicando?",options:["Limpieza de datos","Consentimiento explícito","Auditorías periódicas","Uso de datos sintéticos"],correct:0},
+            {id:142,category:"Pruebas de Caja Blanca",question:"¿Cómo pueden las pruebas de caja blanca ayudar a mejorar un modelo de IA?",options:["Permiten balancear el conjunto de datos","Detectan ataques externos","Permiten entender cómo el modelo llega a sus decisiones","Miden la precisión del modelo"],correct:2},
+            {id:143,category:"Sesgo en IA",question:"Una empresa nota que un modelo de IA está presentando sesgos en sus predicciones. ¿Qué debería abordarse?",options:["Validar el entorno de operación del modelo","Probar el modelo con conjuntos de datos balanceados","Implementar pruebas adversariales","Realizar auditorías regulares del modelo"],correct:3},
+            {id:144,category:"Especificación de Finalidad",question:"Un modelo de IA utiliza información recopilada sin informar a los usuarios ni detallar la base legal. ¿Qué se está violando?",options:["La restricción del acceso a los datos","La anonimación de los datos","El principio de aprendizaje federado","Las regulaciones sobre especificación de finalidad"],correct:3},
+            {id:145,category:"Pruebas de Sesgo",question:"Un equipo descubre que el modelo de IA toma decisiones discriminatorias debido a un conjunto de datos sesgado. ¿Qué práctica debería haberse implementado?",options:["Plataforma de gestión de consentimiento","Pruebas de sesgo","Derecho de oposición","Uso de datos sintéticos"],correct:1},
+            {id:146,category:"Manejo de Errores",question:"Según los requerimientos de manejo de errores, ¿qué debe incluirse en el diseño de excepciones?",options:["Revisar todos los mensajes","Manejar explícitamente con bloques try, catch y finally","Dejar mensajes genéricos","Informar al usuario de detalles internos"],correct:1},
+            {id:147,category:"Seguridad",question:"¿Qué acción aumenta el riesgo de hackers en los entornos informáticos?",options:["Limitar derechos de acceso","Ignorar principios de seguridad en instalación","Prohibir acceso administrativo","Desactivar servicios innecesarios"],correct:1},
+            {id:148,category:"Seguridad Física",question:"¿Qué medida es un ejemplo de medida de seguridad física?",options:["Software antivirus","Autenticación de dos factores","Tarjetas de control de acceso","Firewall"],correct:2},
+            {id:149,category:"Testing",question:"Si una aplicación compila correctamente, el análisis estático no arroja observaciones y la revisión de código no encontró problemas, ¿es correcto afirmar que es segura?",options:["Falso","Verdadero"],correct:0},
+            {id:150,category:"SLA",question:"Después de un evento inesperado, piden elaborar un documento con métricas sobre el tiempo ofertado con posibles sanciones. ¿Cuál es esta métrica?",options:["RPCL","RCO","SLA (Service Level Agreement)","RTA"],correct:2},
+            // Questions 151-200
+            {id:151,category:"Cifrado",question:"Te piden usar un cifrado para cifrar una gran cantidad de información en poco tiempo. ¿Qué tipo de algoritmo utilizarías?",options:["Cifrado simétrico","Curva elíptica","Ofuscación","Hash"],correct:0},
+            {id:152,category:"Autorización",question:"Gracias a este tipo de requerimientos, se puede establecer qué acciones están bloqueadas o permitidas. ¿A qué tipo de requerimientos se refiere?",options:["Requerimientos de manejo de configuraciones","Requerimientos de autenticación","Requerimientos de manejo de errores","Requerimientos de autorización"],correct:3},
+            {id:153,category:"Autenticación",question:"¿Qué es un ataque de autenticación insuficiente?",options:["Prueba de contraseñas con diccionario","Modificar privilegios de usuario","Acceso no autorizado sin autenticación","Recuperación de contraseña"],correct:2},
+            {id:154,category:"Diseño Seguro",question:"¿Qué es fundamental en un diseño seguro?",options:["Modelado de amenazas y evaluación constante","No utilizar claves criptográficas","Uso de encabezados predeterminados","Hardening de servidores"],correct:0},
+            {id:155,category:"SSRF",question:"Para prevenir SSRF, decides realizar un inventario de versiones de componentes e inspeccionar el código estáticamente. ¿Esto logrará impedir que se materialice la amenaza?",options:["Falso","Verdadero"],correct:0},
+            {id:156,category:"Autenticación",question:"Para prevenir cierta vulnerabilidad, se decide usar un mecanismo de autenticación único y centralizado con MFA y RBAC. ¿Qué tipo de amenaza se previene?",options:["Falsificación de solicitudes del lado del servidor","Fallos de integridad de software y datos","Inyección","Errores de identificación y autenticación"],correct:3},
+            {id:157,category:"Comunicación Insegura",question:"Un atacante intercepta datos transmitidos entre una aplicación móvil y su servidor. ¿Qué problema de seguridad es este?",options:["Configuración incorrecta de seguridad","Protección binaria insuficiente","Autenticación insegura","Comunicación insegura"],correct:3},
+            {id:158,category:"MASVS",question:"¿Qué publicación reúne un conjunto completo de controles de seguridad para evaluar la seguridad de las aplicaciones móviles?",options:["OWASP Top 10","PCI-DSS","MASTG","MASVS"],correct:3},
+            {id:159,category:"Autorización",question:"En una aplicación móvil, un usuario sin autorización obtiene acceso a funcionalidades administrativas. ¿Qué vulnerabilidad se está explotando?",options:["Uso incorrecto de credenciales","Autenticación / autorización insegura","Validación de entrada insuficiente","Configuración incorrecta de seguridad"],correct:1},
+            {id:160,category:"MASVS",question:"¿Cuál de las siguientes no representa un área crítica de la superficie de ataque móvil de acuerdo con OWASP MASVS?",options:["MASVS-DEVOPS","MASVS-AUTH","MASVS-CRYPTO","MASVS-PLATFORM"],correct:0},
+            {id:161,category:"Criptografía",question:"Los atacantes prueban sistemáticamente varias combinaciones de claves hasta encontrar la correcta. ¿Qué amenaza se describe?",options:["Criptografía insuficiente (ataque de fuerza bruta)","Controles de privacidad inadecuados","Autenticación / autorización insegura","Uso inadecuado de credenciales"],correct:0},
+            {id:162,category:"Autenticación de APIs",question:"Un atacante logra obtener acceso a un servicio API sin necesidad de autenticación. ¿Qué vulnerabilidad se está explotando?",options:["Autenticación rota","Acceso no autorizado a flujos sensibles","Autorización de función rota","Consumo de recursos sin restricción"],correct:0},
+            {id:163,category:"Consumo de Recursos",question:"¿Qué es 'unrestricted file source consumption'?",options:["La protección de recursos en el servidor","El uso eficiente de recursos en una API","El consumo de recursos sin restricciones que puede llevar a la degradación del servicio","El uso de recursos sólo por administradores"],correct:2},
+            {id:164,category:"Consumo de Recursos",question:"Implementar límites sobre los recursos, cuotas y monitorear el uso son soluciones ante cuál tipo de amenaza?",options:["Falsificación de solicitudes del lado del servidor","Gestión inadecuada del inventario","Configuración incorrecta de seguridad","Consumo de recursos sin restricciones"],correct:3},
+            {id:165,category:"Integración Continua",question:"Durante la integración continua, un equipo omite la automatización de la verificación de seguridad. ¿Cuál es el impacto?",options:["Los contenedores se desarrollan más rápido","Aumento de los riesgos por errores humanos","El sistema operativo se actualizará automáticamente","El proceso de integración se acelera"],correct:1},
+            {id:166,category:"Contenedores",question:"Un equipo realiza una revisión de seguridad de sus contenedores. ¿Qué aspecto deben evaluar primero?",options:["La cantidad de tráfico de red","El tamaño de las imágenes","El número de contenedores utilizados","La seguridad del host del contenedor"],correct:3},
+            {id:167,category:"Políticas de Seguridad",question:"Un equipo quiere asegurarse de que las políticas de seguridad estén actualizadas antes del despliegue. ¿Qué se debe hacer?",options:["Implementar sin hacer ninguna revisión de seguridad","Sólo hacer pruebas de seguridad a posteriori","Ignorar las políticas de seguridad hasta después del despliegue","Revisar todas las políticas de seguridad antes del despliegue"],correct:3},
+            {id:168,category:"DevOps",question:"Un equipo de desarrollo necesita aumentar la velocidad de despliegue y asegurar que el código sea probado automáticamente. ¿Qué práctica DevOps se debe implementar?",options:["Pruebas manuales","Infraestructura como código (IaC)","Entrega continua (CD)","Integración continua (CI)"],correct:3},
+            {id:169,category:"Nube",question:"Una organización detecta un incremento de ataques dirigidos hacia su consola de gestión. ¿Qué medida se debería implementar?",options:["Controlar estrictamente el acceso con privilegios a la consola de gestión","Automatizar los scripts de aprovisionamiento","Realizar pruebas de aplicaciones estáticas (SAST)","Utilizar claves SSH incrustadas"],correct:0},
+            {id:170,category:"Sesgo en IA",question:"Una empresa está desarrollando un modelo de IA para contratación con un conjunto de datos históricamente sesgado. ¿Qué problema podría surgir?",options:["El modelo no tendría efectos negativos","El modelo tomará decisiones justas","El modelo aprenderá sólo de los mejores candidatos","El modelo podría perpetuar desigualdades o tomar decisiones injustas"],correct:3},
+            {id:171,category:"Gestión de Datos",question:"¿Qué tipo de interfaz podría incluirse en los sistemas de IA para permitir a los usuarios gestionar su consentimiento y eliminación de datos?",options:["Interfaz para revisión de seguridad","Interfaz para analizar el uso de datos","Interfaz para solicitudes de eliminación de datos","Interfaz para reportar vulnerabilidades"],correct:2},
+            {id:172,category:"Auditorías OWASP",question:"¿Qué elemento es clave para realizar auditorías de decisiones según OWASP?",options:["Entrenar el modelo con datos balanceados","Tener acceso a los registros detallados","Probar el modelo con datos sensibles","Usar frameworks específicos"],correct:1},
+            {id:173,category:"Explicabilidad IA",question:"¿Qué recomienda OWASP para mitigar riesgos de seguridad y mejorar la comprensión de las decisiones del modelo?",options:["Reducir los datos recolectados","Proveer explicaciones comprensibles mediante LIME o SHAP","Realizar auditorías periódicas","Mantener registros cifrados"],correct:1},
+            {id:174,category:"Ataque Adversarial",question:"Un vehículo autónomo toma decisiones erróneas debido a pequeños cambios en las señales de tráfico. ¿Qué tipo de ataque está afectando?",options:["Ataque adversarial","Envenenamiento de datos","Filtración de información","Inyección de código"],correct:0},
+            {id:175,category:"Pruebas de Vulnerabilidad",question:"Un equipo de seguridad realiza pruebas simulando varios ataques para ver cómo responde el modelo. ¿Qué tipo de pruebas están realizando?",options:["Pruebas de vulnerabilidad","Evaluación de riesgos","Pruebas de caja blanca","Monitoreo continuo"],correct:0},
+            {id:176,category:"VPN",question:"¿Qué herramienta pueden usar las empresas para proteger aplicaciones cuando los empleados acceden remotamente?",options:["Un antivirus","Un firewall","Una VPN","Un IDS"],correct:2},
+            {id:177,category:"Fallo Seguro",question:"Una aplicación web Java en Tomcat no ha personalizado las pantallas de error predeterminadas. ¿Qué principio de seguridad se está incumpliendo?",options:["Diseño abierto","Menor privilegio","Defensa en profundidad","Fallo seguro"],correct:3},
+            {id:178,category:"Sanitización",question:"Al transformar una entrada potencialmente peligrosa a una entrada inocua, ¿cuál es la técnica empleada?",options:["Sanitización","Validación de salida","Refactoring","Rebuild"],correct:0},
+            {id:179,category:"Seguimiento",question:"Gracias a este tipo de requerimientos se puede llevar a cabo investigación sobre qué pasó en un sistema. ¿De qué tipo de requerimiento se trata?",options:["Requerimiento de autenticación","Requerimiento de confidencialidad","Requerimiento de manejo de errores","Requerimiento de seguimiento"],correct:3},
+            {id:180,category:"Disponibilidad",question:"Hablando de las métricas de RPO, RTO, MTD, ¿de qué tipo de criterios se está hablando?",options:["Requerimiento de manejo de errores","Requerimiento de autenticación","Requerimiento de confidencialidad","Requerimiento de disponibilidad"],correct:3},
+            {id:181,category:"Bases de Datos",question:"¿Qué puede causar una brecha de seguridad de datos en una base de datos?",options:["Baja conectividad de red","Uso excesivo de cifrado","Falta de personal en la base de datos","No aplicar parches de seguridad"],correct:3},
+            {id:182,category:"Capacitación",question:"¿Qué es muy importante para una buena seguridad de la información?",options:["El tamaño de la red empresarial","El uso de software de seguridad de última generación","El número de políticas de seguridad","La capacitación y concientización del personal"],correct:3},
+            {id:183,category:"Ciberataques",question:"¿Cuál es el objetivo principal de los ciberataques?",options:["Robar hardware de la empresa","Destruir la infraestructura","Obtener información confidencial","Obtener datos, dinero o destruir la reputación"],correct:3},
+            {id:184,category:"Sanitización",question:"¿Cómo se puede prevenir que las entradas de los usuarios contengan caracteres peligrosos?",options:["Usando HTTPS","Almacenando los datos sin cifrar","Desinfectando las entradas","Desactivando la validación"],correct:2},
+            {id:185,category:"Bases de Datos",question:"¿Cuál es una de las mejores prácticas para asegurar una base de datos?",options:["No aplicar cifrado a los datos","Eliminar las bases de datos antiguas","Utilizar la versión más antigua del software","Proteger todos los datos con cifrado"],correct:3},
+            {id:186,category:"Sesiones",question:"¿Cuál de las siguientes vulnerabilidades surge por una persistencia de sesión incorrecta?",options:["Secuestro de sesión","Administración de sesiones rotas","Fallas de escaneo dinámico","Ataques de lógica de aplicaciones"],correct:1},
+            {id:187,category:"Arquitectura N Capas",question:"En una arquitectura de N capas donde las capas más profundas no validan meticulosamente las solicitudes, si el frontend presenta un fallo, ¿cuál es la principal amenaza?",options:["Errores criptográficos","Falsificación de solicitudes del lado del servidor","Diseño inseguro","Control de acceso roto"],correct:3},
+            {id:188,category:"Pruebas de Penetración",question:"Considerando una prueba que se enfoca en validar el comportamiento del sistema ante las acciones de un atacante, ¿de qué tipo de prueba estamos hablando?",options:["Pruebas de regresión","Pruebas unitarias","Pruebas de penetración","Pruebas de rendimiento"],correct:2},
+            {id:189,category:"Integridad de Software",question:"Para prevenir cierta vulnerabilidad, se decide usar componentes descargados de fuentes oficiales mediante comunicación segura. ¿Qué tipo de amenaza se previene?",options:["Componentes vulnerables y obsoletos","Fallos de integridad de software y datos","Errores de identificación y autenticación","Errores de registro y supervisión de seguridad"],correct:1},
+            {id:190,category:"XSS",question:"Un atacante se aprovecha de un punto de entrada de datos no validado y realiza una inyección XSS. ¿A qué vulnerabilidad corresponde?",options:["Validación de entrada insuficiente","Criptografía insuficiente","Protección binaria insuficiente","Almacenamiento inseguro de datos"],correct:0},
+            {id:191,category:"Desarrollo Híbrido",question:"Una empresa de salud quiere una aplicación que funcione en dispositivos Android e iOS con un solo código base. ¿Qué enfoque debería usar?",options:["Desarrollo nativo para cada plataforma","Desarrollo híbrido","Sólo desarrollo para Android","Aplicación web"],correct:1},
+            {id:192,category:"Sesiones",question:"Un desarrollador no implementa una gestión adecuada de las sesiones de usuario en una aplicación móvil. ¿Qué vulnerabilidad está presente?",options:["Autenticación insegura","Almacenamiento inseguro de datos","Criptografía insuficiente","Configuración incorrecta de seguridad"],correct:0},
+            {id:193,category:"MASVS-RESILIENCE",question:"¿A qué categoría corresponde la medida de seguridad conocida como ofuscación de código?",options:["MASVS-DEVOPS","MASVS-RESILIENCE","MASVS-AUTH","MASVS-STORAGE"],correct:1},
+            {id:194,category:"APIs",question:"¿Qué acción debe realizarse cuando se actualiza una API?",options:["Exponer la API sin controles de acceso","Comprobar si los cambios son compatibles con las versiones anteriores","Desactivar la seguridad mientras se actualiza","No realizar pruebas previas"],correct:1},
+            {id:195,category:"Autorización de Objeto",question:"¿Qué tipo de vulnerabilidades permiten al atacante acceder a objetos de datos cuyo acceso debería haberse restringido?",options:["Falsificación de solicitudes del lado del servidor","Autorización de nivel de objeto roto","Consumo de recursos sin restricciones","Configuración incorrecta de seguridad"],correct:1},
+            {id:196,category:"Flujos Comerciales",question:"Monitorear y registrar el acceso a flujos comerciales confidenciales y realizar pruebas de seguridad periódicas son soluciones ante cuál tipo de amenaza?",options:["Acceso sin restricciones a flujos comerciales sensibles","Autorización de nivel de propiedad de objeto roto","Gestión inadecuada del inventario","Autorización de nivel de función rota"],correct:0},
+            {id:197,category:"Contenedores",question:"Un contenedor ha sido comprometido. ¿Cuál es la primera acción que debería tomarse?",options:["Desplegar el contenedor nuevamente sin revisar los cambios","Revisar los logs y rastrear la vulnerabilidad","Eliminar todos los contenedores inmediatamente","Cambiar la configuración sin investigar"],correct:1},
+            {id:198,category:"IaC",question:"Un equipo de TI desea asegurar que los cambios de infraestructura estén versionados y sean fácilmente reversibles. ¿Qué proceso se debe utilizar?",options:["Crear configuraciones de archivos independientes","Infraestructura como código (IaC)","Evitar la gestión de la infraestructura virtual","Configuración manual de la infraestructura"],correct:1},
+            {id:199,category:"Gestión de Secretos",question:"¿Cuál es la función principal de la gestión de secretos en un entorno digital?",options:["Automatizar procesos de desarrollo","Monitorizar el tráfico de red","Realizar copias de seguridad de las bases de datos","Almacenar y gestionar de manera segura las credenciales de autenticación"],correct:3},
+            {id:200,category:"Limpieza de Datos",question:"Para mejorar la calidad de los datos antes de entrenar un modelo de IA, el equipo decide hacer limpieza de datos. ¿Cuál actividad es parte de este proceso?",options:["Crear un modelo sin revisar los datos","Realizar un análisis de los patrones de datos y realizar normalización","Asegurarse de que los datos no contienen errores, sin ningún proceso adicional","Ignorar los valores atípicos en los datos"],correct:1},
+            // Questions 201-250
+            {id:201,category:"Pruebas Adversariales",question:"¿Qué práctica ayuda a garantizar que un modelo de IA sea resistente a manipulaciones externas?",options:["Supervisar métricas clave","Implementar pruebas adversariales","Realizar pruebas de caja blanca","Utilizar OWASP ZAP"],correct:1},
+            {id:202,category:"Especificación de Finalidad",question:"Una aplicación de reconocimiento facial recopila datos y luego los usa para crear perfiles demográficos sin consentimiento. ¿Qué principio se está ignorando?",options:["El uso de aprendizaje federado para proteger la privacidad","La seguridad en el almacenamiento de datos personales","La especificación de finalidad y consentimiento informado","La auditoría de los datos recopilados"],correct:2},
+            {id:203,category:"Limpieza de Datos",question:"Durante el desarrollo de un modelo de IA, los desarrolladores implementan un mecanismo para eliminar datos maliciosos antes del entrenamiento. ¿Qué medidas están tomando?",options:["Defensa adversarial","Pruebas de caja negra","Verificación y limpieza de datos","Monitoreo de comportamiento"],correct:2},
+            {id:204,category:"Análisis de Código",question:"¿Qué tipo de análisis de código incluye la inspección sin ejecutar el programa?",options:["Sandboxing","Análisis de código estático","Análisis de código dinámico","Revisión de código"],correct:1},
+            {id:205,category:"Claves Criptográficas",question:"¿Cuál es un ejemplo de mala práctica en gestión de claves criptográficas?",options:["Realizar rotaciones frecuentes de claves","Destruir las claves de forma correcta","Almacenar la clave criptográfica junto con los datos en una cita de respaldo","Utilizar claves largas y seguras"],correct:2},
+            {id:206,category:"Desarrollo Nativo",question:"Un equipo planea crear una aplicación con una experiencia fluida utilizando funciones específicas de hardware como la cámara. ¿Qué tipo de desarrollo es más adecuado?",options:["Desarrollo nativo","Desarrollo híbrido","Desarrollo web","Desarrollo en la nube"],correct:0},
+            {id:207,category:"Cadena de Suministro",question:"Un atacante manipula el código de una aplicación móvil para insertar spyware. ¿A qué categoría de riesgo corresponde?",options:["Almacenamiento de datos inseguro","Configuración incorrecta de seguridad","Seguridad inadecuada de la cadena de suministro","Autenticación insegura"],correct:2},
+            {id:208,category:"Desarrollo Híbrido",question:"Un desarrollador busca una solución para crear una app que funcione tanto en Android como en iOS sin duplicar el código. ¿Qué tipo de desarrollo debería usar?",options:["Desarrollo híbrido","Desarrollo web","Desarrollo nativo","Aplicación híbrida personalizada"],correct:0},
+            {id:209,category:"DevOps",question:"Un equipo está buscando reducir la vulnerabilidad a fallos de seguridad en sus aplicaciones. ¿Qué enfoque se debería seguir?",options:["Evitar la automatización de pruebas de seguridad","Integrar prácticas de DevOps en todo el ciclo de vida del desarrollo","Eliminar el uso de herramientas de seguridad","Realizar pruebas de seguridad sólo al final del ciclo de vida"],correct:1},
+            {id:210,category:"Nube",question:"Un equipo está configurando su infraestructura en la nube. ¿Qué práctica de seguridad deben implementar?",options:["Dejar las claves de acceso expuestas en el código fuente","Proteger las claves SSH de las APIs utilizadas en el código","Ignorar las claves API","No verificar las claves SSH"],correct:1},
+            {id:211,category:"SDLC",question:"¿Cuál es la relevancia de incorporar pruebas de seguridad en todas las etapas del SDLC?",options:["Para evitar la formación de equipos de seguridad","Para eliminar todos los riesgos","Para facilitar la implementación","Para reducir costos en fases avanzadas"],correct:3},
+            {id:212,category:"SDLC",question:"¿Cuál es la actividad de seguridad que se lleva a cabo durante la etapa de implementación del SDLC?",options:["Planificación de nuevos requisitos","Creación de documentación","Generación del método de amenazas","Aplicación de estándares de desarrollo"],correct:3},
+            {id:213,category:"Controles de Seguridad",question:"¿Cuál de los siguientes no es un tipo de control de seguridad mencionado?",options:["Control de ciberseguridad","Control de hardware especializado","Control de seguridad física","Control de seguridad en la nube"],correct:1},
+            {id:214,category:"Integridad",question:"Un usuario al hacer una transferencia bancaria espera que el monto sea exactamente el que se descuenta y el mismo que le llega al receptor. ¿A qué requerimiento de seguridad nos referimos?",options:["No repudio","Autorización","Disponibilidad","Integridad"],correct:3},
+            {id:215,category:"Privilegios Mínimos",question:"¿Qué principio de seguridad se debe aplicar otorgando sólo los permisos necesarios a los usuarios?",options:["Privilegios máximos","Validación de entrada","Autenticación centralizada","Privilegios mínimos"],correct:3},
+            {id:216,category:"Manejo de Errores",question:"¿Cuál es el tipo de requerimiento a través del cual se puede especificar qué información se le devuelve al usuario en caso de error?",options:["Requerimiento de manejo de configuraciones","Requerimiento de manejo de errores","Requerimientos de autenticación","Requerimientos de integridad"],correct:1},
+            {id:217,category:"Sanitización",question:"¿Cómo se llama el proceso que garantiza que los datos proporcionados no se interpreten como código?",options:["Limitación","Sanitización","Sustitución","Refactoring"],correct:1},
+            {id:218,category:"STRIDE",question:"En STRIDE: Un atacante hace ingeniería social para obtener credenciales, accede a la cuenta, descarga información y borra el historial. ¿Qué opciones del acrónimo aplican?",options:["Spoofing, Repudiation, Information disclosure","Information destruction, Resale of data, Session hijacking","Tampering, Denial of Service, Elevation of privileges","Spoofing, Tampering, Repudiation"],correct:0},
+            {id:219,category:"Cifrado Asimétrico",question:"Al usar cifrado asimétrico, una llave se divulga libremente y otra se mantiene en secreto. ¿Cuál es la llave que se mantiene libre?",options:["Llave privada","Llave de cifrado","Llave de sellado","Llave pública"],correct:3},
+            {id:220,category:"Fijación de Sesión",question:"¿Cómo puede un desarrollador prevenir la fijación de sesión?",options:["Usando un proxy de sesiones","Generando nuevos IDs de sesión al autenticar","Evitando el uso de contraseñas débiles","Reutilizando IDs de sesión previos"],correct:1},
+            {id:221,category:"Fuerza Bruta",question:"¿Qué tipo de ataque permite adivinar contraseñas mediante prueba y error?",options:["Secuestro de sesión","Inyección SQL","Ataques de aplicaciones","Fuerza bruta"],correct:3},
+            {id:222,category:"Componentes Vulnerables",question:"Para prevenir componentes vulnerables y obsoletos, decides validar los datos del usuario usando consultas dinámicas. ¿Esto logrará impedir que se materialice la amenaza?",options:["Falso","Verdadero"],correct:0},
+            {id:223,category:"Autenticación",question:"Para prevenir cierta vulnerabilidad, se implementa un número máximo de intentos de autenticación y se desactiva la cuenta hasta un procedimiento de reactivación. ¿Qué tipo de amenaza se previene?",options:["Configuración incorrecta de seguridad","Fallos de integridad de software y datos","Inyección","Errores de identificación y autenticación"],correct:3},
+            {id:224,category:"Bombas Lógicas",question:"Un desarrollador sube cambios sin validación rigurosa, introduciendo cambios dañinos que se detonan posteriormente. ¿De qué tipo de amenaza estamos hablando?",options:["Buffer overflow","Bombas lógicas","Robo de sesión","Análisis de código estático"],correct:1},
+            {id:225,category:"Configuración de Seguridad",question:"Un desarrollador configura incorrectamente los permisos de una aplicación, lo que permite el acceso no autorizado. ¿Qué vulnerabilidad se explota?",options:["Almacenamiento inseguro de datos","Autenticación insegura","Configuración incorrecta de seguridad","Criptografía insuficiente"],correct:2},
+            {id:226,category:"UX",question:"Un diseñador está trabajando en una aplicación móvil pero recibe quejas sobre la complejidad de la interfaz. ¿Qué debería hacer?",options:["Simplificar el diseño y centrarse en funciones esenciales","Añadir más funcionalidades","Cambiar de híbrido a nativo","Optimizar el procesamiento"],correct:0},
+            {id:227,category:"Desarrollo Móvil",question:"Un equipo de desarrollo necesita crear una aplicación con una interfaz sencilla compatible con dispositivos de bajo rendimiento. ¿Qué estrategia sería la más adecuada?",options:["Incluir funcionalidades avanzadas","Añadir más funciones gráficas","Reemplazar con un diseño web","Usar una interfaz sencilla y eficiente"],correct:3},
+            {id:228,category:"Flujos Comerciales",question:"Un atacante puede acceder a flujos comerciales confidenciales sin ninguna restricción a través de una API. ¿Qué vulnerabilidad está siendo explotada?",options:["Consumo de recursos sin restricción","Acceso no autorizado a flujos sensibles","Autenticación rota","Autorización de nivel de propiedad rota"],correct:1},
+            {id:229,category:"DoS",question:"Demasiadas peticiones dirigidas a una API pueden ralentizar o detener un servicio para otros clientes. ¿De qué tipo de amenaza estamos hablando?",options:["Ataques basados en la autenticación","Errores de autorización","DoS","Aprovechamiento de vulnerabilidades"],correct:2},
+            {id:230,category:"Secretos en Código",question:"¿Por qué es riesgoso que los desarrolladores codifiquen secretos en aplicaciones o códigos de microservicios?",options:["Porque pueden quedar desprotegidos y mal administrados en diferentes infraestructuras","Porque los secretos pueden ser fácilmente expuestos en la red","Porque los códigos de microservicios son inseguros","Porque los secretos son siempre fáciles de recuperar"],correct:0},
+            {id:231,category:"Contenedores",question:"Un equipo de DevOps implementa contenedores sin realizar auditorías de seguridad regulares. ¿Qué problema puede surgir a largo plazo?",options:["Introducción de vulnerabilidades no detectadas y mayor riesgo de ataques","Los contenedores funcionarán más rápido sin auditorías","Las vulnerabilidades no afectan el rendimiento de los contenedores","El equipo ahorrará tiempo y recursos"],correct:0},
+            {id:232,category:"Artefactos",question:"Una organización descubre que varios artefactos de compilación obsoletos están ocupando espacio en su repositorio de CI. ¿Qué medida se debería tomar?",options:["Migrar todos los artefactos a un repositorio público","Implementar pruebas DAST durante el ciclo de vida de los artefactos","Automatizar los scripts de aprovisionamiento","Especificar las condiciones para eliminar artefactos en función del tiempo o espacio disponible"],correct:3},
+            {id:233,category:"OWASP IA",question:"¿Qué enfoque promueve OWASP para gestionar los datos durante el desarrollo de IA para proteger la privacidad?",options:["Recopilación de datos sólo de usuarios anónimos","Uso de registros de auditoría","Revisión de las políticas de seguridad","Implementación de pruebas de privacidad"],correct:3},
+            {id:234,category:"GDPR",question:"¿Qué derecho permite a los usuarios obtener una copia de sus datos personales en un formato legible por máquinas, según el GDPR?",options:["Derecho de corrección","Derecho de acceso/portabilidad","Derecho de oposición","Derecho de eliminación"],correct:1},
+            {id:235,category:"Validación de Datos",question:"¿Qué práctica asegura que los datos de entrenamiento representen adecuadamente a la población?",options:["Uso de dashboards en tiempo real","Implementación de OWASP ZAP","Validación de conjuntos de datos","Pruebas de caja negra"],correct:2},
+            {id:236,category:"Ciberataques",question:"¿En qué tipo de ataque los servidores de empresas se ven afectados y la información es extraída?",options:["Exfiltración de datos","Ataque de fuerza bruta","Ransomware","Phishing"],correct:0},
+            {id:237,category:"Reutilización de Datos",question:"Una startup utiliza datos financieros de clientes recopilados para un propósito diferente al original. ¿Qué medida adicional debió tomarse?",options:["Implementar auditorías para verificar el uso de los datos","Solicitar explícitamente el consentimiento del cliente para reutilizar sus datos","Usar un sistema de almacenamiento descentralizado para los datos","Limitar el acceso a los datos"],correct:1},
+            {id:238,category:"Auditoría",question:"¿Qué se necesita para garantizar los requisitos de auditoría?",options:["Rastrear y registrar acciones específicas","Hacer cumplir contraseñas seguras","Deshabilitar modificaciones","Monitorear exclusivamente usuarios no autorizados"],correct:0},
+            {id:239,category:"SDLC",question:"¿Cuál es la tarea que se lleva a cabo en la fase de diseño del SDLC para abordar la seguridad?",options:["Desarrollar pruebas de verificación","Crear el modelo de amenazas","Aplicar pruebas dinámicas","Implementar estándares de codificación segura"],correct:1},
+            {id:240,category:"Ransomware",question:"Un usuario nota que sus documentos tienen una extensión desconocida y ve un mensaje pidiendo un pago para desbloquear el acceso. ¿Qué tipo de malware fue usado?",options:["Adware","Criptojacking","Ransomware","Whaling"],correct:2},
+            {id:241,category:"Codificación Simple",question:"¿Cuáles de las siguientes prácticas de codificación son útiles para simplificar el código?",options:["Los procesos deben tener varios puntos de entrada y salida","Usar múltiples funciones pequeñas y simples en lugar de una función compleja","El software debe tener funciones con nombres similares pero implementación distinta","Usar acrónimos y abreviaturas para reducir líneas de código"],correct:1},
+            {id:242,category:"Bibliotecas de Terceros",question:"¿Qué acción puede prevenir vulnerabilidades al trabajar con bibliotecas de terceros?",options:["Usar una sola biblioteca","Compartir bibliotecas con otros desarrolladores","No usar bibliotecas externas","Mantener las bibliotecas actualizadas"],correct:3},
+            {id:243,category:"Defectos",question:"Al hacer un análisis de las causas de una brecha de seguridad, podemos atribuir esta causa a la implementación o la arquitectura. ¿Cómo se denomina esta causa?",options:["Vulnerabilidad","Exploit","Error","Defecto"],correct:3},
+            {id:244,category:"DREAD",question:"¿Cuál metodología cualitativa toma el promedio de las ponderaciones de ciertas categorías para tener el valor de la amenaza?",options:["STRIDE","CIAAAA","Modelado de amenazas","DREAD"],correct:3},
+            {id:245,category:"Cifrado Asimétrico",question:"Al usar cifrado asimétrico, una llave se divulga libremente y otra se mantiene en secreto. ¿Cuál es la llave que se mantiene en secreto?",options:["Llave privada","Llave de cifrado","Llave de sellado","Llave pública"],correct:0},
+            {id:246,category:"Fuzzing",question:"¿Qué diferencia al fuzzing inteligente del tonto?",options:["Genera datos según un protocolo o formato","Utiliza listas de diccionario","Su capacidad para modificar datos aleatorios","Cubre todas las combinaciones posibles"],correct:0},
+            {id:247,category:"Fuzzing",question:"¿Qué tipo de prueba inyecta datos aleatorios para evaluar el comportamiento del sistema?",options:["Validación de entradas","Fijación de sesión","Fuzzing","Smart fuzzing"],correct:2},
+            {id:248,category:"Configuración de Seguridad",question:"Para prevenir configuración incorrecta de seguridad, decides dejar la configuración inicial para mostrar mensajes detallados. ¿Esto logrará impedir la amenaza?",options:["Falso","Verdadero"],correct:0},
+            {id:249,category:"Componentes Vulnerables",question:"Para prevenir cierta vulnerabilidad, se decide usar componentes de terceros descargados de fuentes oficiales, identificando versiones y manteniendo actualizados. ¿Qué tipo de amenaza se previene?",options:["Errores de registro y supervisión de seguridad","Falsificación de solicitudes del lado del servidor","Componentes vulnerables y obsoletos","Configuración incorrecta de seguridad"],correct:2},
+            {id:250,category:"Nube",question:"Un cliente quiere implementar un sistema de reservas en línea con sincronización en tiempo real. ¿Qué debería utilizar?",options:["Aplicación híbrida sin almacenamiento remoto","Procesamiento en el dispositivo","Conexión con servicios basados en la nube","Desarrollo nativo con APIs básicas"],correct:2},
+            // Questions 251-291
+            {id:251,category:"MASVS-DEVOPS",question:"¿Qué categoría establece que la aplicación debe contar con un mecanismo para hacer cumplir las actualizaciones?",options:["MASVS-CRYPTO","MASVS-DEVOPS","MASVS-NETWORK","MASVS-AUTH"],correct:1},
+            {id:252,category:"MASVS-CODE",question:"¿Qué categoría establece que la aplicación debe validar y desinfectar todas las entradas que no son de confianza?",options:["MASVS-CRYPTO","MASVS-DEVOPS","MASVS-NETWORK","MASVS-CODE"],correct:3},
+            {id:253,category:"MASVS-RESILIENCE",question:"¿Qué control intenta validar que el sistema operativo no se ha visto comprometido y, por lo tanto, se puede confiar en sus características de seguridad?",options:["MASVS-CRYPTO","MASVS-DEVOPS","MASVS-NETWORK","MASVS-RESILIENCE"],correct:3},
+            {id:254,category:"SSRF",question:"¿Cuál es la solución para prevenir ataques SSRF?",options:["Hacer uso de bibliotecas de URLs antiguas","Deshabilitar la autenticación de usuarios","Implementar una red de contenedores","Validar y sanear entradas del usuario"],correct:3},
+            {id:255,category:"API Gateway",question:"¿Cómo previene una API Gateway la sobrecarga de servicios?",options:["Proporcionando acceso a todos los servicios sin restricciones","Limitando el número de solicitudes entrantes","Desactivando todos los servicios internos","Permitiendo múltiples solicitudes sin filtrado"],correct:1},
+            {id:256,category:"Consumo de Recursos",question:"¿Cómo se puede mitigar el consumo no restringido de recursos?",options:["Implementando límites y cuotas de uso","Permitiendo acceso ilimitado","No limitando la velocidad de acceso","Eliminando todas las peticiones de los usuarios"],correct:0},
+            {id:257,category:"Autorización de APIs",question:"Un sistema de API no controla adecuadamente las autorizaciones para acceder a datos sensibles. ¿Qué vulnerabilidad se está explotando?",options:["Consumo de recursos sin restricción","Acceso no autorizado a flujos sensibles","Autorización de función rota","Autenticación rota"],correct:2},
+            {id:258,category:"Confidencialidad",question:"Si no se gestiona con cuidado, un cliente de la API podría tener acceso a recursos que no deberían estar disponibles. ¿A qué se refiere esto?",options:["Autorización","Logging","Autenticación","Confidencialidad"],correct:3},
+            {id:259,category:"Contenedores",question:"Un equipo tiene un problema con la actualización de imágenes de contenedor. ¿Qué debería hacer para garantizar la seguridad?",options:["Utilizar imágenes sin ningún tipo de validación","Descargar imágenes de fuentes no verificadas","Asegurarse de que las capas de runtime y sistema operativo estén actualizadas","Mantener las imágenes antiguas para evitar cambios"],correct:2},
+            {id:260,category:"IaC",question:"Durante la implementación de un nuevo entorno en la nube, el equipo usa scripts automatizados para aprovisionar servidores. ¿Qué enfoque están utilizando?",options:["Infraestructura como código (IaC)","Consistencia operativa","DevSecOps","Administración de artefactos"],correct:0},
+            {id:261,category:"IA - Calidad de Datos",question:"Una empresa implementa un modelo de IA que no ha sido entrenado con datos precisos. ¿Qué riesgo principal enfrenta la empresa?",options:["El modelo será 100% confiable desde el inicio","El modelo tomará decisiones basadas en patrones defectuosos","El modelo se ajustará automáticamente a los datos erróneos","El modelo será más seguro y eficiente"],correct:1},
+            {id:262,category:"Consentimiento",question:"Una empresa decide recopilar datos de ubicación para navegación y luego los usa para publicidad sin informar a los usuarios. ¿Qué acción debió tomar?",options:["Anonimizar los datos de ubicación","Utilizar los datos sin informar, ya que el consentimiento original cubre cualquier uso","Obtener el consentimiento explícito de los usuarios para el nuevo uso","Implementar auditorías de los sistemas de recopilación"],correct:2},
+            {id:263,category:"Shift Right",question:"¿Cuál es el enfoque principal al desplazar la seguridad a la derecha?",options:["Identificar fallos antes de desarrollo","Evitar pruebas manuales","Detectar vulnerabilidades en producción","Hacer auditorías exclusivas"],correct:2},
+            {id:264,category:"Controles Digitales",question:"¿Cuál de los siguientes es un control de seguridad digital?",options:["Sistemas de prevención de intrusiones","Software antivirus","Sensores de detección de intrusiones","Mitigación DDoS"],correct:1},
+            {id:265,category:"SDLC",question:"¿Qué problema surge al abordar la seguridad en fases avanzadas del SDLC?",options:["Mayor complejidad del diseño","Incremento en los costos y tiempos de corrección","Reducción de la confidencialidad","Mejora la eficiencia del proyecto"],correct:1},
+            {id:266,category:"Vulnerabilidades en Producción",question:"¿Qué tipo de vulnerabilidad puede detectarse sólo en producción?",options:["Errores de compilación","Deficiencias en arquitectura","Vulnerabilidades relacionadas con la red o el tráfico en vivo","Defectos en la documentación"],correct:2},
+            {id:267,category:"Ofuscación",question:"Es una técnica utilizada para evitar la ingeniería inversa, transformando el código fuente para volverlo ilegible. ¿Cuál es?",options:["Ofuscación","Copias de seguridad","Cifrado simétrico","Hasheo"],correct:0},
+            {id:268,category:"STRIDE",question:"Hablando de la técnica de modelado de amenazas STRIDE. ¿Cuáles opciones forman parte del acrónimo?",options:["Exploitation, Information destruction","Spoofing, Elevation of privileges, Information disclosure","Session hijacking, Resale of data","Tampering, Denial of service, Repudiation"],correct:1},
+            {id:269,category:"STRIDE",question:"En STRIDE, ¿cuáles opciones forman parte del acrónimo?",options:["Resale of data, Data removal","Denial of service, Repudiation, Tampering","Transposition of information","Information destruction, Session hijacking"],correct:1},
+            {id:270,category:"Sesiones",question:"¿Cómo se debe manejar una sesión una vez que el usuario cierra la ventana del navegador?",options:["Mantener la sesión activa por seguridad","Abandonar la sesión explícitamente","Pasar la sesión a otro usuario","Bloquear la cuenta del usuario"],correct:1},
+            {id:271,category:"Secuestro de Sesión",question:"¿Qué implica el secuestro de sesión?",options:["Forzar al usuario a cerrar sesión","Manipulación de contraseñas mediante ataques","Obtención del ID de sesión para hacerse pasar por un usuario legítimo","Creación de un ID de sesión en el servidor"],correct:2},
+            {id:272,category:"SSRF",question:"En una arquitectura de N capas donde las capas profundas no validan meticulosamente, ¿esta configuración puede causar una amenaza del tipo SSRF?",options:["Falso","Verdadero"],correct:1},
+            {id:273,category:"Arquitectura Cliente-Servidor",question:"En una aplicación cliente-servidor, la lógica del negocio debería manejarse principalmente en el servidor. ¿Qué principio estamos cumpliendo?",options:["Economía de mecanismos","Menor privilegio","Aceptabilidad psicológica","Mínima exposición"],correct:3},
+            {id:274,category:"Procesamiento en la Nube",question:"Una aplicación móvil necesita realizar cálculos intensivos que superan la capacidad del dispositivo. ¿Qué solución se recomienda?",options:["Reducir la funcionalidad","Procesar directamente en el dispositivo","Evitar cálculos complejos","Mover el procesamiento a la nube"],correct:3},
+            {id:275,category:"MASVS-CODE",question:"¿Qué implica el control MASVS-CODIGO para la seguridad de la aplicación?",options:["Proteger las contraseñas utilizando técnicas de encriptación fuerte","Validar y desinfectar todas las entradas no confiables antes de usarlas","Mejorar la interfaz gráfica de la aplicación","Permitir el acceso sin restricciones a los archivos"],correct:1},
+            {id:276,category:"Desarrollo Nativo",question:"Una empresa quiere aprovechar características específicas del hardware de los dispositivos. ¿Qué enfoque debe elegir?",options:["Uso exclusivo de APIs en la nube","Desarrollo nativo","Desarrollo híbrido","Desarrollo web puro"],correct:1},
+            {id:277,category:"Configuración de Seguridad",question:"Una aplicación móvil se lanza con la configuración predeterminada y configuraciones de seguridad débiles. ¿Qué amenaza se describe?",options:["Controles de privacidad inadecuados","Configuración incorrecta de seguridad","Uso inadecuado de credenciales","Comunicación insegura"],correct:1},
+            {id:278,category:"Manejo de Errores en APIs",question:"¿Qué tipo de errores deben evitarse en los registros de error de una API?",options:["Mensajes de error genéricos","No registrar errores","Mostrar información detallada sobre el servidor y la base de datos","Registrando sólo información de tráfico"],correct:2},
+            {id:279,category:"API Gateway",question:"¿Por qué es esencial la validación de entrada en una API Gateway?",options:["Para acelerar la respuesta de la API","Para mejorar la velocidad de las respuestas","Para permitir todas las solicitudes sin restricciones","Para asegurar que todos los datos de entrada sean correctos y seguros"],correct:3},
+            {id:280,category:"WAF",question:"¿Qué debe hacer un desarrollador si se descubre un acceso no autorizado a una API?",options:["No permitir ninguna entrada del cliente","Aplicar reglas WAF para bloquear el acceso","Validar nuevamente las URLs","Ignorar la configuración de firewall"],correct:1},
+            {id:281,category:"Consumo Inseguro de API",question:"Los desarrolladores dejan sus APIs vulnerables si los atacantes pueden manipular a proveedores externos. ¿A qué categoría de amenaza hace referencia?",options:["Autorización de nivel de propiedad de objeto roto","Falsificación de solicitudes del lado del servidor","Configuración incorrecta de seguridad","Consumo inseguro de API"],correct:3},
+            {id:282,category:"Consumo Inseguro de API",question:"Los desarrolladores a menudo confían en los datos recibidos de proveedores de renombre e implementan políticas menos estrictas. ¿A qué categoría de amenaza hace referencia?",options:["Configuración incorrecta de seguridad","Acceso sin restricciones a flujos comerciales sensibles","Consumo inseguro de API","Autorización de nivel de propiedad de objeto roto"],correct:2},
+            {id:283,category:"Contenedores",question:"Un equipo decide utilizar contenedores sin cifrado. ¿Cuál es el riesgo?",options:["El contenedor será más rápido","Los contenedores serán más fáciles de manejar","Exposición de datos confidenciales y acceso no autorizado","No habrá vulnerabilidades"],correct:2},
+            {id:284,category:"Soporte Técnico",question:"¿Qué debe hacer un equipo de operaciones cuando detecta un posible problema durante una incidencia de soporte técnico?",options:["Resolver el problema de manera inmediata","Crear un ticket para su investigación","Enviar una alerta al equipo de desarrollo para su revisión","Ignorar el problema si no parece grave"],correct:2},
+            {id:285,category:"IaC",question:"Un equipo desea hacer un seguimiento preciso de las configuraciones de infraestructura a lo largo del tiempo. ¿Qué debería hacer?",options:["Gestionar configuraciones sin ningún sistema de control de versiones","Hacer seguimiento manual de todas las configuraciones","No utilizar ninguna herramienta de gestión de configuraciones","Usar infraestructura como Código (IaC) para gestionar y versionar configuraciones"],correct:3},
+            {id:286,category:"Anonimización",question:"¿Qué técnica ayuda a proteger la privacidad de los datos utilizados en el entrenamiento del modelo?",options:["Técnicas de anonimización","Pruebas adversariales","Implementación de dashboards","Análisis de impacto de privacidad"],correct:0},
+            {id:287,category:"Acceso a Datos",question:"Una empresa de transporte público utiliza datos de ubicación pero los expone porque permite acceso sin restricciones al personal. ¿Qué medida hubiera reducido este riesgo?",options:["Limitar el acceso a los datos sólo a quienes lo necesiten","Anonimizar los datos de ubicación","Implementar aprendizaje federado","Informar mejor a los usuarios sobre la recopilación"],correct:0},
+            {id:288,category:"Regulaciones de IA",question:"Una organización está desarrollando un modelo de IA para predicción de comportamiento delictivo basado en perfiles demográficos. ¿Por qué podría ser considerado ilegal?",options:["No se realizó un análisis ético del proyecto","Los datos no están anonimizados","Involucra un alto riesgo para los derechos humanos y la equidad social","No se utiliza aprendizaje federado"],correct:2},
+            {id:289,category:"Defensa en Profundidad",question:"Una empresa implementa distintas medidas de seguridad en cada una de las capas de la aplicación. ¿Cómo se conoce este principio de seguridad?",options:["Economía de mecanismos","Fallo seguro","Defensa en profundidad","Diseño abierto"],correct:2},
+            {id:290,category:"Gestión de Configuraciones",question:"¿Qué función realiza la administración de configuraciones en el desarrollo de software?",options:["Supervisar artefactos y componentes","Limitar revisiones técnicas","Gestionar sólo cambios en la base de datos","Proteger exclusivamente bibliotecas del sistema"],correct:0},
+            {id:291,category:"SaaS",question:"Un cliente utiliza una solución SaaS y su cuenta de administración tiene acceso no supervisado a la consola. ¿Qué recomendación de seguridad debería seguir?",options:["Usar herramientas SAST en la fase de construcción","Autorizar el aprovisionamiento de infraestructura","Implementar procesos de DevSecOps","Supervisar y controlar estrictamente los privilegios de acceso a la consola de administración SaaS"],correct:3}
+        ];
+
+        // State
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        let answerResults = {};
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let selectedCategories = new Set();
+
+        const categories = [...new Set(allQuestions.map(q => q.category))];
+
+        function init() {
+            renderCategories();
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('categoryGrid');
+            const categoryCount = {};
+            
+            allQuestions.forEach(q => {
+                categoryCount[q.category] = (categoryCount[q.category] || 0) + 1;
+            });
+
+            grid.innerHTML = `
+                <div class="category-chip selected" onclick="toggleAllCategories(this)" data-category="all">
+                    <div class="category-chip-name">Todas las categorías</div>
+                    <div class="category-chip-count">${allQuestions.length} preguntas</div>
+                </div>
+            `;
+
+            categories.forEach(cat => {
+                grid.innerHTML += `
+                    <div class="category-chip" onclick="toggleCategory('${cat}', this)">
+                        <div class="category-chip-name">${cat}</div>
+                        <div class="category-chip-count">${categoryCount[cat]} preg.</div>
+                    </div>
+                `;
+            });
+
+            selectedCategories = new Set(categories);
+        }
+
+        function toggleAllCategories(element) {
+            const allChips = document.querySelectorAll('.category-chip');
+            if (element.classList.contains('selected')) {
+                allChips.forEach(chip => chip.classList.remove('selected'));
+                selectedCategories.clear();
+            } else {
+                allChips.forEach(chip => chip.classList.add('selected'));
+                selectedCategories = new Set(categories);
+            }
+        }
+
+        function toggleCategory(category, element) {
+            document.querySelector('[data-category="all"]').classList.remove('selected');
+            
+            if (selectedCategories.has(category)) {
+                selectedCategories.delete(category);
+                element.classList.remove('selected');
+            } else {
+                selectedCategories.add(category);
+                element.classList.add('selected');
+            }
+            
+            if (selectedCategories.size === categories.length) {
+                document.querySelector('[data-category="all"]').classList.add('selected');
+            }
+        }
+
+        function startExam() {
+            if (selectedCategories.size === 0) {
+                alert('Por favor selecciona al menos una categoría');
+                return;
+            }
+
+            let limit = parseInt(document.getElementById('questionLimit').value) || 291;
+            limit = Math.max(10, Math.min(291, limit));
+
+            let filteredQuestions = allQuestions.filter(q => selectedCategories.has(q.category));
+            filteredQuestions = shuffleArray(filteredQuestions);
+            questions = filteredQuestions.slice(0, limit);
+            
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            answerResults = {};
+            correctCount = 0;
+            incorrectCount = 0;
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('examScreen').classList.remove('hidden');
+            
+            document.getElementById('totalQuestions').textContent = questions.length;
+            
+            renderQuestionNav();
+            renderQuestion();
+            updateStats();
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function renderQuestionNav() {
+            const nav = document.getElementById('questionNav');
+            nav.innerHTML = '';
+            
+            questions.forEach((_, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                if (index === currentQuestionIndex) btn.classList.add('current');
+                if (answerResults[index] === true) btn.classList.add('correct');
+                if (answerResults[index] === false) btn.classList.add('incorrect');
+                btn.textContent = index + 1;
+                btn.onclick = () => goToQuestion(index);
+                nav.appendChild(btn);
+            });
+        }
+
+        function goToQuestion(index) {
+            currentQuestionIndex = index;
+            renderQuestion();
+            renderQuestionNav();
+        }
+
+        function updateStats() {
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+            
+            const answeredCount = Object.keys(userAnswers).length;
+            const progress = (answeredCount / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function renderQuestion() {
+            const question = questions[currentQuestionIndex];
+            const isAnswered = userAnswers[currentQuestionIndex] !== undefined;
+            const userAnswer = userAnswers[currentQuestionIndex];
+            const isCorrect = answerResults[currentQuestionIndex];
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('questionNumber').textContent = `Pregunta ${currentQuestionIndex + 1}`;
+            document.getElementById('questionCategory').textContent = question.category;
+            document.getElementById('questionText').textContent = question.question;
+            
+            const questionCard = document.getElementById('questionCard');
+            questionCard.classList.remove('answered-correct', 'answered-incorrect');
+            if (isAnswered) {
+                questionCard.classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+            }
+            
+            const optionsList = document.getElementById('optionsList');
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            
+            optionsList.innerHTML = question.options.map((option, index) => {
+                let className = 'option';
+                let feedback = '';
+                
+                if (isAnswered) {
+                    className += ' disabled';
+                    if (index === question.correct) {
+                        className += ' correct';
+                        if (index === userAnswer) {
+                            feedback = '<span class="option-feedback correct">✓ ¡Correcto!</span>';
+                        } else {
+                            className += ' show-correct';
+                            feedback = '<span class="option-feedback correct">✓ Respuesta correcta</span>';
+                        }
+                    } else if (index === userAnswer) {
+                        className += ' incorrect';
+                        feedback = '<span class="option-feedback incorrect">✗ Incorrecto</span>';
+                    }
+                }
+                
+                return `
+                    <div class="${className}" onclick="${isAnswered ? '' : `selectOption(${index})`}">
+                        <span class="option-letter">${letters[index]}</span>
+                        <span class="option-text">${option}</span>
+                        ${feedback}
+                    </div>
+                `;
+            }).join('');
+
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            if (isAnswered) {
+                if (isCorrect) {
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback-message correct">
+                            <span class="feedback-icon">✅</span>
+                            <span>¡Excelente! Has respondido correctamente.</span>
+                        </div>
+                    `;
+                } else {
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback-message incorrect">
+                            <span class="feedback-icon">❌</span>
+                            <span>Respuesta incorrecta. La respuesta correcta está marcada en verde.</span>
+                        </div>
+                    `;
+                }
+            } else {
+                feedbackContainer.innerHTML = '';
+            }
+
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                document.getElementById('nextBtn').classList.add('hidden');
+                document.getElementById('finishBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('nextBtn').classList.remove('hidden');
+                document.getElementById('finishBtn').classList.add('hidden');
+            }
+        }
+
+        function selectOption(optionIndex) {
+            if (userAnswers[currentQuestionIndex] !== undefined) return;
+            
+            const question = questions[currentQuestionIndex];
+            const isCorrect = optionIndex === question.correct;
+            
+            userAnswers[currentQuestionIndex] = optionIndex;
+            answerResults[currentQuestionIndex] = isCorrect;
+            
+            if (isCorrect) {
+                correctCount++;
+            } else {
+                incorrectCount++;
+            }
+            
+            updateStats();
+            renderQuestion();
+            renderQuestionNav();
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+                renderQuestionNav();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+                renderQuestionNav();
+            }
+        }
+
+        function finishExam() {
+            const unanswered = questions.length - Object.keys(userAnswers).length;
+            const score = Math.round((correctCount / questions.length) * 100);
+
+            document.getElementById('examScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            
+            document.getElementById('finalScore').textContent = `${score}%`;
+            document.getElementById('finalCorrectCount').textContent = correctCount;
+            document.getElementById('finalIncorrectCount').textContent = incorrectCount;
+            document.getElementById('finalUnansweredCount').textContent = unanswered;
+
+            let gradeText = '';
+            let gradeEmoji = '';
+            
+            if (score >= 90) { gradeText = 'Excelente'; gradeEmoji = '🏆'; }
+            else if (score >= 80) { gradeText = 'Muy Bien'; gradeEmoji = '🎉'; }
+            else if (score >= 70) { gradeText = 'Aprobado'; gradeEmoji = '✅'; }
+            else if (score >= 60) { gradeText = 'Necesita Mejorar'; gradeEmoji = '📚'; }
+            else { gradeText = 'No Aprobado'; gradeEmoji = '❌'; }
+
+            document.getElementById('gradeText').textContent = `${gradeEmoji} ${gradeText}`;
+        }
+
+        function reviewAnswers() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.remove('hidden');
+
+            const container = document.getElementById('reviewContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            
+            container.innerHTML = questions.map((question, qIndex) => {
+                const userAnswer = userAnswers[qIndex];
+                const isCorrect = answerResults[qIndex];
+                const isUnanswered = userAnswer === undefined;
+
+                return `
+                    <div class="question-card fade-in" style="animation-delay: ${qIndex * 0.02}s">
+                        <div class="question-header">
+                            <span class="question-number">Pregunta ${qIndex + 1}</span>
+                            <span class="question-category">${question.category}</span>
+                            <span style="margin-left: auto; font-size: 1.5rem;">
+                                ${isUnanswered ? '⚠️' : (isCorrect ? '✅' : '❌')}
+                            </span>
+                        </div>
+                        <p class="question-text">${question.question}</p>
+                        <div class="options-list">
+                            ${question.options.map((option, oIndex) => {
+                                let className = 'option disabled';
+                                let feedback = '';
+                                
+                                if (oIndex === question.correct) {
+                                    className += ' correct';
+                                    feedback = '<span class="option-feedback correct">✓ Correcta</span>';
+                                } else if (oIndex === userAnswer && !isCorrect) {
+                                    className += ' incorrect';
+                                    feedback = '<span class="option-feedback incorrect">Tu respuesta</span>';
+                                }
+                                
+                                return `
+                                    <div class="${className}">
+                                        <span class="option-letter">${letters[oIndex]}</span>
+                                        <span class="option-text">${option}</span>
+                                        ${feedback}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function backToResults() {
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+        }
+
+        function restartExam() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            answerResults = {};
+            correctCount = 0;
+            incorrectCount = 0;
+            
+            renderCategories();
+        }
+
+        init();
+    </script>
+</body>
+</html>
