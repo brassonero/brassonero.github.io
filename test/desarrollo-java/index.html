@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación Examen Java - Conceptos y Análisis de Código</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --bg-card: #1c2128;
+            --accent-orange: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --accent-purple: #a855f7;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border-color: #30363d;
+            --glow-orange: 0 0 20px rgba(249, 115, 22, 0.3);
+            --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
+            --glow-green: 0 0 20px rgba(16, 185, 129, 0.3);
+            --glow-red: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(249, 115, 22, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(249, 115, 22, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue), var(--accent-orange));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 65px; height: 65px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: var(--glow-orange);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p { color: var(--text-secondary); font-size: 1.1rem; margin-top: 0.5rem; }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover { border-color: var(--accent-orange); box-shadow: var(--glow-orange); }
+        .stat-card.correct-stat { border-color: var(--accent-green); }
+        .stat-card.incorrect-stat { border-color: var(--accent-red); }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--accent-orange);
+        }
+
+        .stat-value.correct { color: var(--accent-green); }
+        .stat-value.incorrect { color: var(--accent-red); }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.3rem;
+        }
+
+        .progress-container {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover { border-color: rgba(249, 115, 22, 0.3); }
+        .question-card.answered-correct { border-color: var(--accent-green); box-shadow: var(--glow-green); }
+        .question-card.answered-incorrect { border-color: var(--accent-red); box-shadow: var(--glow-red); }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .question-category {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            color: #c9d1d9;
+        }
+
+        .options-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: var(--accent-orange);
+            background: rgba(249, 115, 22, 0.05);
+        }
+
+        .option.correct {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.15);
+            box-shadow: var(--glow-green);
+        }
+
+        .option.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.15);
+            box-shadow: var(--glow-red);
+        }
+
+        .option.disabled { cursor: not-allowed; opacity: 0.7; }
+        .option.show-correct { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+
+        .option-letter {
+            width: 36px; height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .option:hover:not(.disabled) .option-letter { background: var(--accent-orange); color: white; }
+        .option.correct .option-letter { background: var(--accent-green); color: white; }
+        .option.incorrect .option-letter { background: var(--accent-red); color: white; }
+        .option.show-correct .option-letter { background: var(--accent-green); color: white; }
+
+        .option-text { flex: 1; color: var(--text-primary); font-size: 0.95rem; }
+
+        .option-feedback {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-feedback.correct { color: var(--accent-green); }
+        .option-feedback.incorrect { color: var(--accent-red); }
+
+        .feedback-message {
+            margin-top: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-message.correct {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .feedback-message.incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .feedback-icon { font-size: 1.5rem; }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.9rem 2rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+            color: white;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-orange); }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover { border-color: var(--accent-orange); background: var(--bg-secondary); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .question-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+            gap: 0.35rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .nav-btn {
+            width: 38px; height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .nav-btn.current { background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue)); border-color: transparent; color: white; }
+        .nav-btn.correct { background: var(--accent-green); border-color: transparent; color: white; }
+        .nav-btn.incorrect { background: var(--accent-red); border-color: transparent; color: white; }
+
+        .results-container { text-align: center; padding: 3rem; }
+
+        .results-score {
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .results-grade { font-size: 2rem; margin-bottom: 2rem; }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .result-stat { background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; }
+
+        .result-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .result-stat-value.correct { color: var(--accent-green); }
+        .result-stat-value.incorrect { color: var(--accent-red); }
+        .result-stat-value.unanswered { color: var(--accent-yellow); }
+
+        .start-screen { text-align: center; padding: 3rem; }
+        .start-screen h2 { font-size: 2rem; margin-bottom: 1.5rem; }
+
+        .start-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .info-item {
+            background: var(--bg-tertiary);
+            padding: 1.2rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-icon {
+            width: 45px; height: 45px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .info-text h4 { font-size: 0.9rem; color: var(--text-muted); font-weight: 400; }
+        .info-text p { font-size: 1.1rem; color: var(--text-primary); font-weight: 500; }
+
+        .category-selector { margin: 2rem 0; }
+        .category-selector h3 { margin-bottom: 1rem; color: var(--text-secondary); }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .category-chip {
+            padding: 0.8rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .category-chip:hover { border-color: var(--accent-orange); }
+        .category-chip.selected { border-color: var(--accent-orange); background: rgba(249, 115, 22, 0.1); }
+        .category-chip-name { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; }
+        .category-chip-count { font-size: 0.8rem; color: var(--text-muted); }
+
+        .question-limit {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .question-limit label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); }
+
+        .question-limit input {
+            width: 100px;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-orange); }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .header h1 { font-size: 1.6rem; }
+            .question-text { font-size: 1rem; }
+            .start-info { grid-template-columns: 1fr; }
+            .results-stats { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+            .code-block { font-size: 0.75rem; }
+        }
+
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+
+        .option.correct { animation: pulse-green 0.5s ease; }
+        .option.incorrect { animation: pulse-red 0.5s ease; }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .section-badge.theory { background: var(--accent-blue); color: white; }
+        .section-badge.code { background: var(--accent-purple); color: white; }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">☕</div>
+                <div>
+                    <h1>Simulación Examen Java</h1>
+                    <p>Conceptos, Teoría y Análisis de Código</p>
+                </div>
+            </div>
+        </header>
+
+        <div id="startScreen" class="question-card start-screen">
+            <h2>Bienvenido a la Evaluación</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Esta evaluación contiene preguntas de conceptos teóricos y análisis de código Java.<br>
+                Recibirás retroalimentación inmediata en cada respuesta.
+            </p>
+
+            <div class="start-info">
+                <div class="info-item">
+                    <div class="info-icon">📚</div>
+                    <div class="info-text">
+                        <h4>Sección Teoría</h4>
+                        <p>57 preguntas</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">💻</div>
+                    <div class="info-text">
+                        <h4>Análisis de Código</h4>
+                        <p>45 preguntas</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">✅</div>
+                    <div class="info-text">
+                        <h4>Para aprobar</h4>
+                        <p>70% mínimo</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">⚡</div>
+                    <div class="info-text">
+                        <h4>Retroalimentación</h4>
+                        <p>Inmediata</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-limit">
+                <label>Número de preguntas para el examen:</label>
+                <input type="number" id="questionLimit" min="10" max="102" value="102">
+                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-102)</span>
+            </div>
+
+            <div class="category-selector">
+                <h3>Filtrar por categorías (opcional):</h3>
+                <div class="category-grid" id="categoryGrid"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="startExam()" style="margin-top: 1rem; padding: 1rem 3rem;">
+                🚀 Comenzar Evaluación
+            </button>
+        </div>
+
+        <div id="examScreen" class="hidden">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" id="currentQuestion">1</div>
+                    <div class="stat-label">Actual</div>
+                </div>
+                <div class="stat-card correct-stat">
+                    <div class="stat-value correct" id="correctCount">0</div>
+                    <div class="stat-label">Correctas</div>
+                </div>
+                <div class="stat-card incorrect-stat">
+                    <div class="stat-value incorrect" id="incorrectCount">0</div>
+                    <div class="stat-label">Incorrectas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalQuestions">102</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <div class="question-nav" id="questionNav"></div>
+
+            <div class="question-card fade-in" id="questionCard">
+                <div class="question-header">
+                    <span class="question-number" id="questionNumber">Pregunta 1</span>
+                    <span class="question-category" id="questionCategory">Categoría</span>
+                    <span class="section-badge" id="sectionBadge">Teoría</span>
+                </div>
+                <div id="questionContent">
+                    <p class="question-text" id="questionText">Texto de la pregunta...</p>
+                </div>
+                <div class="options-list" id="optionsList"></div>
+                <div id="feedbackContainer"></div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">← Anterior</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Siguiente →</button>
+                <button class="btn btn-primary hidden" id="finishBtn" onclick="finishExam()">🏁 Finalizar</button>
+            </div>
+        </div>
+
+        <div id="resultsScreen" class="hidden">
+            <div class="question-card results-container">
+                <h2 style="margin-bottom: 1rem;">Resultados de la Evaluación</h2>
+                <div class="results-score" id="finalScore">0%</div>
+                <div class="results-grade" id="gradeText">Calificación</div>
+                
+                <div class="results-stats">
+                    <div class="result-stat">
+                        <div class="result-stat-value correct" id="finalCorrectCount">0</div>
+                        <div class="stat-label">Correctas</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value incorrect" id="finalIncorrectCount">0</div>
+                        <div class="stat-label">Incorrectas</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value unanswered" id="finalUnansweredCount">0</div>
+                        <div class="stat-label">Sin responder</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="reviewAnswers()">📋 Revisar Respuestas</button>
+                    <button class="btn btn-primary" onclick="restartExam()">🔄 Nuevo Examen</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviewScreen" class="hidden">
+            <div class="question-card" style="margin-bottom: 1rem;">
+                <h2 style="margin-bottom: 0.5rem;">Revisión de Respuestas</h2>
+                <p style="color: var(--text-secondary);">Las respuestas correctas se muestran en verde</p>
+            </div>
+            <div id="reviewContainer"></div>
+            <div class="navigation">
+                <button class="btn btn-primary" onclick="backToResults()">← Volver a Resultados</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Complete Question Database - 102 questions
+        const allQuestions = [
+            // ========== SECCIÓN TEORÍA (57 preguntas) ==========
+            {id:1,category:"Clases Internas",section:"theory",question:"Son los tipos de clases internos en Java:",options:["Abstracta, estática, heredada, anónima","Anónima, pública, estándar, estática","Pública, nativa, heredada, anónima","Regular, estática, local a un método, anónima"],correct:3},
+            {id:2,category:"Colecciones",section:"theory",question:"Son clases en Java que, a diferencia de los arreglos, pueden expandirse o contraerse dinámicamente conforme se les agregan o restan elementos:",options:["Expansores","Reductores","Cadenas","Colecciones"],correct:3},
+            {id:3,category:"Hilos",section:"theory",question:"Es el nombre del hilo, en el que corre el método main de un programa Java:",options:["Main","Central","Head","Prime"],correct:0},
+            {id:4,category:"Hilos",section:"theory",question:"Es el nombre del estado en el que se encuentra un hilo antes de invocar el método Thread:",options:["Nuevo (new)","Ejecutable (runnable)","Muerto (dead)","En ejecución (running)"],correct:0},
+            {id:5,category:"Métodos String",section:"theory",question:"El método String.split regresa:",options:["Un arreglo de cadenas","Una lista de cadenas","Un mapa de cadenas","Ninguna de los anteriores"],correct:0},
+            {id:6,category:"Clases Internas",section:"theory",question:"Una clase interna no-estática:",options:["Tiene acceso a todos los miembros de su clase externa","No tiene acceso a los miembros de su clase externa","Tiene acceso sólo a los miembros públicos de su clase externa","Tiene acceso a todos los miembros de su clase externa con excepción de los privados"],correct:0},
+            {id:7,category:"Herencia",section:"theory",question:"Una clase Java soporta:",options:["Herencia simple","Herencia múltiple","Herencia compuesta","Ninguna de las anteriores"],correct:0},
+            {id:8,category:"Genéricos",section:"theory",question:"El tipo parametrizado, en la sintaxis de un genérico se escribe:",options:["Entre paréntesis","Entre paréntesis angulares <>","Entre corchetes","Entre llaves"],correct:1},
+            {id:9,category:"Polimorfismo",section:"theory",question:"La invocación de métodos de manera polifórmica aplica sólo para:",options:["Métodos estáticos","Métodos de instancia","Variables de instancia","Métodos marcados con el modificador: native"],correct:1},
+            {id:10,category:"Métodos Implícitos",section:"theory",question:"Es el nombre del método que es invocado de manera implícita en un objeto, cuando se le pasa una referencia al mismo método System.out.println:",options:["Print","toChar","toString","hashCode"],correct:2},
+            {id:11,category:"Aserciones",section:"theory",question:"Se refiere al mecanismo que permite al programador Java, probar suposiciones durante la fase de desarrollo, sin tener que declarar el código a probar, dentro de un bloque try:",options:["Bloque","Comentario","Contención (contention)","Aserción (assertion)"],correct:3},
+            {id:12,category:"Modificadores",section:"theory",question:"Al emplear el operador de incremento (++) en una variable declarada con el modificador final:",options:["La variable conserva su valor original","La variable es preincrementada","La variable es postincrementada","Se produce un error en tiempo de compilación"],correct:3},
+            {id:13,category:"Hilos",section:"theory",question:"Es la unidad de tiempo empleada en el argumento al método estático Thread.sleep:",options:["Hora","Minuto","Segundo","Milisegundo"],correct:3},
+            {id:14,category:"Clases Internas",section:"theory",question:"Se refiere a la declaración de clases dentro de otra:",options:["Clases abstractas","Clases heredadas","Clases internas","Ninguna de las anteriores"],correct:2},
+            {id:15,category:"Clases Internas",section:"theory",question:"Una clase interna declarada dentro de un método:",options:["No tiene acceso a los miembros de su clase externa","Tiene acceso a las variables locales declaradas en el método","Tiene acceso a las variables locales declaradas en el método, marcadas con el modificador final","Ninguna de las anteriores"],correct:2},
+            {id:16,category:"Clases Internas",section:"theory",question:"Son consideradas clases internas, las cuales no tienen ninguna relación especial con su clase externa:",options:["Abstractas","Anónimas","Estáticas","Regulares"],correct:2},
+            {id:17,category:"String",section:"theory",question:"Un objeto de tipo String se caracteriza por ser:",options:["Inmutable","Un tipo primitivo","Mutable","Polimórfico"],correct:0},
+            {id:18,category:"Paquetes",section:"theory",question:"Una vez que una clase se encuentra en un paquete, la parte del paquete en su nombre calificado completo es:",options:["Atómica","Estática","Dinámica","Abstracta"],correct:0},
+            {id:19,category:"Clases Internas",section:"theory",question:"Es la única manera de acceder a una clase interna regular:",options:["A través de la línea de comandos, empleando el comando java, seguido del nombre de la clase","Directamente en tiempo de ejecución, mediante una referencia a un objeto de su tipo","Indirectamente en tiempo de ejecución, mediante una referencia a un objeto del tipo de clase que contiene","Ninguna de las anteriores"],correct:2},
+            {id:20,category:"Genéricos",section:"theory",question:"Es la sintaxis empleada en Java, para declarar una colección que sólo acepta objetos de un tipo en particular:",options:["Genérico","Especificador","Modificador","Limitante"],correct:0},
+            {id:21,category:"Modificadores",section:"theory",question:"En la práctica, son los modificadores de acceso que empelan en las variables de instancias de una clase, para controlar los datos asignables a las mismas:",options:["final, private","static, transient","public, private","private, protected"],correct:0},
+            {id:22,category:"Serialización",section:"theory",question:"Es el modificador del lenguaje Java, con el cual se marca una variable de instancia, la cual no se desea incluir en la serialización de una clase:",options:["static","volatile","remote","transient"],correct:3},
+            {id:23,category:"Properties",section:"theory",question:"Es la clase Java, empleada para acceder a la información persistente del sistema, tal como la versión de S.O.:",options:["java.util.Persistent","java.util.SysInfo","java.util.Environment","java.util.Properties"],correct:3},
+            {id:24,category:"Hilos",section:"theory",question:"Es el estado en el que se encuentra un hilo, cuando se encuentra 'esperando' la disponibilidad de un recurso:",options:["Durmiendo (sleep)","Bloqueado (blocked)","Muerto (dead)","Ninguna de las anteriores"],correct:1},
+            {id:25,category:"I/O",section:"theory",question:"En el API I/O de Java, se encuentra definida como una clase, la cual es una representación abstracta de la ruta de un archivo o directorio:",options:["Directory","Pathname","File","FilePath"],correct:2},
+            {id:26,category:"Hilos",section:"theory",question:"Es el componente de la máquina virtual de Java, que coordina la ejecución de varios hilos:",options:["Controlador (controller)","Pila (stack)","Programador de hilos (thread scheduler)","Memoria"],correct:2},
+            {id:27,category:"Operadores",section:"theory",question:"Los operadores lógicos de corto-circuito (short-circuit) evalúan: A && B vs A & B",options:["Siempre ambos lados de la expresión lógica","Condicionalmente el lado derecho de la expresión lógica","Únicamente el lado izquierdo de la expresión lógica","Únicamente el lado derecho de la expresión lógica"],correct:1},
+            {id:28,category:"Colecciones",section:"theory",question:"Es un tipo de colección, la cual, no acepta elementos duplicados, para lo cual, emplea el método equals:",options:["Mapa (Map)","Árbol (Tree)","Lista (List)","Conjunto (Set)"],correct:3},
+            {id:29,category:"Serialización",section:"theory",question:"Es el mecanismo nativo de Java a través del cual, el estado de un objeto puede ser guardado y posteriormente recuperado:",options:["Contención","Serialización","Almacenamiento","Registro"],correct:1},
+            {id:30,category:"Caracteres",section:"theory",question:"Al comparar caracteres, Java emplear el valor:",options:["Unicode de los caracteres","ANSI de los caracteres","UTF8 de los caracteres","Ninguna de las anteriores"],correct:0},
+            {id:31,category:"Patrones",section:"theory",question:"Se refiere a los diseños orientados a objetos, los cuales ya han sido probados y garantizan la reducción de errores potenciales en el código:",options:["Patrones de diseño","Hojas de estilo","Interface","Metadatos"],correct:0},
+            {id:32,category:"I/O",section:"theory",question:"Al terminar de escribir datos a un flujo de salida (output stream), se emplea este método para garantizar que todos los datos en el flujo sean escritos al archivo asociado:",options:["Unload","Discharge","Empty","Flush"],correct:3},
+            {id:33,category:"Excepciones",section:"theory",question:"¿En qué momento se disparan las Excepciones en Java?",options:["En el momento de ejecución","En la compilación","En líneas del código"],correct:0},
+            {id:34,category:"Colecciones",section:"theory",question:"Colección de Java que almacena objetos clave-valor:",options:["List","Conjunto Set","Map","Array"],correct:2},
+            {id:35,category:"Estructuras",section:"theory",question:"Los programas en Java se pueden construir mediante estructuras repetitivas, selectivas y...",options:["Secuenciales","Algorítmicas","De cálculo"],correct:0},
+            {id:36,category:"POO",section:"theory",question:"¿Cuál es la descripción que crees que define mejor el concepto 'clase' en la programación orientada a objetos?",options:["Es un concepto similar al de 'array'","Es un modelo o plantilla a partir de la cual creamos objetos","Es una categoría de datos ordenada secuencialmente"],correct:1},
+            {id:37,category:"POO",section:"theory",question:"¿Qué elementos crees que definen a un objeto?",options:["Sus atributos y sus métodos","Su interfaz y los eventos asociados","La forma en que establece comunicación e intercambia mensajes"],correct:0},
+            {id:38,category:"Herencia",section:"theory",question:"¿Qué código de los siguientes tiene que ver con la herencia?",options:["public class Componente inherit Producto","public class Componente extends Producto","public class Componente implements Producto"],correct:1},
+            {id:39,category:"POO",section:"theory",question:"¿Qué significa instanciar una clase?",options:["Duplicar una clase","Crear un objeto a partir de la clase","Conectar dos clases entre sí"],correct:1},
+            {id:40,category:"Swing",section:"theory",question:"En Java, ¿a qué nos estamos refiriendo si hablamos de 'Swing'?",options:["Una función utilizada para intercambiar valores","Un framework específico para Android","Una librería para construir interfaces gráficas"],correct:2},
+            {id:41,category:"Bytecode",section:"theory",question:"¿Qué es el bytecode en Java?",options:["El formato de intercambio de datos","El formato que obtenemos tras compilar un fuente .java","Un tipo de variable"],correct:1},
+            {id:42,category:"Interfaces",section:"theory",question:"¿Qué código asociarías a una Interfaz en Java?",options:["public class Componente interface Product","Componente cp = new Componente (interfaz)","public class Componente implements Printable"],correct:2},
+            {id:43,category:"Sobrecarga",section:"theory",question:"¿Qué significa sobrecargar (overload) un método?",options:["Editarlo para modificar su comportamiento","Añadirle funcionalidades a un método","Crear un método con el mismo nombre, pero diferentes argumentos"],correct:2},
+            {id:44,category:"Excepciones",section:"theory",question:"¿Qué es una excepción?",options:["Un error que lanza un método cuando algo va mal","Un objeto que no puede ser instanciado","Un tipo de evento muy utilizado al crear interfaces"],correct:0},
+            {id:45,category:"JVM",section:"theory",question:"¿Qué es JVM?",options:["Java Virtual Memory: el gestor de memoria virtual de Java","Java Virtual Machine: la máquina virtual Java que traduce el bytecode","Java V Mobile: la versión 5 de Java para dispositivos móviles"],correct:1},
+            {id:46,category:"Herencia",section:"theory",question:"Una clase puede heredar de varias clases.",options:["Falso","Cierto"],correct:0},
+            {id:47,category:"Interfaces",section:"theory",question:"Una clase puede implementar varias interfaces y heredar de una única clase.",options:["Cierto","Falso"],correct:0},
+            {id:48,category:"Modificadores",section:"theory",question:"¿Cuál de las siguientes afirmaciones es verdadera?",options:["Un método final debe ser también static pero no tiene por qué ser al revés","Un método final no se puede redefinir en una subclase","Un método final debe ser también protected pero no tiene por qué ser al revés"],correct:1},
+            {id:49,category:"Object",section:"theory",question:"¿Por qué el método toString() se puede usar con objetos que no lo incluyen en su definición de clase?",options:["Porque está definido en la clase Object","Porque toString() es un método predefinido de java","Falso, se produciría un error de compilación"],correct:0},
+            {id:50,category:"Modificadores",section:"theory",question:"Todos los atributos de una clase tienen que ser privados.",options:["No es estrictamente necesario","Cierto","Falso"],correct:0},
+            {id:51,category:"Interfaces",section:"theory",question:"En Java, ¿puede una clase implementar varias interfaces simultáneamente?",options:["Sí","No"],correct:0},
+            {id:52,category:"JVM",section:"theory",question:"Java es un lenguaje de programación multiplataforma porque es interpretado.",options:["Cierto","Falso"],correct:0},
+            {id:53,category:"Clases Abstractas",section:"theory",question:"¿Una clase o un método son abstractos si se declaran con la palabra reservada?",options:["New","Abstract","Public"],correct:1},
+            {id:54,category:"Polimorfismo",section:"theory",question:"¿En qué se basa el polimorfismo?",options:["En crear clases y métodos en un programa","En utilizar un mismo método para distintos objetos","En utilizar un método para un solo objeto"],correct:1},
+            {id:55,category:"StringBuffer",section:"theory",question:"¿Método que calcula la capacidad o máximo número de caracteres un objeto cadena?",options:["CompareTo","Append","Capacity"],correct:2},
+            {id:56,category:"String",section:"theory",question:"¿Método que sustituye las ocurrencias de un caracter por otro en una cadena?",options:["NextToken","Replace","Length"],correct:1},
+            {id:57,category:"StringTokenizer",section:"theory",question:"¿Método de la clase StringTokenizer que se utiliza para obtener subcadenas?",options:["NextToken","Getchars","Capacity"],correct:0},
+            
+            // ========== SECCIÓN ANÁLISIS DE CÓDIGO (45 preguntas) ==========
+            {id:58,category:"Clases Abstractas",section:"code",question:"¿Cuál será el resultado de tratar de compilar y ejecutar el siguiente código?",code:"abstract class MineBase {\n    abstract void amethod();\n    static int i;\n}\npublic class Mine extends MineBase {\n    public static void main (String argv[]){\n        int[] ar = new int [5];\n        for(i = 0; i < ar.length; i++)\n            System.out.println(ar[i]);\n    }\n    public void amethod(){}\n}",options:["Una secuencia de cinco CEROS será impresa","Error: la variable ar se utiliza antes de que se inicializa","IndexOutBoundes Error","Error Mine debe declararse abstracta"],correct:0},
+            {id:59,category:"Arrays",section:"code",question:"Selecciona una respuesta:",code:"int [] arr = { 1, 2, 3, 4};\nint [] arr2 = new int[4];\narr2 = arr;\nSystem.out.println(arr2[4]);",options:["Imprime 4","Runtime Exception ArrayOutBounds","Compila con warnings","Compila con error"],correct:1},
+            {id:60,category:"Comparación",section:"code",question:"Selecciona la respuesta correcta:",code:"class test {\n    public static void main(String [] args) {\n        test inst_test = new test();\n        int i1 = 2000;\n        int i2 = 2000;\n        int i3 = 2;\n        int i4 = 2;\n        Integer Ithree = new Integer(2);\n        Integer Ifour = new Integer(2);\n        System.out.println( Ithree == Ifour );\n        inst_test.method( i3, i4);\n        inst_test.method( i1, i2);\n    }\n    void method(int i3, int i4){\n        System.out.println( i3 == i4 );\n    }\n}",options:["false false false","false true true","true false true","true true true"],correct:1},
+            {id:61,category:"Autoboxing",section:"code",question:"¿Qué ocurrirá al compilar y ejecutar el siguiente código?",code:"public class test01 {\n    public static void main(String [] args) {\n        Integer ten = new Integer(10);\n        Long nine = new Long (9);\n        System.out.println( ten + nine);\n        int t = 10;\n        System.out.println(t + ten);\n    }\n}",options:["19 seguido por 20","19 seguido por 11","Error: No se puede convertir java langentero","10 seguido por 1"],correct:0},
+            {id:62,category:"Autoboxing",section:"code",question:"¿Qué ocurrirá al compilar y ejecutar el siguiente código?",code:"public class test01 {\n    public static void main(String [] args) {\n        Integer ten = new Integer(10);\n        Long nine = new Long (9);\n        System.out.println( ten + nine);\n        int i = 1;\n        System.out.println(i + ten);\n    }\n}",options:["19 seguido por 20","19 seguido por 11","Error: No se puede convertir java langentero","10 seguido por 1"],correct:1},
+            {id:63,category:"printf",section:"code",question:"Selecciona una respuesta:",code:"class test02{\n    public static void main ( String [] args ){\n        System.out.println(\"%s\", new test02());\n    }\n    public String toString(){\n        return \"testing something\";\n    }\n}",options:["Da un runtime exception","Imprime test@13234 o algo como eso","Compila con error","Imprime testing something"],correct:2},
+            {id:64,category:"Equals",section:"code",question:"¿Qué línea imprime FALSE?",code:"Integer eye = new Integer(42);\nDouble d = new Double(42.0);\nint i = 42;\ndouble dd = 42.0;\nSystem.out.println( i == eye ); // 1\nSystem.out.println( eye.equals(d)); // 2\nSystem.out.println( eye == 42 ); // 3\nSystem.out.println( i == 42 ); // 4\nSystem.out.println( i == dd ); // 5",options:["3","1","4","2"],correct:3},
+            {id:65,category:"Operadores",section:"code",question:"¿Cuál es el resultado del siguiente programa?",code:"public static void main(String[] args) {\n    int j=2;\n    int k=3;\n    int m=2;\n    System.out.println ((k+m < j) | (3-j >= k));\n}",options:["False","True","No compila"],correct:0},
+            {id:66,category:"Ciclos",section:"code",question:"¿Cuál es la salida del siguiente programa?",code:"public static void main(String[] args) {\n    int contador=1;\n    while (contador<=10) {\n        System.out.println(contador%2 == 1 ? \"****\" : \"++++++++\");\n        ++contador;\n    }\n}",options:["Imprime 5 veces el símbolo * y luego 5 veces el símbolo +","Alterna 5 veces cada uno los símbolos * y +","Se cicla y desborda"],correct:1},
+            {id:67,category:"Ciclos",section:"code",question:"¿Qué hace el siguiente código fuente?",code:"int suma = 0;\nint y = 1;\nint x = 0;\nwhile (x<100) {\n    if (y%2!=0) {\n        suma+=y;\n        x++;\n        System.out.println(y);\n    }\n    y++;\n}\nSystem.out.println(suma);",options:["Suma del 1 al 100 los números que sean pares","Suma del 1 al 100 los números que sean impares","Se cicla"],correct:1},
+            {id:68,category:"Ciclos",section:"code",question:"¿Hace lo mismo el código fuente Uno y el código fuente Dos?",code:"/* Código Uno*/\nint x= 0;\ndo {\n    System.out.println(x);\n    x++;\n} while (x<10);\n\n/* Código Dos */\nint y= 0;\nwhile (y<10){\n    System.out.println(y);\n    y++;\n}",options:["Sí, los dos muestran del 0 al 9","No, el primero imprime del 0 al 9 y segundo del 1 al 9","Ninguna de las anteriores"],correct:0},
+            {id:69,category:"Comparación",section:"code",question:"¿Cuál es el resultado del siguiente programa?",code:"int j=2;\nSystem.out.println ( j == 3 );",options:["false","true","No compila"],correct:0},
+            {id:70,category:"Operadores",section:"code",question:"Si la variable b es de tipo byte y fue declarada anteriormente, ¿Cuál es el valor de b tras esta operación?",code:"b += 2+(2*Byte.MAX_VALUE);",options:["No tiene valor","El valor que tenga inicialmente b","Ninguna de las anteriores"],correct:1},
+            {id:71,category:"Ciclos",section:"code",question:"¿Cuál es el valor que se muestra por pantalla?",code:"int x = 0;\nint y = 0;\nwhile (x<5) {\n    y += x;\n} x++;\nSystem.out.println(y);",options:["No compila","Error en tiempo de ejecución (bucle infinito)","Imprime del 1 al 5"],correct:1},
+            {id:72,category:"Estructuras",section:"code",question:"¿Qué tipo de estructura representa el siguiente código?",code:"while (contador < 20) {\n    System.out.println(\"Número de línea \" + contador);\n    contador++;\n}",options:["Estructura secuencial","Estructura condicional","Estructura repetitiva"],correct:2},
+            {id:73,category:"Algoritmos",section:"code",question:"¿Qué hace el siguiente programa?",code:"double y = 4;\nboolean flag = false;\nfor (int x=3; x<10000000; x=x+2) {\n    if (flag) {\n        y += ((double)4/x);\n        flag = false;\n    }\n    else {\n        y -= ((double)4/x);\n        flag = true;\n    }\n}",options:["Recorre entre el 4 y el 10000000","Calcula el número de PI","Ninguna de las anteriores"],correct:1},
+            {id:74,category:"Excepciones",section:"code",question:"Indique qué escribe el siguiente fragmento de programa:",code:"int x = 0;\ntry {\n    System.out.print(\"1\");\n    if (x <= 0) throw new IllegalArgumentException();\n    System.out.print(\"2\");\n} catch (Exception e) {\n    System.out.print(\"3\");\n    return;\n} finally {\n    System.out.print(\"4\");\n}",options:["134","4321","34"],correct:0},
+            {id:75,category:"Equals",section:"code",question:"Dada la clase Uno, indique que se imprime al ejecutar:",code:"public class Uno {\n    private double x, y;\n    Uno(double x, double y) {\n        this.x = x; this.y = y;\n    }\n    public boolean equals(Uno p) {\n        return this.x == p.x && this.y == p.y;\n    }\n}\n\nUno p = new Uno(1, 2);\nUno q = new Uno(1, 2);\nSystem.out.print(p.equals(q));",options:["True","False","No compila"],correct:0},
+            {id:76,category:"Interfaces",section:"code",question:"Dadas las siguientes clases, ¿Qué pasará si...?",code:"interface A {\n    void a1();\n}\ninterface B {\n    void b1();\n}\nclass C implements A, B {\n    public void a1() { }\n    public void b1() { }\n}\n\n// Qué pasará si ...\nB x = new C();\nx.b1();",options:["Se ejecuta el método a1() de la clase C","Se ejecuta el método b1() de la clase C","Ninguna de las anteriores (error de compilación por visibilidad)"],correct:1},
+            {id:77,category:"Arrays",section:"code",question:"¿Qué resulta de la ejecución del siguiente código?",code:"int A []= new int[100];\nfor(int i : A) {\n    A[i] = 7;\n}",options:["Se genera un array de 100 números enteros inicializados a 7","Se genera un array de 7 números, con capacidad de 100","Desborda (ArrayIndexOutOfBoundsException posible)"],correct:0},
+            {id:78,category:"Arrays",section:"code",question:"Tras ejecutar, ¿qué valor contiene a[5][5]?",code:"int[][] a; a = new int[10][];\nfor (int i = 0; i < 10; i++) {\n    a[i]= new int[5];\n    for (int j = 0; j < 5; j++)\n        a[i][j] = j*10 + i;\n}",options:["Ese código no compila","Error en tiempo de ejecución (índice fuera de rango)","False"],correct:1},
+            {id:79,category:"Excepciones",section:"code",question:"Indique qué escribe el siguiente fragmento de programa:",code:"int x = 0;\ntry {\n    System.out.print(\"1\");\n    if (x < 0) throw new IllegalArgumentException();\n    System.out.print(\"2\");\n} catch (Exception e) {\n    System.out.print(\"3\");\n    return;\n} finally {\n    System.out.print(\"4\");\n}",options:["124","421","142"],correct:0},
+            {id:80,category:"Interfaces",section:"code",question:"Dadas las siguientes clases, ¿Qué pasará si...?",code:"interface A {\n    void a1();\n}\ninterface B {\n    void b1();\n}\nclass C implements A, B {\n    public void a1() { }\n    public void c1() { }\n}\n\n// Qué pasará si ...\nC c = new C();\nc.b1();",options:["El método b1() es ejecutado correctamente","Error en tiempo de ejecución al invocar el método b1()","Error de compilación en la declaración de C: falta el método b1()"],correct:2},
+            {id:81,category:"Arrays",section:"code",question:"¿Cuántos elementos del array quedarán a null después de terminar el siguiente código?",code:"Integer[][] a;\na = new Integer[10][];\nfor (int i = 0; i < 10; i++)\n    for (int j = 0; j < 5; j++)\n        a[i][j] = new Integer(j*10 + i);",options:["Ese código dará error de ejecución (NullPointerException)","El código dará error en compilación","10"],correct:0},
+            {id:82,category:"Ciclos",section:"code",question:"Indique qué escribe la llamada m(2):",code:"void m(int x) {\n    while (x > 0) {\n        System.out.print( --x );\n    }\n}",options:["No compila","10","Error durante la ejecución"],correct:1},
+            {id:83,category:"Herencia",section:"code",question:"Indique qué formas de definir la clase HombreLobo son posibles:",code:"/* 1 */ class HombreLobo extends Hombre, Lobo { }\n/* 2 */ class HombreLobo implements Hombre, Lobo { }\n/* 3 */ class HombreLobo extends Hombre implements Lobo { }",options:["1 y 3","2 y 3","Solo la opción 3"],correct:1},
+            {id:84,category:"Colecciones",section:"code",question:"Indique qué se imprime al ejecutar el siguiente fragmento de programa:",code:"List v1 = new ArrayList();\nv1.add(\"1\");\nv1.add(\"2\");\nList v2 = new ArrayList();\nv2.add(\"1\");\nv2.add(\"2\");\nif (v1 == v2)\n    System.out.println(\"Iguales\");\nelse\n    System.out.println(\"Distintos\");",options:["Distintos","Iguales","No compila"],correct:0},
+            {id:85,category:"Métodos",section:"code",question:"Dado el siguiente código: ¿Qué ocurre al preguntar persona.busca(\"Juan\")?",code:"class Persona {\n    private final String nombre;\n    private List hijos= new ArrayList();\n    // ... ... ...\n    boolean busca (String nombre) {\n        if (this.nombre != null && this.nombre.equals(nombre))\n            return true;\n        for (Persona hijo: hijos)\n            if (hijo.nombre.equals(nombre))\n                return true;\n        return false;\n    }\n}",options:["Devuelve false en todos los casos","Imprime la lista de hijos","Devuelve TRUE si la persona o algunos de sus hijos tiene de nombre \"Juan\""],correct:2},
+            {id:86,category:"Arrays",section:"code",question:"Selecciona una respuesta:",code:"int [] arr = new int[] { 1, 2, 3, 4};\nString [] arrstr = Arrays.toString(arr);\nfor (String s : arrstr)\n{\n    System.out.println(s);\n}",options:["Imprime 1,2,3,4","Error Runtime","Ninguno de los anteriores","Compila con error"],correct:3},
+            {id:87,category:"Equals",section:"code",question:"¿Qué línea imprime FALSE?",code:"Integer eye = new Integer(42);\nDouble d = new Double(42.0);\nint i = 42;\ndouble dd = 42.0;\nSystem.out.println( i == eye ); // 1\nSystem.out.println( eye.equals(d)); // 2\nSystem.out.println( eye == 42 ); // 3\nSystem.out.println( i == 42 ); // 4\nSystem.out.println( i == dd ); // 5",options:["3","1","4","2"],correct:3},
+            {id:88,category:"Variables",section:"code",question:"¿Qué sucederá cuando compiles y ejecutes el siguiente código?",code:"public class MyClass{\n    static int i;\n    public static void main(String argv[]){\n        System.out.println(i);\n    }\n}",options:["null","1","0","Error Variable i may not have been initialized"],correct:2},
+            {id:89,category:"Excepciones",section:"code",question:"Seleccione una respuesta:",code:"class Animal{\n    void method() throws IOException{}\n}\nclass Dog extends Animal{\n    void method() throws FileNotFoundException{}\n}",options:["Compila con error: incorrect syntax","Ninguno de los anteriores","Error Runtime","Compila con error: Incompatible types"],correct:0},
+            {id:90,category:"Interfaces",section:"code",question:"Selecciona una respuesta:",code:"class num{\n    int x=9;\n}\ninterface blob{\n    final num n = new num();\n    final Integer number = 1;\n}\nclass test implements blob {\n    public static void main (String []args){\n        n.x = 10; //1\n        number++; //2\n    }\n}",options:["Error Runtime en línea 1","Compila con error en línea 1","Compila y corre bien","Error de compilador en línea 2"],correct:3},
+            {id:91,category:"Ciclos",section:"code",question:"¿Qué código colocado después del comentario //For loop podrá llenar de elementos el arreglo ia[] con los valores de la variable i?",code:"public class Lin{\n    public static void main (String argv[]){\n        Lin l = new Lin();\n        l.amethod();\n    }\n    public void amethod(){\n        int ia[] = new int [4];\n        //Start For loop\n        {\n            ia[i]=i;\n            System.out.println(ia[i]);\n        }\n    }\n}",options:["for(int i=0; i < ia.length()-1; i++)","for(int i=0; i < ia.length(); i++)","for(int i=1; i < 4; i++)","for(int i=0; i < ia.length; i++)"],correct:3},
+            {id:92,category:"Modificadores",section:"code",question:"Seleccione una respuesta:",code:"package packed;\npublic class pack\n{\n    static public int x1 = 7;\n    static protected int x2 = 8;\n    static int x3=9;\n    static private int x4 = 10;\n}\n\nimport packed.pack;\nclass test extends pack\n{\n    public static void main (String args[])\n    {\n        pack p = new pack();\n        System.out.println (pack.x2);\n    }\n}",options:["Error Runtime","Imprime 8","Ninguno de los anteriores","Compila con error"],correct:1},
+            {id:93,category:"JavaScript",section:"code",question:"¿Cuál es la salida de la siguiente función JAVASCRIPT?",code:"function Imprimir()\n{\n    numero1 = \"50\";\n    numero2 = \"20\";\n    resultado = numero1 + numero2;\n    return resultado;\n}",options:["70","cero","5020","Error Variable i may not have been initialized"],correct:2},
+            {id:94,category:"String",section:"code",question:"¿Cuál será el resultado cuando se intenta compilar y ejecutar el siguiente código?",code:"public class Conv {\n    public static void main (String argv[]) {\n        Conv c = new Conv();\n        String s = new String (\"ello\");\n        c.amethod(s);\n    }\n    public void amethod (String s){\n        char c = 'H';\n        c += s;\n        System.out.println(c);\n    }\n}",options:["La compilación y generación de la cadena \"Hello\"","La compilación y generación de la cadena \"ello\"","La compilación y generación de la cadena \"elloH\"","Compila y genera error (son tipos diferentes char y String al concatenar)"],correct:3},
+            {id:95,category:"Autoboxing",section:"code",question:"¿Qué ocurrirá si intenta compilar y ejecutar el siguiente código?",code:"Integer ten = new Integer(10);\nLong nine = new Long (9);\nSystem.out.println(ten + nine);\nint i = 1;\nSystem.out.println(i + ten);",options:["19 seguido por 20","19 seguido por 11","Error: No se puede convertir java langentero","10 seguido por 1"],correct:1},
+            {id:96,category:"Switch",section:"code",question:"¿Qué va a ser impreso si se intenta compilar y ejecutar el siguiente código?",code:"int i = 9;\nswitch(i){\n    default:\n        System.out.println(\"default\");\n    case 0:\n        System.out.println(\"zero\");\n        break;\n    case 1:\n        System.out.println(\"one\");\n    case 2:\n        System.out.println(\"Two\");\n}",options:["default","default, zero","error default clause not defined","no output displayed"],correct:1},
+            {id:97,category:"Ciclos",section:"code",question:"¿Qué código colocado después del comentario //For loop podrá llenar de elementos el arreglo ia[] con los valores de la variable i?",code:"public class Lin{\n    public static void main(String argv[]){\n        Lin l = new Lin();\n        l.amethod();\n    }\n    public void amethod(){\n        int ia[] = new int[4];\n        //Start For loop\n        {\n            ia[i]=i;\n            System.out.println(ia[i]);\n        }\n    }\n}",options:["for(int i=0; i < ia.length() -1; i++)","for (int i =0; i< ia.length(); i++)","for(int i=1; i<4; i++)","for(int i=0; i< ia.length; i++)"],correct:3},
+            {id:98,category:"Excepciones",section:"code",question:"¿Qué línea es la salida?",code:"class test {\n    test() {\n        try {\n            throw new RuntimeException();\n        } finally {\n            System.out.println(\"Damn !\");\n        }\n    }\n    public static void main( String args[] ) {\n        try {\n            new test();\n        } catch ( Throwable t ) {\n            System.out.println(\"Caught\");\n        }\n    }\n}",options:["Compila con error: incorrect syntax","Damn ! seguido de Caught","Error Runtime","Compila con error: Incompatible types"],correct:1},
+            {id:99,category:"JavaScript",section:"code",question:"¿Cuál es el valor de funcionRetornoControlador?",code:"var funcionRetornoControlador;\ntraerArchivo();\nfunction traerArchivo(){\n    leerArchivoServidor(\"PruebaParams.jsp\", recibirArchivo);\n}\nfunction recibirArchivo(texto){\n    document.getElementById(\"divContenido\").innerHTML = texto;\n}\nfunction leerArchivoServidor(archivo, funcionRetorno){\n    funcionRetornoControlador = funcionRetorno;\n}",options:["funcionRetorno","leerArchivoServidor","traerArchivo","recibirArchivo"],correct:3},
+            {id:100,category:"StringBuffer",section:"code",question:"¿Qué línea es la salida de este fragmento de código?",code:"StringBuffer sb = new StringBuffer(\"abcdef\");\nSystem.out.println( sb.append(\"123\").delete(0,5).reverse().insert(1,\"1\") );",options:["3121","3121f","Ninguno de los anteriores","321"],correct:0},
+            {id:101,category:"Interfaces",section:"code",question:"Seleccione una respuesta:",code:"class num {\n    int x=9;\n}\ninterface blob {\n    final num n = new num();\n    final Integer number = 1;\n}\nclass test implements blob {\n    public static void main ( String [] args ) {\n        n.x = 10; // 1\n        number++; //2\n    }\n}",options:["Error Runtime en línea 1","Compila con error en línea 1","Compila y corre bien","Error de compilador en línea 2"],correct:3},
+            {id:102,category:"Arrays",section:"code",question:"Selecciona una respuesta:",code:"int [] arr = new int[] { 1, 2, 3, 4};\nString [] arrstr = Arrays.toString(arr);\nfor (String s : arrstr)\n{\n    System.out.println(s);\n}",options:["Imprime 1,2,3,4","Error Runtime","Ninguno de los anteriores","Compila con error (Arrays.toString devuelve String, no String[])"],correct:3}
+        ];
+
+        // State
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        let answerResults = {};
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let selectedCategories = new Set();
+
+        const categories = [...new Set(allQuestions.map(q => q.category))];
+
+        function init() {
+            renderCategories();
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('categoryGrid');
+            const categoryCount = {};
+            
+            allQuestions.forEach(q => {
+                categoryCount[q.category] = (categoryCount[q.category] || 0) + 1;
+            });
+
+            grid.innerHTML = `
+                <div class="category-chip selected" onclick="toggleAllCategories(this)" data-category="all">
+                    <div class="category-chip-name">📚 Todas las categorías</div>
+                    <div class="category-chip-count">${allQuestions.length} preguntas</div>
+                </div>
+                <div class="category-chip selected" onclick="toggleSection('theory', this)" data-section="theory">
+                    <div class="category-chip-name">📖 Solo Teoría</div>
+                    <div class="category-chip-count">57 preguntas</div>
+                </div>
+                <div class="category-chip selected" onclick="toggleSection('code', this)" data-section="code">
+                    <div class="category-chip-name">💻 Solo Código</div>
+                    <div class="category-chip-count">45 preguntas</div>
+                </div>
+            `;
+
+            categories.forEach(cat => {
+                grid.innerHTML += `
+                    <div class="category-chip" onclick="toggleCategory('${cat}', this)">
+                        <div class="category-chip-name">${cat}</div>
+                        <div class="category-chip-count">${categoryCount[cat]} preg.</div>
+                    </div>
+                `;
+            });
+
+            selectedCategories = new Set(categories);
+        }
+
+        function toggleAllCategories(element) {
+            const allChips = document.querySelectorAll('.category-chip');
+            if (element.classList.contains('selected')) {
+                allChips.forEach(chip => chip.classList.remove('selected'));
+                selectedCategories.clear();
+            } else {
+                allChips.forEach(chip => chip.classList.add('selected'));
+                selectedCategories = new Set(categories);
+            }
+        }
+
+        function toggleSection(section, element) {
+            const allChips = document.querySelectorAll('.category-chip');
+            allChips.forEach(chip => chip.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            selectedCategories.clear();
+            allQuestions.filter(q => q.section === section).forEach(q => {
+                selectedCategories.add(q.category);
+            });
+        }
+
+        function toggleCategory(category, element) {
+            document.querySelector('[data-category="all"]').classList.remove('selected');
+            document.querySelector('[data-section="theory"]').classList.remove('selected');
+            document.querySelector('[data-section="code"]').classList.remove('selected');
+            
+            if (selectedCategories.has(category)) {
+                selectedCategories.delete(category);
+                element.classList.remove('selected');
+            } else {
+                selectedCategories.add(category);
+                element.classList.add('selected');
+            }
+        }
+
+        function startExam() {
+            if (selectedCategories.size === 0) {
+                alert('Por favor selecciona al menos una categoría');
+                return;
+            }
+
+            let limit = parseInt(document.getElementById('questionLimit').value) || 102;
+            limit = Math.max(10, Math.min(102, limit));
+
+            let filteredQuestions = allQuestions.filter(q => selectedCategories.has(q.category));
+            filteredQuestions = shuffleArray(filteredQuestions);
+            questions = filteredQuestions.slice(0, limit);
+            
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            answerResults = {};
+            correctCount = 0;
+            incorrectCount = 0;
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('examScreen').classList.remove('hidden');
+            
+            document.getElementById('totalQuestions').textContent = questions.length;
+            
+            renderQuestionNav();
+            renderQuestion();
+            updateStats();
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function renderQuestionNav() {
+            const nav = document.getElementById('questionNav');
+            nav.innerHTML = '';
+            
+            questions.forEach((_, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                if (index === currentQuestionIndex) btn.classList.add('current');
+                if (answerResults[index] === true) btn.classList.add('correct');
+                if (answerResults[index] === false) btn.classList.add('incorrect');
+                btn.textContent = index + 1;
+                btn.onclick = () => goToQuestion(index);
+                nav.appendChild(btn);
+            });
+        }
+
+        function goToQuestion(index) {
+            currentQuestionIndex = index;
+            renderQuestion();
+            renderQuestionNav();
+        }
+
+        function updateStats() {
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+            
+            const answeredCount = Object.keys(userAnswers).length;
+            const progress = (answeredCount / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function renderQuestion() {
+            const question = questions[currentQuestionIndex];
+            const isAnswered = userAnswers[currentQuestionIndex] !== undefined;
+            const userAnswer = userAnswers[currentQuestionIndex];
+            const isCorrect = answerResults[currentQuestionIndex];
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('questionNumber').textContent = `Pregunta ${currentQuestionIndex + 1}`;
+            document.getElementById('questionCategory').textContent = question.category;
+            
+            const sectionBadge = document.getElementById('sectionBadge');
+            if (question.section === 'theory') {
+                sectionBadge.textContent = 'Teoría';
+                sectionBadge.className = 'section-badge theory';
+            } else {
+                sectionBadge.textContent = 'Código';
+                sectionBadge.className = 'section-badge code';
+            }
+            
+            // Render question with optional code block
+            let questionHTML = `<p class="question-text">${question.question}</p>`;
+            if (question.code) {
+                questionHTML += `<pre class="code-block">${escapeHtml(question.code)}</pre>`;
+            }
+            document.getElementById('questionContent').innerHTML = questionHTML;
+            
+            const questionCard = document.getElementById('questionCard');
+            questionCard.classList.remove('answered-correct', 'answered-incorrect');
+            if (isAnswered) {
+                questionCard.classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+            }
+            
+            const optionsList = document.getElementById('optionsList');
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            
+            optionsList.innerHTML = question.options.map((option, index) => {
+                let className = 'option';
+                let feedback = '';
+                
+                if (isAnswered) {
+                    className += ' disabled';
+                    if (index === question.correct) {
+                        className += ' correct';
+                        if (index === userAnswer) {
+                            feedback = '<span class="option-feedback correct">✓ ¡Correcto!</span>';
+                        } else {
+                            className += ' show-correct';
+                            feedback = '<span class="option-feedback correct">✓ Respuesta correcta</span>';
+                        }
+                    } else if (index === userAnswer) {
+                        className += ' incorrect';
+                        feedback = '<span class="option-feedback incorrect">✗ Incorrecto</span>';
+                    }
+                }
+                
+                return `
+                    <div class="${className}" onclick="${isAnswered ? '' : `selectOption(${index})`}">
+                        <span class="option-letter">${letters[index]}</span>
+                        <span class="option-text">${option}</span>
+                        ${feedback}
+                    </div>
+                `;
+            }).join('');
+
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            if (isAnswered) {
+                if (isCorrect) {
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback-message correct">
+                            <span class="feedback-icon">✅</span>
+                            <span>¡Excelente! Has respondido correctamente.</span>
+                        </div>
+                    `;
+                } else {
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback-message incorrect">
+                            <span class="feedback-icon">❌</span>
+                            <span>Respuesta incorrecta. La respuesta correcta está marcada en verde.</span>
+                        </div>
+                    `;
+                }
+            } else {
+                feedbackContainer.innerHTML = '';
+            }
+
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                document.getElementById('nextBtn').classList.add('hidden');
+                document.getElementById('finishBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('nextBtn').classList.remove('hidden');
+                document.getElementById('finishBtn').classList.add('hidden');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function selectOption(optionIndex) {
+            if (userAnswers[currentQuestionIndex] !== undefined) return;
+            
+            const question = questions[currentQuestionIndex];
+            const isCorrect = optionIndex === question.correct;
+            
+            userAnswers[currentQuestionIndex] = optionIndex;
+            answerResults[currentQuestionIndex] = isCorrect;
+            
+            if (isCorrect) {
+                correctCount++;
+            } else {
+                incorrectCount++;
+            }
+            
+            updateStats();
+            renderQuestion();
+            renderQuestionNav();
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+                renderQuestionNav();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+                renderQuestionNav();
+            }
+        }
+
+        function finishExam() {
+            const unanswered = questions.length - Object.keys(userAnswers).length;
+            const score = Math.round((correctCount / questions.length) * 100);
+
+            document.getElementById('examScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            
+            document.getElementById('finalScore').textContent = `${score}%`;
+            document.getElementById('finalCorrectCount').textContent = correctCount;
+            document.getElementById('finalIncorrectCount').textContent = incorrectCount;
+            document.getElementById('finalUnansweredCount').textContent = unanswered;
+
+            let gradeText = '';
+            let gradeEmoji = '';
+            
+            if (score >= 90) { gradeText = 'Excelente'; gradeEmoji = '🏆'; }
+            else if (score >= 80) { gradeText = 'Muy Bien'; gradeEmoji = '🎉'; }
+            else if (score >= 70) { gradeText = 'Aprobado'; gradeEmoji = '✅'; }
+            else if (score >= 60) { gradeText = 'Necesita Mejorar'; gradeEmoji = '📚'; }
+            else { gradeText = 'No Aprobado'; gradeEmoji = '❌'; }
+
+            document.getElementById('gradeText').textContent = `${gradeEmoji} ${gradeText}`;
+        }
+
+        function reviewAnswers() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.remove('hidden');
+
+            const container = document.getElementById('reviewContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            
+            container.innerHTML = questions.map((question, qIndex) => {
+                const userAnswer = userAnswers[qIndex];
+                const isCorrect = answerResults[qIndex];
+                const isUnanswered = userAnswer === undefined;
+
+                let questionContent = `<p class="question-text">${question.question}</p>`;
+                if (question.code) {
+                    questionContent += `<pre class="code-block">${escapeHtml(question.code)}</pre>`;
+                }
+
+                return `
+                    <div class="question-card fade-in" style="animation-delay: ${qIndex * 0.02}s">
+                        <div class="question-header">
+                            <span class="question-number">Pregunta ${qIndex + 1}</span>
+                            <span class="question-category">${question.category}</span>
+                            <span class="section-badge ${question.section}">${question.section === 'theory' ? 'Teoría' : 'Código'}</span>
+                            <span style="margin-left: auto; font-size: 1.5rem;">
+                                ${isUnanswered ? '⚠️' : (isCorrect ? '✅' : '❌')}
+                            </span>
+                        </div>
+                        ${questionContent}
+                        <div class="options-list">
+                            ${question.options.map((option, oIndex) => {
+                                let className = 'option disabled';
+                                let feedback = '';
+                                
+                                if (oIndex === question.correct) {
+                                    className += ' correct';
+                                    feedback = '<span class="option-feedback correct">✓ Correcta</span>';
+                                } else if (oIndex === userAnswer && !isCorrect) {
+                                    className += ' incorrect';
+                                    feedback = '<span class="option-feedback incorrect">Tu respuesta</span>';
+                                }
+                                
+                                return `
+                                    <div class="${className}">
+                                        <span class="option-letter">${letters[oIndex]}</span>
+                                        <span class="option-text">${option}</span>
+                                        ${feedback}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function backToResults() {
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+        }
+
+        function restartExam() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            answerResults = {};
+            correctCount = 0;
+            incorrectCount = 0;
+            
+            renderCategories();
+        }
+
+        init();
+    </script>
+</body>
+</html>
