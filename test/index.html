@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluaciones - Centro de Certificaciones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --bg-card: #161f2e;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #2d3748;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-orange), var(--accent-cyan));
+            background-size: 300% 100%;
+            animation: shimmer 4s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -300% 0; }
+            100% { background-position: 300% 0; }
+        }
+
+        .logo-icon {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .test-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .test-card.security::before {
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+        }
+
+        .test-card.java::before {
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue));
+        }
+
+        .test-card:hover {
+            transform: translateY(-5px);
+            border-color: transparent;
+        }
+
+        .test-card.security:hover {
+            box-shadow: 0 10px 40px rgba(6, 182, 212, 0.2);
+            border-color: var(--accent-cyan);
+        }
+
+        .test-card.java:hover {
+            box-shadow: 0 10px 40px rgba(249, 115, 22, 0.2);
+            border-color: var(--accent-orange);
+        }
+
+        .test-icon {
+            width: 60px; height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .test-card.security .test-icon {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(139, 92, 246, 0.2));
+        }
+
+        .test-card.java .test-icon {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(59, 130, 246, 0.2));
+        }
+
+        .test-card h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .test-card .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .test-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            margin-right: 0.3rem;
+        }
+
+        .test-card.security .stat-value { color: var(--accent-cyan); }
+        .test-card.java .stat-value { color: var(--accent-orange); }
+
+        .stat-label {
+            color: var(--text-muted);
+        }
+
+        .topics {
+            flex: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .topics h4 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.8rem;
+        }
+
+        .topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .topic-tag {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .start-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .test-card.security .start-btn {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        }
+
+        .test-card.java .start-btn {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+        }
+
+        .start-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .header { padding: 2rem 1.5rem; }
+            .header h1 { font-size: 1.8rem; }
+            .test-card { padding: 1.5rem; }
+            .tests-grid { grid-template-columns: 1fr; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .logo-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo-icon">📋</div>
+            <h1>Centro de Evaluaciones</h1>
+            <p>Simuladores de exámenes de certificación</p>
+        </header>
+
+        <div class="tests-grid">
+            <a href="desarrollo-seguro/" class="test-card security">
+                <div class="test-icon">🔐</div>
+                <h2>Desarrollo Seguro</h2>
+                <p class="subtitle">Guía HITSS 2024 - Certificación de Seguridad</p>
+                
+                <div class="test-stats">
+                    <div class="stat">
+                        <span class="stat-value">291</span>
+                        <span class="stat-label">preguntas</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">70%</span>
+                        <span class="stat-label">para aprobar</span>
+                    </div>
+                </div>
+
+                <div class="topics">
+                    <h4>Temas incluidos</h4>
+                    <div class="topics-list">
+                        <span class="topic-tag">OWASP Top 10</span>
+                        <span class="topic-tag">APIs</span>
+                        <span class="topic-tag">DevSecOps</span>
+                        <span class="topic-tag">MASVS</span>
+                        <span class="topic-tag">GDPR</span>
+                        <span class="topic-tag">Criptografía</span>
+                        <span class="topic-tag">S-SDLC</span>
+                        <span class="topic-tag">IA Security</span>
+                    </div>
+                </div>
+
+                <div class="start-btn">
+                    🚀 Comenzar Evaluación
+                </div>
+            </a>
+
+            <a href="desarrollo-java/" class="test-card java">
+                <div class="test-icon">☕</div>
+                <h2>Programación Java</h2>
+                <p class="subtitle">Simulación de Examen - Teoría y Código</p>
+                
+                <div class="test-stats">
+                    <div class="stat">
+                        <span class="stat-value">102</span>
+                        <span class="stat-label">preguntas</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">70%</span>
+                        <span class="stat-label">para aprobar</span>
+                    </div>
+                </div>
+
+                <div class="topics">
+                    <h4>Temas incluidos</h4>
+                    <div class="topics-list">
+                        <span class="topic-tag">POO</span>
+                        <span class="topic-tag">Colecciones</span>
+                        <span class="topic-tag">Hilos</span>
+                        <span class="topic-tag">Excepciones</span>
+                        <span class="topic-tag">Herencia</span>
+                        <span class="topic-tag">Interfaces</span>
+                        <span class="topic-tag">JVM</span>
+                        <span class="topic-tag">Análisis de Código</span>
+                    </div>
+                </div>
+
+                <div class="start-btn">
+                    🚀 Comenzar Evaluación
+                </div>
+            </a>
+        </div>
+
+        <footer class="footer">
+            <p>Evaluaciones con retroalimentación inmediata • Sin límite de tiempo</p>
+        </footer>
+    </div>
+</body>
+</html>
