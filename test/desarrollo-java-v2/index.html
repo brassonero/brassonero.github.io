@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación Examen Java II - Conceptos y Análisis de Código</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --bg-card: #1c2128;
+            --accent-orange: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --accent-purple: #a855f7;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border-color: #30363d;
+            --glow-orange: 0 0 20px rgba(249, 115, 22, 0.3);
+            --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
+            --glow-green: 0 0 20px rgba(16, 185, 129, 0.3);
+            --glow-red: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(249, 115, 22, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(249, 115, 22, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue), var(--accent-orange));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 65px; height: 65px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: var(--glow-orange);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p { color: var(--text-secondary); font-size: 1.1rem; margin-top: 0.5rem; }
+
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover { border-color: var(--accent-orange); box-shadow: var(--glow-orange); }
+        .stat-card.correct-stat { border-color: var(--accent-green); }
+        .stat-card.incorrect-stat { border-color: var(--accent-red); }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--accent-orange);
+        }
+
+        .stat-value.correct { color: var(--accent-green); }
+        .stat-value.incorrect { color: var(--accent-red); }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.3rem;
+        }
+
+        .progress-container {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover { border-color: rgba(249, 115, 22, 0.3); }
+        .question-card.answered-correct { border-color: var(--accent-green); box-shadow: var(--glow-green); }
+        .question-card.answered-incorrect { border-color: var(--accent-red); box-shadow: var(--glow-red); }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .question-category {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            color: #c9d1d9;
+        }
+
+        .options-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: var(--accent-orange);
+            background: rgba(249, 115, 22, 0.05);
+        }
+
+        .option.correct {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.15);
+            box-shadow: var(--glow-green);
+        }
+
+        .option.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.15);
+            box-shadow: var(--glow-red);
+        }
+
+        .option.disabled { cursor: not-allowed; opacity: 0.7; }
+        .option.show-correct { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+
+        .option-letter {
+            width: 36px; height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .option:hover:not(.disabled) .option-letter { background: var(--accent-orange); color: white; }
+        .option.correct .option-letter { background: var(--accent-green); color: white; }
+        .option.incorrect .option-letter { background: var(--accent-red); color: white; }
+        .option.show-correct .option-letter { background: var(--accent-green); color: white; }
+
+        .option-text { flex: 1; color: var(--text-primary); font-size: 0.95rem; }
+
+        .option-feedback {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-feedback.correct { color: var(--accent-green); }
+        .option-feedback.incorrect { color: var(--accent-red); }
+
+        .feedback-message {
+            margin-top: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-message.correct {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .feedback-message.incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .feedback-icon { font-size: 1.5rem; }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.9rem 2rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+            color: white;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-orange); }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover { border-color: var(--accent-orange); background: var(--bg-secondary); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .question-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+            gap: 0.35rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .nav-btn {
+            width: 38px; height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .nav-btn.current { background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue)); border-color: transparent; color: white; }
+        .nav-btn.correct { background: var(--accent-green); border-color: transparent; color: white; }
+        .nav-btn.incorrect { background: var(--accent-red); border-color: transparent; color: white; }
+
+        .results-container { text-align: center; padding: 3rem; }
+
+        .results-score {
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .results-grade { font-size: 2rem; margin-bottom: 2rem; }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .result-stat { background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; }
+
+        .result-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .result-stat-value.correct { color: var(--accent-green); }
+        .result-stat-value.incorrect { color: var(--accent-red); }
+        .result-stat-value.unanswered { color: var(--accent-yellow); }
+
+        .start-screen { text-align: center; padding: 3rem; }
+        .start-screen h2 { font-size: 2rem; margin-bottom: 1.5rem; }
+
+        .start-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .info-item {
+            background: var(--bg-tertiary);
+            padding: 1.2rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-icon {
+            width: 45px; height: 45px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .info-text h4 { font-size: 0.9rem; color: var(--text-muted); font-weight: 400; }
+        .info-text p { font-size: 1.1rem; color: var(--text-primary); font-weight: 500; }
+
+        .category-selector { margin: 2rem 0; }
+        .category-selector h3 { margin-bottom: 1rem; color: var(--text-secondary); }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .category-chip {
+            padding: 0.8rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .category-chip:hover { border-color: var(--accent-orange); }
+        .category-chip.selected { border-color: var(--accent-orange); background: rgba(249, 115, 22, 0.1); }
+        .category-chip-name { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; }
+        .category-chip-count { font-size: 0.8rem; color: var(--text-muted); }
+
+        .question-limit {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .question-limit label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); }
+
+        .question-limit input {
+            width: 100px;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-orange); }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .header h1 { font-size: 1.6rem; }
+            .question-text { font-size: 1rem; }
+            .start-info { grid-template-columns: 1fr; }
+            .results-stats { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+            .code-block { font-size: 0.75rem; }
+        }
+
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+
+        .option.correct { animation: pulse-green 0.5s ease; }
+        .option.incorrect { animation: pulse-red 0.5s ease; }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .section-badge.theory { background: var(--accent-blue); color: white; }
+        .section-badge.code { background: var(--accent-purple); color: white; }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">☕</div>
+                <div>
+                    <h1>Simulación Examen Java II</h1>
+                    <p>Conceptos, Teoría y Análisis de Código</p>
+                    <span class="version-badge">Versión 2 - Nuevas Preguntas</span>
+                </div>
+            </div>
+        </header>
+
+        <div id="startScreen" class="question-card start-screen">
+            <h2>Bienvenido a la Evaluación</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Segunda versión con preguntas completamente diferentes.<br>
+                Mismos temas, nuevos desafíos. Retroalimentación inmediata.
+            </p>
+
+            <div class="start-info">
+                <div class="info-item">
+                    <div class="info-icon">📚</div>
+                    <div class="info-text">
+                        <h4>Sección Teoría</h4>
+                        <p>55 preguntas</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">💻</div>
+                    <div class="info-text">
+                        <h4>Análisis de Código</h4>
+                        <p>45 preguntas</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">✅</div>
+                    <div class="info-text">
+                        <h4>Para aprobar</h4>
+                        <p>70% mínimo</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">⚡</div>
+                    <div class="info-text">
+                        <h4>Retroalimentación</h4>
+                        <p>Inmediata</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-limit">
+                <label>Número de preguntas para el examen:</label>
+                <input type="number" id="questionLimit" min="10" max="100" value="100">
+                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-100)</span>
+            </div>
+
+            <div class="category-selector">
+                <h3>Filtrar por categorías (opcional):</h3>
+                <div class="category-grid" id="categoryGrid"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="startExam()" style="margin-top: 1rem; padding: 1rem 3rem;">
+                🚀 Comenzar Evaluación
+            </button>
+        </div>
+
+        <div id="examScreen" class="hidden">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" id="currentQuestion">1</div>
+                    <div class="stat-label">Actual</div>
+                </div>
+                <div class="stat-card correct-stat">
+                    <div class="stat-value correct" id="correctCount">0</div>
+                    <div class="stat-label">Correctas</div>
+                </div>
+                <div class="stat-card incorrect-stat">
+                    <div class="stat-value incorrect" id="incorrectCount">0</div>
+                    <div class="stat-label">Incorrectas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalQuestions">100</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <div class="question-nav" id="questionNav"></div>
+
+            <div class="question-card fade-in" id="questionCard">
+                <div class="question-header">
+                    <span class="question-number" id="questionNumber">Pregunta 1</span>
+                    <span class="question-category" id="questionCategory">Categoría</span>
+                    <span class="section-badge" id="sectionBadge">Teoría</span>
+                </div>
+                <div id="questionContent">
+                    <p class="question-text" id="questionText">Texto de la pregunta...</p>
+                </div>
+                <div class="options-list" id="optionsList"></div>
+                <div id="feedbackContainer"></div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">← Anterior</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Siguiente →</button>
+                <button class="btn btn-primary hidden" id="finishBtn" onclick="finishExam()">🏁 Finalizar</button>
+            </div>
+        </div>
+
+        <div id="resultsScreen" class="hidden">
+            <div class="question-card results-container">
+                <h2 style="margin-bottom: 1rem;">Resultados de la Evaluación</h2>
+                <div class="results-score" id="finalScore">0%</div>
+                <div class="results-grade" id="gradeText">Calificación</div>
+                
+                <div class="results-stats">
+                    <div class="result-stat">
+                        <div class="result-stat-value correct" id="finalCorrectCount">0</div>
+                        <div class="stat-label">Correctas</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value incorrect" id="finalIncorrectCount">0</div>
+                        <div class="stat-label">Incorrectas</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value unanswered" id="finalUnansweredCount">0</div>
+                        <div class="stat-label">Sin responder</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="reviewAnswers()">📋 Revisar Respuestas</button>
+                    <button class="btn btn-primary" onclick="restartExam()">🔄 Nuevo Examen</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviewScreen" class="hidden">
+            <div class="question-card" style="margin-bottom: 1rem;">
+                <h2 style="margin-bottom: 0.5rem;">Revisión de Respuestas</h2>
+                <p style="color: var(--text-secondary);">Las respuestas correctas se muestran en verde</p>
+            </div>
+            <div id="reviewContainer"></div>
+            <div class="navigation">
+                <button class="btn btn-primary" onclick="backToResults()">← Volver a Resultados</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Complete Question Database - Version 2 - 100 NEW questions
+        const allQuestions = [
+            // ========== SECCIÓN TEORÍA (55 preguntas) ==========
+            {id:1,category:"Clases Internas",section:"theory",question:"¿Qué tipo de clase interna puede ser instanciada sin necesidad de una instancia de la clase externa?",options:["Clase interna regular","Clase interna local","Clase interna estática","Clase anónima"],correct:2},
+            {id:2,category:"Clases Internas",section:"theory",question:"Una clase anónima en Java:",options:["Puede extender múltiples clases","Siempre tiene un nombre definido","Se define e instancia en una sola expresión","No puede implementar interfaces"],correct:2},
+            {id:3,category:"Colecciones",section:"theory",question:"¿Cuál es la diferencia principal entre ArrayList y LinkedList?",options:["ArrayList usa nodos enlazados, LinkedList usa arrays","ArrayList es más rápido en acceso aleatorio, LinkedList en inserciones","LinkedList no permite elementos duplicados","No hay diferencia significativa"],correct:1},
+            {id:4,category:"Colecciones",section:"theory",question:"¿Qué interfaz debe implementar una clase para poder usarse como clave en un HashMap?",options:["Serializable","Comparable","Debe sobrescribir hashCode() y equals()","Iterable"],correct:2},
+            {id:5,category:"Colecciones",section:"theory",question:"¿Qué colección mantiene el orden de inserción de los elementos?",options:["HashSet","TreeSet","LinkedHashSet","HashMap"],correct:2},
+            {id:6,category:"Hilos",section:"theory",question:"¿Cuál es la diferencia entre los métodos wait() y sleep()?",options:["wait() es estático, sleep() no lo es","sleep() libera el lock, wait() no","wait() libera el lock, sleep() no","No hay diferencia"],correct:2},
+            {id:7,category:"Hilos",section:"theory",question:"¿Qué palabra reservada se usa para evitar condiciones de carrera en Java?",options:["volatile","synchronized","atomic","concurrent"],correct:1},
+            {id:8,category:"Hilos",section:"theory",question:"¿Qué método se debe sobrescribir al implementar la interfaz Runnable?",options:["start()","execute()","run()","begin()"],correct:2},
+            {id:9,category:"Hilos",section:"theory",question:"¿Qué sucede si se llama al método run() directamente en lugar de start() en un Thread?",options:["Se lanza una excepción","El código se ejecuta en un nuevo hilo","El código se ejecuta en el hilo actual, no se crea nuevo hilo","El programa se bloquea"],correct:2},
+            {id:10,category:"Modificadores",section:"theory",question:"¿Cuál es el alcance de una variable con modificador default (sin modificador)?",options:["Solo la clase actual","La clase y sus subclases","El paquete actual","Todo el proyecto"],correct:2},
+            {id:11,category:"Modificadores",section:"theory",question:"Una variable static final debe ser inicializada:",options:["Solo en el constructor","En la declaración o en un bloque static","En cualquier método","No necesita inicialización"],correct:1},
+            {id:12,category:"Modificadores",section:"theory",question:"¿Qué modificador previene que una clase sea heredada?",options:["static","private","abstract","final"],correct:3},
+            {id:13,category:"Modificadores",section:"theory",question:"¿Puede una clase abstracta tener métodos concretos (con implementación)?",options:["No, todos deben ser abstractos","Sí, puede tener ambos tipos","Solo si son métodos static","Solo si son métodos final"],correct:1},
+            {id:14,category:"String",section:"theory",question:"¿Por qué los objetos String son considerados thread-safe?",options:["Porque usan synchronized internamente","Porque son inmutables","Porque están en el String Pool","Porque implementan Runnable"],correct:1},
+            {id:15,category:"String",section:"theory",question:"¿Cuál es la diferencia entre String, StringBuilder y StringBuffer?",options:["No hay diferencia","String es mutable, los otros inmutables","StringBuffer es thread-safe, StringBuilder no","StringBuilder es thread-safe, StringBuffer no"],correct:2},
+            {id:16,category:"String",section:"theory",question:"¿Qué método se usa para comparar el contenido de dos Strings?",options:["==","compareTo()","equals()","compare()"],correct:2},
+            {id:17,category:"Herencia",section:"theory",question:"¿Qué palabra reservada se usa para llamar al constructor de la clase padre?",options:["this","parent","super","base"],correct:2},
+            {id:18,category:"Herencia",section:"theory",question:"¿Puede una subclase reducir la visibilidad de un método heredado al sobrescribirlo?",options:["Sí, siempre","No, debe ser igual o mayor visibilidad","Solo si el método es protected","Solo si el método es public"],correct:1},
+            {id:19,category:"Herencia",section:"theory",question:"¿Qué es el 'diamond problem' y cómo lo resuelve Java?",options:["Es un problema de rendimiento, se resuelve con caché","Es ambigüedad en herencia múltiple, Java no permite herencia múltiple de clases","Es un problema de memoria, se resuelve con garbage collection","No existe tal problema en Java"],correct:1},
+            {id:20,category:"Polimorfismo",section:"theory",question:"¿Qué tipo de polimorfismo ocurre en tiempo de compilación?",options:["Polimorfismo de herencia","Sobrecarga de métodos (overloading)","Sobreescritura de métodos (overriding)","Polimorfismo de interfaz"],correct:1},
+            {id:21,category:"Polimorfismo",section:"theory",question:"¿Qué es el 'dynamic method dispatch' en Java?",options:["Llamada a métodos static","Resolución de métodos sobrecargados","Resolución de métodos sobreescritos en tiempo de ejecución","Llamada a constructores"],correct:2},
+            {id:22,category:"Sobrecarga",section:"theory",question:"¿Cuál de las siguientes NO es una forma válida de sobrecargar un método?",options:["Cambiar el tipo de retorno únicamente","Cambiar el número de parámetros","Cambiar el tipo de parámetros","Cambiar el orden de los parámetros"],correct:0},
+            {id:23,category:"Sobrecarga",section:"theory",question:"¿Se puede sobrecargar el método main en Java?",options:["No, main es único","Sí, pero solo el original se ejecuta al iniciar","No, causaría error de compilación","Sí, y todos se ejecutan"],correct:1},
+            {id:24,category:"Excepciones",section:"theory",question:"¿Cuál es la diferencia entre checked y unchecked exceptions?",options:["Las checked son más graves","Las unchecked deben ser declaradas o capturadas","Las checked deben ser declaradas o capturadas","No hay diferencia"],correct:2},
+            {id:25,category:"Excepciones",section:"theory",question:"¿Qué sucede si un método en el bloque finally lanza una excepción?",options:["Se ignora","Se propaga y puede ocultar la excepción original","El programa termina inmediatamente","Se ejecuta el bloque catch"],correct:1},
+            {id:26,category:"Excepciones",section:"theory",question:"¿Qué clase es la raíz de todas las excepciones en Java?",options:["Exception","Error","Throwable","RuntimeException"],correct:2},
+            {id:27,category:"Excepciones",section:"theory",question:"¿Puede un bloque try existir sin catch?",options:["No, siempre necesita catch","Sí, si tiene finally","No, necesita catch y finally","Sí, puede estar solo"],correct:1},
+            {id:28,category:"Interfaces",section:"theory",question:"Desde Java 8, las interfaces pueden tener:",options:["Solo métodos abstractos","Métodos default con implementación","Variables de instancia","Constructores"],correct:1},
+            {id:29,category:"Interfaces",section:"theory",question:"¿Pueden las variables en una interfaz ser modificadas?",options:["Sí, son variables normales","No, son implícitamente public static final","Solo si se declaran como mutable","Depende del modificador de acceso"],correct:1},
+            {id:30,category:"Interfaces",section:"theory",question:"¿Qué es una interfaz funcional en Java?",options:["Una interfaz sin métodos","Una interfaz con exactamente un método abstracto","Una interfaz que extiende Function","Una interfaz con solo métodos default"],correct:1},
+            {id:31,category:"Object",section:"theory",question:"¿Qué método de Object se recomienda sobrescribir junto con equals()?",options:["toString()","clone()","hashCode()","finalize()"],correct:2},
+            {id:32,category:"Object",section:"theory",question:"¿Qué hace el método getClass() de Object?",options:["Devuelve el nombre de la clase","Devuelve el objeto Class que representa la clase del objeto","Crea una nueva instancia","Verifica el tipo del objeto"],correct:1},
+            {id:33,category:"Genéricos",section:"theory",question:"¿Qué significa el 'type erasure' en genéricos de Java?",options:["Los tipos genéricos son eliminados en tiempo de compilación","Los tipos genéricos se mantienen en runtime","Es un tipo de casting automático","Es un error de compilación"],correct:0},
+            {id:34,category:"Genéricos",section:"theory",question:"¿Qué representa el wildcard '?' en genéricos?",options:["Cualquier tipo primitivo","Un tipo desconocido","Un tipo null","Un error de sintaxis"],correct:1},
+            {id:35,category:"Genéricos",section:"theory",question:"¿Cuál es la diferencia entre <? extends T> y <? super T>?",options:["Son equivalentes","extends para lectura, super para escritura","super para lectura, extends para escritura","No hay wildcard super en Java"],correct:1},
+            {id:36,category:"I/O",section:"theory",question:"¿Cuál es la diferencia entre Reader/Writer y InputStream/OutputStream?",options:["No hay diferencia","Reader/Writer son para caracteres, Stream para bytes","Stream son más modernos","Reader/Writer son para archivos binarios"],correct:1},
+            {id:37,category:"I/O",section:"theory",question:"¿Qué patrón de diseño implementan las clases de I/O de Java como BufferedReader?",options:["Singleton","Factory","Decorator","Observer"],correct:2},
+            {id:38,category:"Serialización",section:"theory",question:"¿Qué interfaz debe implementar una clase para ser serializable?",options:["Cloneable","Serializable","Externalizable","Cualquiera de las anteriores"],correct:1},
+            {id:39,category:"Serialización",section:"theory",question:"¿Qué es el serialVersionUID?",options:["Un identificador único de instancia","Un identificador de versión de la clase serializada","El tamaño del objeto serializado","El hashcode del objeto"],correct:1},
+            {id:40,category:"Empaquetamiento",section:"theory",question:"¿Qué tipo de archivo es un JAR?",options:["Un archivo comprimido tipo ZIP con estructura específica","Un archivo de texto plano","Un archivo binario ejecutable","Un archivo de configuración"],correct:0},
+            {id:41,category:"Empaquetamiento",section:"theory",question:"¿Qué archivo especifica la clase principal en un JAR ejecutable?",options:["main.txt","config.xml","MANIFEST.MF","index.class"],correct:2},
+            {id:42,category:"Empaquetamiento",section:"theory",question:"¿Qué es un archivo EAR?",options:["Un archivo de audio","Enterprise Application Archive para aplicaciones Java EE","Un archivo de errores","Un tipo de excepción"],correct:1},
+            {id:43,category:"Operadores",section:"theory",question:"¿Cuál es el resultado de 5 / 2 en Java?",options:["2.5","2","3","Error de compilación"],correct:1},
+            {id:44,category:"Operadores",section:"theory",question:"¿Qué hace el operador >>> en Java?",options:["División","Desplazamiento a la derecha sin signo","Desplazamiento a la izquierda","Comparación"],correct:1},
+            {id:45,category:"Operadores",section:"theory",question:"¿Cuál es la diferencia entre & y && en Java?",options:["No hay diferencia","& es bitwise y evaluación completa, && es lógico con cortocircuito","&& es bitwise, & es lógico","& solo funciona con números"],correct:1},
+            {id:46,category:"Ciclos",section:"theory",question:"¿Qué hace la sentencia 'continue' en un ciclo?",options:["Termina el ciclo completamente","Salta a la siguiente iteración","Pausa el ciclo","Reinicia el ciclo desde el inicio"],correct:1},
+            {id:47,category:"Ciclos",section:"theory",question:"¿Cuántas veces se ejecuta un ciclo do-while como mínimo?",options:["Cero veces","Una vez","Depende de la condición","Dos veces"],correct:1},
+            {id:48,category:"Ciclos",section:"theory",question:"¿Qué tipo de ciclo es el for-each en Java?",options:["Un ciclo for normal","Un ciclo while disfrazado","Un iterador simplificado sobre colecciones o arrays","Un ciclo infinito"],correct:2},
+            {id:49,category:"JVM",section:"theory",question:"¿Qué hace el Garbage Collector en Java?",options:["Compila el código","Libera memoria de objetos no referenciados","Gestiona los hilos","Maneja las excepciones"],correct:1},
+            {id:50,category:"JVM",section:"theory",question:"¿Qué es el JIT compiler?",options:["Un compilador que traduce Java a C","Just-In-Time compiler que compila bytecode a código máquina en runtime","Un IDE de Java","Un tipo de JVM"],correct:1},
+            {id:51,category:"Variables",section:"theory",question:"¿Cuál es el valor por defecto de una variable int de instancia?",options:["null","0","undefined","Debe ser inicializada"],correct:1},
+            {id:52,category:"Variables",section:"theory",question:"¿Qué es autoboxing en Java?",options:["Crear objetos automáticamente","Conversión automática entre tipos primitivos y sus wrappers","Encapsulamiento automático","Un tipo de herencia"],correct:1},
+            {id:53,category:"Variables",section:"theory",question:"¿Cuál es el rango de un byte en Java?",options:["0 a 255","-128 a 127","0 a 127","-256 a 255"],correct:1},
+            {id:54,category:"Clases Abstractas",section:"theory",question:"¿Puede una clase abstracta tener constructor?",options:["No, nunca","Sí, pero no puede ser llamado directamente","Solo si todos los métodos son concretos","Solo constructores privados"],correct:1},
+            {id:55,category:"Main",section:"theory",question:"¿Cuál es la firma correcta del método main?",options:["public void main(String args)","public static void main(String[] args)","static public main(String args[])","Tanto B como C son válidas"],correct:3},
+            
+            // ========== SECCIÓN ANÁLISIS DE CÓDIGO (45 preguntas) ==========
+            {id:56,category:"Variables",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"int x = 10;\nint y = x++;\nint z = ++x;\nSystem.out.println(y + \" \" + z);",options:["10 12","11 12","10 11","11 11"],correct:0},
+            {id:57,category:"String",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"String s1 = \"Hello\";\nString s2 = \"Hello\";\nString s3 = new String(\"Hello\");\nSystem.out.println(s1 == s2);\nSystem.out.println(s1 == s3);\nSystem.out.println(s1.equals(s3));",options:["true true true","true false true","false false true","true true false"],correct:1},
+            {id:58,category:"Arrays",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"int[] arr = {1, 2, 3, 4, 5};\nSystem.out.println(arr.length);\nSystem.out.println(arr[arr.length - 1]);",options:["5 y 5","4 y 5","5 y 4","Error en tiempo de ejecución"],correct:0},
+            {id:59,category:"Herencia",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"class Animal {\n    void sound() { System.out.println(\"Animal\"); }\n}\nclass Dog extends Animal {\n    void sound() { System.out.println(\"Bark\"); }\n}\npublic class Test {\n    public static void main(String[] args) {\n        Animal a = new Dog();\n        a.sound();\n    }\n}",options:["Animal","Bark","Error de compilación","Ninguna salida"],correct:1},
+            {id:60,category:"Excepciones",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"try {\n    int[] arr = new int[5];\n    arr[10] = 50;\n} catch (ArrayIndexOutOfBoundsException e) {\n    System.out.print(\"A \");\n} catch (Exception e) {\n    System.out.print(\"B \");\n} finally {\n    System.out.print(\"C\");\n}",options:["A C","B C","A B C","C"],correct:0},
+            {id:61,category:"Ciclos",section:"code",question:"¿Cuántas veces imprime 'Hello'?",code:"for (int i = 0; i < 5; i++) {\n    if (i == 3) continue;\n    System.out.println(\"Hello\");\n}",options:["5 veces","4 veces","3 veces","Infinitas veces"],correct:1},
+            {id:62,category:"Switch",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"int x = 2;\nswitch(x) {\n    case 1: System.out.print(\"One \");\n    case 2: System.out.print(\"Two \");\n    case 3: System.out.print(\"Three \");\n    default: System.out.print(\"Default\");\n}",options:["Two","Two Three Default","Two Three","One Two Three Default"],correct:1},
+            {id:63,category:"Operadores",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"int a = 5;\nint b = 10;\nSystem.out.println(a > 3 && b < 15);\nSystem.out.println(a > 3 || b > 15);",options:["true true","false true","true false","false false"],correct:0},
+            {id:64,category:"Sobrecarga",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"class Test {\n    void print(int x) { System.out.print(\"int \"); }\n    void print(double x) { System.out.print(\"double \"); }\n    void print(Integer x) { System.out.print(\"Integer \"); }\n    \n    public static void main(String[] args) {\n        Test t = new Test();\n        t.print(5);\n        t.print(5.0);\n    }\n}",options:["int double","Integer double","int int","double double"],correct:0},
+            {id:65,category:"Constructores",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"class Parent {\n    Parent() { System.out.print(\"Parent \"); }\n}\nclass Child extends Parent {\n    Child() { System.out.print(\"Child \"); }\n}\npublic class Test {\n    public static void main(String[] args) {\n        Child c = new Child();\n    }\n}",options:["Child Parent","Parent Child","Child","Parent"],correct:1},
+            {id:66,category:"Static",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"class Counter {\n    static int count = 0;\n    Counter() { count++; }\n}\npublic class Test {\n    public static void main(String[] args) {\n        Counter c1 = new Counter();\n        Counter c2 = new Counter();\n        Counter c3 = new Counter();\n        System.out.println(Counter.count);\n    }\n}",options:["1","2","3","0"],correct:2},
+            {id:67,category:"Interfaces",section:"code",question:"¿Este código compila correctamente?",code:"interface A {\n    default void show() { System.out.println(\"A\"); }\n}\ninterface B {\n    default void show() { System.out.println(\"B\"); }\n}\nclass C implements A, B {\n    // Sin implementación de show()\n}",options:["Sí, compila y muestra A","Sí, compila y muestra B","No compila, conflicto de métodos default","No compila, falta la clase main"],correct:2},
+            {id:68,category:"Colecciones",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"List<String> list = new ArrayList<>();\nlist.add(\"A\");\nlist.add(\"B\");\nlist.add(\"C\");\nlist.remove(1);\nSystem.out.println(list);",options:["[A, C]","[B, C]","[A, B]","Error en tiempo de ejecución"],correct:0},
+            {id:69,category:"Colecciones",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"Set<Integer> set = new HashSet<>();\nset.add(1);\nset.add(2);\nset.add(1);\nset.add(3);\nSystem.out.println(set.size());",options:["4","3","2","Error de compilación"],correct:1},
+            {id:70,category:"StringBuilder",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"StringBuilder sb = new StringBuilder(\"Hello\");\nsb.append(\" World\");\nsb.insert(5, \",\");\nSystem.out.println(sb);",options:["Hello World","Hello, World","Hello,World","Error de compilación"],correct:1},
+            {id:71,category:"Wrapper",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"Integer a = 127;\nInteger b = 127;\nInteger c = 128;\nInteger d = 128;\nSystem.out.println(a == b);\nSystem.out.println(c == d);",options:["true true","false false","true false","false true"],correct:2},
+            {id:72,category:"Ternario",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"int x = 5;\nString result = (x > 3) ? (x > 4) ? \"A\" : \"B\" : \"C\";\nSystem.out.println(result);",options:["A","B","C","Error de compilación"],correct:0},
+            {id:73,category:"Final",section:"code",question:"¿Este código compila?",code:"final int x;\nx = 10;\nx = 20;\nSystem.out.println(x);",options:["Sí, imprime 20","Sí, imprime 10","No compila, x ya fue asignada","No compila, x no inicializada"],correct:2},
+            {id:74,category:"This",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"class Person {\n    String name = \"Default\";\n    Person(String name) {\n        this.name = name;\n    }\n    void print() {\n        String name = \"Local\";\n        System.out.println(this.name);\n    }\n}\npublic class Test {\n    public static void main(String[] args) {\n        new Person(\"John\").print();\n    }\n}",options:["Default","Local","John","Error de compilación"],correct:2},
+            {id:75,category:"Casting",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"double d = 9.7;\nint i = (int) d;\nSystem.out.println(i);",options:["10","9","9.7","Error de compilación"],correct:1},
+            {id:76,category:"NullPointer",section:"code",question:"¿Qué excepción lanza este código?",code:"String s = null;\nSystem.out.println(s.length());",options:["ArrayIndexOutOfBoundsException","NullPointerException","IllegalArgumentException","No lanza excepción"],correct:1},
+            {id:77,category:"For-each",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"int[] arr = {1, 2, 3, 4, 5};\nfor (int num : arr) {\n    if (num == 3) break;\n    System.out.print(num + \" \");\n}",options:["1 2 3","1 2","1 2 3 4 5","3 4 5"],correct:1},
+            {id:78,category:"Recursión",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"public class Test {\n    static int factorial(int n) {\n        if (n <= 1) return 1;\n        return n * factorial(n - 1);\n    }\n    public static void main(String[] args) {\n        System.out.println(factorial(5));\n    }\n}",options:["5","120","24","Error: StackOverflow"],correct:1},
+            {id:79,category:"Instanceof",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"class Animal {}\nclass Dog extends Animal {}\npublic class Test {\n    public static void main(String[] args) {\n        Animal a = new Dog();\n        System.out.println(a instanceof Animal);\n        System.out.println(a instanceof Dog);\n    }\n}",options:["true false","false true","true true","false false"],correct:2},
+            {id:80,category:"Abstract",section:"code",question:"¿Este código compila?",code:"abstract class Shape {\n    abstract void draw();\n    void display() { System.out.println(\"Shape\"); }\n}\nclass Circle extends Shape {\n    void draw() { System.out.println(\"Circle\"); }\n}",options:["No, Circle debe ser abstracta","No, Shape no puede tener métodos concretos","Sí, compila correctamente","No, falta constructor en Shape"],correct:2},
+            {id:81,category:"Comparación",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"String s1 = new String(\"hello\");\nString s2 = new String(\"hello\");\nSystem.out.println(s1 == s2);\nSystem.out.println(s1.hashCode() == s2.hashCode());",options:["true true","false false","false true","true false"],correct:2},
+            {id:82,category:"Inicialización",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"class Test {\n    static { System.out.print(\"Static \"); }\n    { System.out.print(\"Instance \"); }\n    Test() { System.out.print(\"Constructor \"); }\n    \n    public static void main(String[] args) {\n        new Test();\n        new Test();\n    }\n}",options:["Static Instance Constructor Instance Constructor","Static Instance Constructor Static Instance Constructor","Instance Constructor Instance Constructor","Static Static Instance Constructor Instance Constructor"],correct:0},
+            {id:83,category:"Enum",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"enum Day { MONDAY, TUESDAY, WEDNESDAY }\npublic class Test {\n    public static void main(String[] args) {\n        Day d = Day.MONDAY;\n        System.out.println(d.ordinal());\n        System.out.println(Day.valueOf(\"TUESDAY\"));\n    }\n}",options:["1 TUESDAY","0 TUESDAY","MONDAY TUESDAY","Error de compilación"],correct:1},
+            {id:84,category:"Varargs",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"class Test {\n    static void print(int... nums) {\n        System.out.println(nums.length);\n    }\n    public static void main(String[] args) {\n        print();\n        print(1, 2, 3);\n    }\n}",options:["0 3","1 3","Error de compilación","0 1"],correct:0},
+            {id:85,category:"Map",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"Map<String, Integer> map = new HashMap<>();\nmap.put(\"A\", 1);\nmap.put(\"B\", 2);\nmap.put(\"A\", 3);\nSystem.out.println(map.size());\nSystem.out.println(map.get(\"A\"));",options:["3 1","2 3","3 3","2 1"],correct:1},
+            {id:86,category:"Lambda",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"List<Integer> nums = Arrays.asList(1, 2, 3, 4, 5);\nnums.stream()\n    .filter(n -> n % 2 == 0)\n    .forEach(n -> System.out.print(n + \" \"));",options:["1 3 5","2 4","1 2 3 4 5","Error de compilación"],correct:1},
+            {id:87,category:"Try-resources",section:"code",question:"¿Qué imprime este código?",code:"try (java.io.PrintWriter pw = new java.io.PrintWriter(System.out)) {\n    pw.print(\"A \");\n    throw new RuntimeException();\n} catch (Exception e) {\n    System.out.print(\"B \");\n} finally {\n    System.out.print(\"C\");\n}",options:["A B C","A C","B C","A B"],correct:0},
+            {id:88,category:"Modulo",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"System.out.println(10 % 3);\nSystem.out.println(-10 % 3);\nSystem.out.println(10 % -3);",options:["1 -1 1","1 -1 -1","1 1 1","Error de compilación"],correct:0},
+            {id:89,category:"Array Multidimensional",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"int[][] arr = {{1, 2}, {3, 4, 5}, {6}};\nSystem.out.println(arr.length);\nSystem.out.println(arr[1].length);",options:["3 3","2 3","3 2","6 3"],correct:0},
+            {id:90,category:"Concatenación",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"System.out.println(1 + 2 + \"3\");\nSystem.out.println(\"1\" + 2 + 3);",options:["33 123","33 6","6 123","123 123"],correct:0},
+            {id:91,category:"Precedencia",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"int x = 5;\nSystem.out.println(x++ + ++x + x++);",options:["18","19","21","Error de compilación"],correct:0},
+            {id:92,category:"Boolean",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"boolean a = true;\nboolean b = false;\nboolean c = true;\nSystem.out.println(a || b && c);\nSystem.out.println((a || b) && c);",options:["true true","false true","true false","false false"],correct:0},
+            {id:93,category:"Return",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"public class Test {\n    static int getValue() {\n        try {\n            return 1;\n        } finally {\n            return 2;\n        }\n    }\n    public static void main(String[] args) {\n        System.out.println(getValue());\n    }\n}",options:["1","2","Error de compilación","1 y luego 2"],correct:1},
+            {id:94,category:"While",section:"code",question:"¿Cuántas iteraciones realiza este ciclo?",code:"int i = 0;\nwhile (i++ < 5) {\n    System.out.println(i);\n}",options:["4 iteraciones","5 iteraciones","6 iteraciones","Infinitas"],correct:1},
+            {id:95,category:"Char",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"char c = 'A';\nSystem.out.println(c + 1);\nSystem.out.println((char)(c + 1));",options:["66 B","A1 B","65 A","Error de compilación"],correct:0},
+            {id:96,category:"Overriding",section:"code",question:"¿Este código compila?",code:"class Parent {\n    protected void show() { }\n}\nclass Child extends Parent {\n    void show() { }\n}",options:["Sí, compila","No, visibilidad reducida","No, falta @Override","No, método final"],correct:1},
+            {id:97,category:"Interface Default",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"interface Printable {\n    default void print() {\n        System.out.println(\"Printable\");\n    }\n}\nclass Document implements Printable {\n    public void print() {\n        System.out.println(\"Document\");\n    }\n}\npublic class Test {\n    public static void main(String[] args) {\n        Printable p = new Document();\n        p.print();\n    }\n}",options:["Printable","Document","Error de compilación","Printable Document"],correct:1},
+            {id:98,category:"BitWise",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"int a = 5;  // 101 en binario\nint b = 3;  // 011 en binario\nSystem.out.println(a & b);\nSystem.out.println(a | b);\nSystem.out.println(a ^ b);",options:["1 7 6","5 3 2","0 8 8","Error"],correct:0},
+            {id:99,category:"Clone",section:"code",question:"¿Qué imprime este código?",code:"int[] original = {1, 2, 3};\nint[] copy = original.clone();\ncopy[0] = 100;\nSystem.out.println(original[0]);\nSystem.out.println(copy[0]);",options:["100 100","1 100","1 1","Error de compilación"],correct:1},
+            {id:100,category:"Anonymous",section:"code",question:"¿Cuál es la salida del siguiente código?",code:"interface Greeting {\n    void greet();\n}\npublic class Test {\n    public static void main(String[] args) {\n        Greeting g = new Greeting() {\n            public void greet() {\n                System.out.println(\"Hello!\");\n            }\n        };\n        g.greet();\n    }\n}",options:["Hello!","Error: no se puede instanciar interfaz","Greeting","null"],correct:0}
+        ];
+
+        // State
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        let answerResults = {};
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let selectedCategories = new Set();
+
+        const categories = [...new Set(allQuestions.map(q => q.category))];
+
+        function init() {
+            renderCategories();
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('categoryGrid');
+            const categoryCount = {};
+            
+            allQuestions.forEach(q => {
+                categoryCount[q.category] = (categoryCount[q.category] || 0) + 1;
+            });
+
+            grid.innerHTML = `
+                <div class="category-chip selected" onclick="toggleAllCategories(this)" data-category="all">
+                    <div class="category-chip-name">📚 Todas las categorías</div>
+                    <div class="category-chip-count">${allQuestions.length} preguntas</div>
+                </div>
+                <div class="category-chip selected" onclick="toggleSection('theory', this)" data-section="theory">
+                    <div class="category-chip-name">📖 Solo Teoría</div>
+                    <div class="category-chip-count">55 preguntas</div>
+                </div>
+                <div class="category-chip selected" onclick="toggleSection('code', this)" data-section="code">
+                    <div class="category-chip-name">💻 Solo Código</div>
+                    <div class="category-chip-count">45 preguntas</div>
+                </div>
+            `;
+
+            categories.forEach(cat => {
+                grid.innerHTML += `
+                    <div class="category-chip" onclick="toggleCategory('${cat}', this)">
+                        <div class="category-chip-name">${cat}</div>
+                        <div class="category-chip-count">${categoryCount[cat]} preg.</div>
+                    </div>
+                `;
+            });
+
+            selectedCategories = new Set(categories);
+        }
+
+        function toggleAllCategories(element) {
+            const allChips = document.querySelectorAll('.category-chip');
+            if (element.classList.contains('selected')) {
+                allChips.forEach(chip => chip.classList.remove('selected'));
+                selectedCategories.clear();
+            } else {
+                allChips.forEach(chip => chip.classList.add('selected'));
+                selectedCategories = new Set(categories);
+            }
+        }
+
+        function toggleSection(section, element) {
+            const allChips = document.querySelectorAll('.category-chip');
+            allChips.forEach(chip => chip.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            selectedCategories.clear();
+            allQuestions.filter(q => q.section === section).forEach(q => {
+                selectedCategories.add(q.category);
+            });
+        }
+
+        function toggleCategory(category, element) {
+            document.querySelector('[data-category="all"]').classList.remove('selected');
+            document.querySelector('[data-section="theory"]').classList.remove('selected');
+            document.querySelector('[data-section="code"]').classList.remove('selected');
+            
+            if (selectedCategories.has(category)) {
+                selectedCategories.delete(category);
+                element.classList.remove('selected');
+            } else {
+                selectedCategories.add(category);
+                element.classList.add('selected');
+            }
+        }
+
+        function startExam() {
+            if (selectedCategories.size === 0) {
+                alert('Por favor selecciona al menos una categoría');
+                return;
+            }
+
+            let limit = parseInt(document.getElementById('questionLimit').value) || 100;
+            limit = Math.max(10, Math.min(100, limit));
+
+            let filteredQuestions = allQuestions.filter(q => selectedCategories.has(q.category));
+            filteredQuestions = shuffleArray(filteredQuestions);
+            questions = filteredQuestions.slice(0, limit);
+            
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            answerResults = {};
+            correctCount = 0;
+            incorrectCount = 0;
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('examScreen').classList.remove('hidden');
+            
+            document.getElementById('totalQuestions').textContent = questions.length;
+            
+            renderQuestionNav();
+            renderQuestion();
+            updateStats();
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function renderQuestionNav() {
+            const nav = document.getElementById('questionNav');
+            nav.innerHTML = '';
+            
+            questions.forEach((_, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                if (index === currentQuestionIndex) btn.classList.add('current');
+                if (answerResults[index] === true) btn.classList.add('correct');
+                if (answerResults[index] === false) btn.classList.add('incorrect');
+                btn.textContent = index + 1;
+                btn.onclick = () => goToQuestion(index);
+                nav.appendChild(btn);
+            });
+        }
+
+        function goToQuestion(index) {
+            currentQuestionIndex = index;
+            renderQuestion();
+            renderQuestionNav();
+        }
+
+        function updateStats() {
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+            
+            const answeredCount = Object.keys(userAnswers).length;
+            const progress = (answeredCount / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function renderQuestion() {
+            const question = questions[currentQuestionIndex];
+            const isAnswered = userAnswers[currentQuestionIndex] !== undefined;
+            const userAnswer = userAnswers[currentQuestionIndex];
+            const isCorrect = answerResults[currentQuestionIndex];
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('questionNumber').textContent = `Pregunta ${currentQuestionIndex + 1}`;
+            document.getElementById('questionCategory').textContent = question.category;
+            
+            const sectionBadge = document.getElementById('sectionBadge');
+            if (question.section === 'theory') {
+                sectionBadge.textContent = 'Teoría';
+                sectionBadge.className = 'section-badge theory';
+            } else {
+                sectionBadge.textContent = 'Código';
+                sectionBadge.className = 'section-badge code';
+            }
+            
+            let questionHTML = `<p class="question-text">${question.question}</p>`;
+            if (question.code) {
+                questionHTML += `<pre class="code-block">${escapeHtml(question.code)}</pre>`;
+            }
+            document.getElementById('questionContent').innerHTML = questionHTML;
+            
+            const questionCard = document.getElementById('questionCard');
+            questionCard.classList.remove('answered-correct', 'answered-incorrect');
+            if (isAnswered) {
+                questionCard.classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+            }
+            
+            const optionsList = document.getElementById('optionsList');
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            
+            optionsList.innerHTML = question.options.map((option, index) => {
+                let className = 'option';
+                let feedback = '';
+                
+                if (isAnswered) {
+                    className += ' disabled';
+                    if (index === question.correct) {
+                        className += ' correct';
+                        if (index === userAnswer) {
+                            feedback = '<span class="option-feedback correct">✓ ¡Correcto!</span>';
+                        } else {
+                            className += ' show-correct';
+                            feedback = '<span class="option-feedback correct">✓ Respuesta correcta</span>';
+                        }
+                    } else if (index === userAnswer) {
+                        className += ' incorrect';
+                        feedback = '<span class="option-feedback incorrect">✗ Incorrecto</span>';
+                    }
+                }
+                
+                return `
+                    <div class="${className}" onclick="${isAnswered ? '' : `selectOption(${index})`}">
+                        <span class="option-letter">${letters[index]}</span>
+                        <span class="option-text">${option}</span>
+                        ${feedback}
+                    </div>
+                `;
+            }).join('');
+
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            if (isAnswered) {
+                if (isCorrect) {
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback-message correct">
+                            <span class="feedback-icon">✅</span>
+                            <span>¡Excelente! Has respondido correctamente.</span>
+                        </div>
+                    `;
+                } else {
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback-message incorrect">
+                            <span class="feedback-icon">❌</span>
+                            <span>Respuesta incorrecta. La respuesta correcta está marcada en verde.</span>
+                        </div>
+                    `;
+                }
+            } else {
+                feedbackContainer.innerHTML = '';
+            }
+
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                document.getElementById('nextBtn').classList.add('hidden');
+                document.getElementById('finishBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('nextBtn').classList.remove('hidden');
+                document.getElementById('finishBtn').classList.add('hidden');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function selectOption(optionIndex) {
+            if (userAnswers[currentQuestionIndex] !== undefined) return;
+            
+            const question = questions[currentQuestionIndex];
+            const isCorrect = optionIndex === question.correct;
+            
+            userAnswers[currentQuestionIndex] = optionIndex;
+            answerResults[currentQuestionIndex] = isCorrect;
+            
+            if (isCorrect) {
+                correctCount++;
+            } else {
+                incorrectCount++;
+            }
+            
+            updateStats();
+            renderQuestion();
+            renderQuestionNav();
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+                renderQuestionNav();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+                renderQuestionNav();
+            }
+        }
+
+        function finishExam() {
+            const unanswered = questions.length - Object.keys(userAnswers).length;
+            const score = Math.round((correctCount / questions.length) * 100);
+
+            document.getElementById('examScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            
+            document.getElementById('finalScore').textContent = `${score}%`;
+            document.getElementById('finalCorrectCount').textContent = correctCount;
+            document.getElementById('finalIncorrectCount').textContent = incorrectCount;
+            document.getElementById('finalUnansweredCount').textContent = unanswered;
+
+            let gradeText = '';
+            let gradeEmoji = '';
+            
+            if (score >= 90) { gradeText = 'Excelente'; gradeEmoji = '🏆'; }
+            else if (score >= 80) { gradeText = 'Muy Bien'; gradeEmoji = '🎉'; }
+            else if (score >= 70) { gradeText = 'Aprobado'; gradeEmoji = '✅'; }
+            else if (score >= 60) { gradeText = 'Necesita Mejorar'; gradeEmoji = '📚'; }
+            else { gradeText = 'No Aprobado'; gradeEmoji = '❌'; }
+
+            document.getElementById('gradeText').textContent = `${gradeEmoji} ${gradeText}`;
+        }
+
+        function reviewAnswers() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.remove('hidden');
+
+            const container = document.getElementById('reviewContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            
+            container.innerHTML = questions.map((question, qIndex) => {
+                const userAnswer = userAnswers[qIndex];
+                const isCorrect = answerResults[qIndex];
+                const isUnanswered = userAnswer === undefined;
+
+                let questionContent = `<p class="question-text">${question.question}</p>`;
+                if (question.code) {
+                    questionContent += `<pre class="code-block">${escapeHtml(question.code)}</pre>`;
+                }
+
+                return `
+                    <div class="question-card fade-in" style="animation-delay: ${qIndex * 0.02}s">
+                        <div class="question-header">
+                            <span class="question-number">Pregunta ${qIndex + 1}</span>
+                            <span class="question-category">${question.category}</span>
+                            <span class="section-badge ${question.section}">${question.section === 'theory' ? 'Teoría' : 'Código'}</span>
+                            <span style="margin-left: auto; font-size: 1.5rem;">
+                                ${isUnanswered ? '⚠️' : (isCorrect ? '✅' : '❌')}
+                            </span>
+                        </div>
+                        ${questionContent}
+                        <div class="options-list">
+                            ${question.options.map((option, oIndex) => {
+                                let className = 'option disabled';
+                                let feedback = '';
+                                
+                                if (oIndex === question.correct) {
+                                    className += ' correct';
+                                    feedback = '<span class="option-feedback correct">✓ Correcta</span>';
+                                } else if (oIndex === userAnswer && !isCorrect) {
+                                    className += ' incorrect';
+                                    feedback = '<span class="option-feedback incorrect">Tu respuesta</span>';
+                                }
+                                
+                                return `
+                                    <div class="${className}">
+                                        <span class="option-letter">${letters[oIndex]}</span>
+                                        <span class="option-text">${option}</span>
+                                        ${feedback}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function backToResults() {
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+        }
+
+        function restartExam() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            answerResults = {};
+            correctCount = 0;
+            incorrectCount = 0;
+            
+            renderCategories();
+        }
+
+        init();
+    </script>
+</body>
+</html>
