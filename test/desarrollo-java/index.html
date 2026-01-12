@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desarrollo Java</title>
+    <title>Examen Mainware Java BI - Completo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,6 +19,8 @@
             --accent-red: #ef4444;
             --accent-yellow: #f59e0b;
             --accent-purple: #a855f7;
+            --accent-cyan: #06b6d4;
+            --accent-pink: #ec4899;
             --text-primary: #f0f6fc;
             --text-secondary: #8b949e;
             --text-muted: #6e7681;
@@ -75,7 +77,7 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue), var(--accent-orange));
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue), var(--accent-purple), var(--accent-orange));
             background-size: 200% 100%;
             animation: shimmer 3s linear infinite;
         }
@@ -462,9 +464,9 @@
 
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 0.8rem;
-            max-height: 250px;
+            max-height: 300px;
             overflow-y: auto;
             padding: 0.5rem;
         }
@@ -553,6 +555,24 @@
         }
         .section-badge.theory { background: var(--accent-blue); color: white; }
         .section-badge.code { background: var(--accent-purple); color: white; }
+        .section-badge.cbi { background: var(--accent-cyan); color: white; }
+        .section-badge.sql { background: var(--accent-green); color: white; }
+        .section-badge.diagram { background: var(--accent-pink); color: white; }
+
+        .diagram-note {
+            background: rgba(236, 72, 153, 0.1);
+            border: 1px solid var(--accent-pink);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--accent-pink);
+        }
+
+        .diagram-note strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -563,8 +583,8 @@
             <div class="logo">
                 <div class="logo-icon">☕</div>
                 <div>
-                    <h1>Simulación Examen Java</h1>
-                    <p>Conceptos, Teoría y Análisis de Código</p>
+                    <h1>Examen Mainware Java BI</h1>
+                    <p>Java • CBI • SQL • Diagramas de Flujo</p>
                 </div>
             </div>
         </header>
@@ -572,15 +592,15 @@
         <div id="startScreen" class="question-card start-screen">
             <h2>Bienvenido a la Evaluación</h2>
             <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                Esta evaluación contiene preguntas de conceptos teóricos y análisis de código Java.<br>
+                Evaluación completa para certificación Java BI de Mainware.<br>
                 Recibirás retroalimentación inmediata en cada respuesta.
             </p>
 
             <div class="start-info">
                 <div class="info-item">
-                    <div class="info-icon">📚</div>
+                    <div class="info-icon">📖</div>
                     <div class="info-text">
-                        <h4>Sección Teoría</h4>
+                        <h4>Teoría Java</h4>
                         <p>57 preguntas</p>
                     </div>
                 </div>
@@ -592,29 +612,43 @@
                     </div>
                 </div>
                 <div class="info-item">
+                    <div class="info-icon">📊</div>
+                    <div class="info-text">
+                        <h4>CBI / BI</h4>
+                        <p>5 preguntas</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🗄️</div>
+                    <div class="info-text">
+                        <h4>SQL / Bases de Datos</h4>
+                        <p>10 preguntas</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">📐</div>
+                    <div class="info-text">
+                        <h4>Diagramas de Flujo</h4>
+                        <p>8 preguntas</p>
+                    </div>
+                </div>
+                <div class="info-item">
                     <div class="info-icon">✅</div>
                     <div class="info-text">
                         <h4>Para aprobar</h4>
                         <p>70% mínimo</p>
                     </div>
                 </div>
-                <div class="info-item">
-                    <div class="info-icon">⚡</div>
-                    <div class="info-text">
-                        <h4>Retroalimentación</h4>
-                        <p>Inmediata</p>
-                    </div>
-                </div>
             </div>
 
             <div class="question-limit">
                 <label>Número de preguntas para el examen:</label>
-                <input type="number" id="questionLimit" min="10" max="102" value="102">
-                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-102)</span>
+                <input type="number" id="questionLimit" min="10" max="125" value="125">
+                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-125)</span>
             </div>
 
             <div class="category-selector">
-                <h3>Filtrar por categorías (opcional):</h3>
+                <h3>Filtrar por secciones (opcional):</h3>
                 <div class="category-grid" id="categoryGrid"></div>
             </div>
 
@@ -638,7 +672,7 @@
                     <div class="stat-label">Incorrectas</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="totalQuestions">102</div>
+                    <div class="stat-value" id="totalQuestions">125</div>
                     <div class="stat-label">Total</div>
                 </div>
             </div>
@@ -710,9 +744,9 @@
     </div>
 
     <script>
-        // Complete Question Database - 102 questions
+        // Complete Question Database - 125 questions
         const allQuestions = [
-            // ========== SECCIÓN TEORÍA (57 preguntas) ==========
+            // ========== SECCIÓN TEORÍA JAVA (57 preguntas) ==========
             {id:1,category:"Clases Internas",section:"theory",question:"Son los tipos de clases internos en Java:",options:["Abstracta, estática, heredada, anónima","Anónima, pública, estándar, estática","Pública, nativa, heredada, anónima","Regular, estática, local a un método, anónima"],correct:3},
             {id:2,category:"Colecciones",section:"theory",question:"Son clases en Java que, a diferencia de los arreglos, pueden expandirse o contraerse dinámicamente conforme se les agregan o restan elementos:",options:["Expansores","Reductores","Cadenas","Colecciones"],correct:3},
             {id:3,category:"Hilos",section:"theory",question:"Es el nombre del hilo, en el que corre el método main de un programa Java:",options:["Main","Central","Head","Prime"],correct:0},
@@ -733,7 +767,7 @@
             {id:18,category:"Paquetes",section:"theory",question:"Una vez que una clase se encuentra en un paquete, la parte del paquete en su nombre calificado completo es:",options:["Atómica","Estática","Dinámica","Abstracta"],correct:0},
             {id:19,category:"Clases Internas",section:"theory",question:"Es la única manera de acceder a una clase interna regular:",options:["A través de la línea de comandos, empleando el comando java, seguido del nombre de la clase","Directamente en tiempo de ejecución, mediante una referencia a un objeto de su tipo","Indirectamente en tiempo de ejecución, mediante una referencia a un objeto del tipo de clase que contiene","Ninguna de las anteriores"],correct:2},
             {id:20,category:"Genéricos",section:"theory",question:"Es la sintaxis empleada en Java, para declarar una colección que sólo acepta objetos de un tipo en particular:",options:["Genérico","Especificador","Modificador","Limitante"],correct:0},
-            {id:21,category:"Modificadores",section:"theory",question:"En la práctica, son los modificadores de acceso que empelan en las variables de instancias de una clase, para controlar los datos asignables a las mismas:",options:["final, private","static, transient","public, private","private, protected"],correct:0},
+            {id:21,category:"Modificadores",section:"theory",question:"En la práctica, son los modificadores de acceso que emplean en las variables de instancias de una clase, para controlar los datos asignables a las mismas:",options:["final, private","static, transient","public, private","private, protected"],correct:0},
             {id:22,category:"Serialización",section:"theory",question:"Es el modificador del lenguaje Java, con el cual se marca una variable de instancia, la cual no se desea incluir en la serialización de una clase:",options:["static","volatile","remote","transient"],correct:3},
             {id:23,category:"Properties",section:"theory",question:"Es la clase Java, empleada para acceder a la información persistente del sistema, tal como la versión de S.O.:",options:["java.util.Persistent","java.util.SysInfo","java.util.Environment","java.util.Properties"],correct:3},
             {id:24,category:"Hilos",section:"theory",question:"Es el estado en el que se encuentra un hilo, cuando se encuentra 'esperando' la disponibilidad de un recurso:",options:["Durmiendo (sleep)","Bloqueado (blocked)","Muerto (dead)","Ninguna de las anteriores"],correct:1},
@@ -816,7 +850,36 @@
             {id:99,category:"JavaScript",section:"code",question:"¿Cuál es el valor de funcionRetornoControlador?",code:"var funcionRetornoControlador;\ntraerArchivo();\nfunction traerArchivo(){\n    leerArchivoServidor(\"PruebaParams.jsp\", recibirArchivo);\n}\nfunction recibirArchivo(texto){\n    document.getElementById(\"divContenido\").innerHTML = texto;\n}\nfunction leerArchivoServidor(archivo, funcionRetorno){\n    funcionRetornoControlador = funcionRetorno;\n}",options:["funcionRetorno","leerArchivoServidor","traerArchivo","recibirArchivo"],correct:3},
             {id:100,category:"StringBuffer",section:"code",question:"¿Qué línea es la salida de este fragmento de código?",code:"StringBuffer sb = new StringBuffer(\"abcdef\");\nSystem.out.println( sb.append(\"123\").delete(0,5).reverse().insert(1,\"1\") );",options:["3121","3121f","Ninguno de los anteriores","321"],correct:0},
             {id:101,category:"Interfaces",section:"code",question:"Seleccione una respuesta:",code:"class num {\n    int x=9;\n}\ninterface blob {\n    final num n = new num();\n    final Integer number = 1;\n}\nclass test implements blob {\n    public static void main ( String [] args ) {\n        n.x = 10; // 1\n        number++; //2\n    }\n}",options:["Error Runtime en línea 1","Compila con error en línea 1","Compila y corre bien","Error de compilador en línea 2"],correct:3},
-            {id:102,category:"Arrays",section:"code",question:"Selecciona una respuesta:",code:"int [] arr = new int[] { 1, 2, 3, 4};\nString [] arrstr = Arrays.toString(arr);\nfor (String s : arrstr)\n{\n    System.out.println(s);\n}",options:["Imprime 1,2,3,4","Error Runtime","Ninguno de los anteriores","Compila con error (Arrays.toString devuelve String, no String[])"],correct:3}
+            {id:102,category:"Arrays",section:"code",question:"Selecciona una respuesta:",code:"int [] arr = new int[] { 1, 2, 3, 4};\nString [] arrstr = Arrays.toString(arr);\nfor (String s : arrstr)\n{\n    System.out.println(s);\n}",options:["Imprime 1,2,3,4","Error Runtime","Ninguno de los anteriores","Compila con error (Arrays.toString devuelve String, no String[])"],correct:3},
+            
+            // ========== SECCIÓN CBI / BI (5 preguntas) ==========
+            {id:103,category:"Protección de Datos",section:"cbi",question:"Según la ley de protección de datos, ¿cuáles se consideran como personales y privados?",options:["Correo, nombre, domicilio","Edad, religión, teléfono","Domicilio, edad, teléfono","Teléfono, domicilio, correo electrónico"],correct:0},
+            {id:104,category:"Protección de Datos",section:"cbi",question:"Es correcto descargar la información que se tiene en reportes o procesos ETL donde se muestran los datos personales y sensibles, de acuerdo a la ley de protección de datos:",options:["VERDADERO","FALSO"],correct:1},
+            {id:105,category:"Protección de Datos",section:"cbi",question:"Es correcto compartir información de los reportes o tablas que consulto en las herramientas BI del banco:",options:["VERDADERO","FALSO"],correct:1},
+            {id:106,category:"Business Intelligence",section:"cbi",question:"El término 'Real Time Business Intelligence' está incorporado / dirigido a:",options:["EIS (Sistemas de información ejecutiva)","DSS (Sistemas de toma de decisiones)","Toma de decisiones operacionales","Todas las anteriores"],correct:3},
+            {id:107,category:"JackBe Presto",section:"cbi",question:"Una de las ventajas más importantes de la herramienta JackBe Presto, con respecto a otras herramientas...",options:["Se puede acceder desde el iPad","Combina una gran gama de colores y tipo de gráficos en sus tableros","Facilita el acceso a diversas fuentes de información (host, distribuido, windows)","Todas las anteriores"],correct:2},
+            
+            // ========== SECCIÓN SQL / BASES DE DATOS (10 preguntas) ==========
+            {id:108,category:"Tablas",section:"sql",question:"Si una tabla es tan grande que rebasa el tamaño máximo de un VSAM o el estándar de la instalación, entonces necesitamos:",options:["Ampliar el espacio","Generar una tabla espejo","Particionar","Darle un compress"],correct:2},
+            {id:109,category:"SQL",section:"sql",question:"¿Qué es SQL?",options:["Es un programa para extraer datos","Es un manejador de Base de datos","Es un lenguaje de manipulación de datos","Es una utilería de manipulación de datos"],correct:2},
+            {id:110,category:"Tablas",section:"sql",question:"Si una tabla es 7x24, al solicitar una modificación a la estructura de la misma, debemos solicitar:",options:["Un Estanding","Se realice en fin de semana","Ampliar el espacio","No se permite"],correct:0},
+            {id:111,category:"Tipos BD",section:"sql",question:"Tipo de Base de datos que establece una relación de arriba-abajo de los datos. Está basada en una relación uno a uno o uno a muchos:",options:["Jerárquica","Red (Network)","Relacional","Ninguna de las tres"],correct:0},
+            {id:112,category:"Tipos BD",section:"sql",question:"Tipo de Base de datos que es un modelo de almacenamiento en tablas, están compuestas de filas y columnas, y las relaciones son mantenidas a través de columnas comunes (CROSS REFERENCE):",options:["Jerárquica","Red (Network)","Relacional","Ninguna de las tres"],correct:2},
+            {id:113,category:"SQL",section:"sql",question:"Palabra reservada para extraer un registro entre un rango de datos:",options:["LIKE","IN","BETWEEN","HAVING"],correct:2},
+            {id:114,category:"SQL",section:"sql",question:"Instrucción para unir tablas:",options:["UNION","MERGE","JOIN","CONNECT"],correct:2},
+            {id:115,category:"SQL",section:"sql",question:"¿Qué es Storage Group?",options:["Un tipo de índice","Un conjunto de bases de datos","Una partición de tabla","Un tipo de constraint"],correct:1},
+            {id:116,category:"SQL",section:"sql",question:"¿Para qué sirve ORDER BY?",options:["Para filtrar registros","Para agrupar registros","Para ordenar los resultados","Para limitar registros"],correct:2},
+            {id:117,category:"SQL",section:"sql",question:"Instrucción para filtrar, que solo traiga un dato cuando tiene más datos similares:",options:["UNIQUE","DISTINCT","SINGLE","FIRST"],correct:1},
+            
+            // ========== SECCIÓN DIAGRAMAS DE FLUJO (8 preguntas) ==========
+            {id:118,category:"Reloj Digital",section:"diagram",question:"Diagrama de flujo que muestra el funcionamiento de un reloj digital, el cual escribe la hora cada segundo. ¿Cuál es el diagrama correcto?",diagramNote:"El diagrama debe: Inicializar H=0, M=0, S=0; Escribir H:M:S; Incrementar S; Si S=60 entonces S=0 y M=M+1; Si M=60 entonces M=0 y H=H+1; Si H=24 entonces H=0; Esperar 1 segundo; Repetir.",options:["Diagrama A - Verifica S=60 con NO arriba, SI abajo","Diagrama B - Verifica S=60 con SI arriba, NO abajo","Diagrama C - Verifica H=24 con SI arriba, NO abajo (invertido)","Diagrama D - Flujo correcto: NO a izquierda, SI continúa el reset"],correct:3},
+            {id:119,category:"Suma Tiempos",section:"diagram",question:"Diagrama de flujo para sumar dos tiempos (hh:mm:ss). ¿Cuál maneja correctamente el acarreo de segundos y minutos?",diagramNote:"Debe: Sumar segundos, si >60 restar 60 y sumar 1 a minutos; Sumar minutos, si >60 restar 60 y sumar 1 a horas; El acarreo debe usar ma=1 y ha=1 correctamente.",options:["Diagrama que usa ma=1 cuando suma_seg > 60","Diagrama que usa ma=59 como comparación","Diagrama que suma directamente sin verificar acarreo","Diagrama que usa ha=12 para el acarreo de horas"],correct:0},
+            {id:120,category:"Año Bisiesto",section:"diagram",question:"Un año es bisiesto si es múltiplo de 4, exceptuando los múltiplos de 100, que sólo son bisiestos cuando son múltiplos además de 400. ¿Cuál diagrama es correcto?",diagramNote:"Lógica correcta: Si (A MOD 4 = 0) Y ((A MOD 100 ≠ 0) O (A MOD 400 = 0)) entonces ES BISIESTO.",options:["Diagrama a) - Verifica MOD 4, luego MOD 100 hacia NO, luego MOD 400","Diagrama b) - Verifica MOD 4, MOD 100 hacia SI, MOD 400 hacia SI = bisiesto","Diagrama c) - MOD 4=NO va a 'es bisiesto' (INCORRECTO)","Diagrama b) es el correcto - flujo: MOD4→SI→MOD100→SI→MOD400→SI=bisiesto, MOD100→NO=bisiesto"],correct:1},
+            {id:121,category:"Días Transcurridos",section:"diagram",question:"Diagrama para calcular los días transcurridos en el año dada una fecha. ¿Cuál considera correctamente los años bisiestos y los días por mes?",diagramNote:"Debe verificar año bisiesto (febrero=29 o 28), considerar meses de 30 días (abril, junio, sept, nov) y meses de 31 días.",options:["Diagrama que solo suma 30 días por mes","Diagrama que verifica año%4=0, año%100=0, año%400=0 para bisiesto y diferencia días por mes","Diagrama que no considera febrero como caso especial","Diagrama que usa 28 días fijos para febrero"],correct:1},
+            {id:122,category:"Lista Ordenada",section:"diagram",question:"Diagrama de flujo que determina si una lista está ordenada de manera ascendente o descendente. ¿Cuál es el correcto?",diagramNote:"Debe comparar Lista[i] con Lista[i+1] para todos los elementos, determinando si todos cumplen < (ascendente), > (descendente), o ninguno (no ordenada).",options:["Diagrama A - Compara Lista[i] > Lista[i+1], si todos NO = ascendente, si todos SI = descendente","Diagrama B - Lógica invertida en las comparaciones finales","Diagrama C - Solo detecta ascendente, no descendente","Diagrama A es correcto - detecta ambos casos y 'no ordenada'"],correct:0},
+            {id:123,category:"Separador Miles",section:"diagram",question:"Diagrama 100: Cadena números y separación de miles. El diagrama imprime los dígitos de un número agregando comas cada 3 dígitos. ¿Cuál es la lógica correcta?",diagramNote:"Usa contador y=0, incrementa con cada dígito impreso, cuando y=3 imprime coma y reinicia y=0.",options:["Imprime coma cuando y < 3","Imprime coma cuando y = 3, luego y = 0","Imprime coma después de cada dígito","No usa contador, imprime coma fija"],correct:1},
+            {id:124,category:"Suma Pares Impares",section:"diagram",question:"Diagrama que lee N números y calcula la suma de los pares e impares por separado. ¿Cuál usa correctamente R = A mod 2?",diagramNote:"Si R=0 entonces es PAR (suma a P), si R≠0 entonces es IMPAR (suma a S).",options:["Diagrama a) - R = A mod 2, si R=0 entonces P=P+A (correcto para pares)","Diagrama b) - R = A mod 2, si R=0 entonces P=P+S (incorrecto)","Diagrama c) - R = A mod N (incorrecto, debería ser mod 2)","Diagrama a) es correcto - separa correctamente pares e impares"],correct:0},
+            {id:125,category:"Archivos",section:"diagram",question:"Diagrama para actualizar y generar archivos de SALDOS con PAGOS. Cuando SALDOS = PAGOS (mismo número de cuenta), ¿qué operación se realiza?",diagramNote:"Compara número de cuenta de SALDOS vs PAGOS: Si >, error pago a cuenta inexistente; Si =, actualiza saldo; Si <, guarda registro sin cambios.",options:["ERROR - Pago a una cuenta inexistente","Saldo = Saldo - Importe_pago, Fecha = Fecha de último pago","Guardar registros sin modificar","Leer siguiente registro de PAGOS únicamente"],correct:1}
         ];
 
         // State
@@ -826,95 +889,80 @@
         let answerResults = {};
         let correctCount = 0;
         let incorrectCount = 0;
-        let selectedCategories = new Set();
+        let selectedSections = new Set();
 
-        const categories = [...new Set(allQuestions.map(q => q.category))];
+        const sections = {
+            'theory': { name: '📖 Teoría Java', count: 57 },
+            'code': { name: '💻 Análisis de Código', count: 45 },
+            'cbi': { name: '📊 CBI / BI', count: 5 },
+            'sql': { name: '🗄️ SQL / Bases de Datos', count: 10 },
+            'diagram': { name: '📐 Diagramas de Flujo', count: 8 }
+        };
 
         function init() {
-            renderCategories();
+            renderSections();
         }
 
-        function renderCategories() {
+        function renderSections() {
             const grid = document.getElementById('categoryGrid');
-            const categoryCount = {};
             
-            allQuestions.forEach(q => {
-                categoryCount[q.category] = (categoryCount[q.category] || 0) + 1;
-            });
-
             grid.innerHTML = `
-                <div class="category-chip selected" onclick="toggleAllCategories(this)" data-category="all">
-                    <div class="category-chip-name">📚 Todas las categorías</div>
-                    <div class="category-chip-count">${allQuestions.length} preguntas</div>
-                </div>
-                <div class="category-chip selected" onclick="toggleSection('theory', this)" data-section="theory">
-                    <div class="category-chip-name">📖 Solo Teoría</div>
-                    <div class="category-chip-count">57 preguntas</div>
-                </div>
-                <div class="category-chip selected" onclick="toggleSection('code', this)" data-section="code">
-                    <div class="category-chip-name">💻 Solo Código</div>
-                    <div class="category-chip-count">45 preguntas</div>
+                <div class="category-chip selected" onclick="toggleAllSections(this)" data-section="all">
+                    <div class="category-chip-name">📚 Todas las secciones</div>
+                    <div class="category-chip-count">125 preguntas</div>
                 </div>
             `;
 
-            categories.forEach(cat => {
+            Object.entries(sections).forEach(([key, value]) => {
                 grid.innerHTML += `
-                    <div class="category-chip" onclick="toggleCategory('${cat}', this)">
-                        <div class="category-chip-name">${cat}</div>
-                        <div class="category-chip-count">${categoryCount[cat]} preg.</div>
+                    <div class="category-chip selected" onclick="toggleSection('${key}', this)" data-section="${key}">
+                        <div class="category-chip-name">${value.name}</div>
+                        <div class="category-chip-count">${value.count} preguntas</div>
                     </div>
                 `;
             });
 
-            selectedCategories = new Set(categories);
+            selectedSections = new Set(Object.keys(sections));
         }
 
-        function toggleAllCategories(element) {
+        function toggleAllSections(element) {
             const allChips = document.querySelectorAll('.category-chip');
             if (element.classList.contains('selected')) {
                 allChips.forEach(chip => chip.classList.remove('selected'));
-                selectedCategories.clear();
+                selectedSections.clear();
             } else {
                 allChips.forEach(chip => chip.classList.add('selected'));
-                selectedCategories = new Set(categories);
+                selectedSections = new Set(Object.keys(sections));
             }
         }
 
         function toggleSection(section, element) {
-            const allChips = document.querySelectorAll('.category-chip');
-            allChips.forEach(chip => chip.classList.remove('selected'));
-            element.classList.add('selected');
+            document.querySelector('[data-section="all"]').classList.remove('selected');
             
-            selectedCategories.clear();
-            allQuestions.filter(q => q.section === section).forEach(q => {
-                selectedCategories.add(q.category);
-            });
-        }
-
-        function toggleCategory(category, element) {
-            document.querySelector('[data-category="all"]').classList.remove('selected');
-            document.querySelector('[data-section="theory"]').classList.remove('selected');
-            document.querySelector('[data-section="code"]').classList.remove('selected');
-            
-            if (selectedCategories.has(category)) {
-                selectedCategories.delete(category);
+            if (selectedSections.has(section)) {
+                selectedSections.delete(section);
                 element.classList.remove('selected');
             } else {
-                selectedCategories.add(category);
+                selectedSections.add(section);
                 element.classList.add('selected');
+            }
+            
+            // Check if all are selected
+            if (selectedSections.size === Object.keys(sections).length) {
+                document.querySelector('[data-section="all"]').classList.add('selected');
             }
         }
 
         function startExam() {
-            if (selectedCategories.size === 0) {
-                alert('Por favor selecciona al menos una categoría');
+            if (selectedSections.size === 0) {
+                alert('Por favor selecciona al menos una sección');
                 return;
             }
 
-            let limit = parseInt(document.getElementById('questionLimit').value) || 102;
-            limit = Math.max(10, Math.min(102, limit));
+            let limit = parseInt(document.getElementById('questionLimit').value) || 125;
+            limit = Math.max(10, Math.min(125, limit));
 
-            let filteredQuestions = allQuestions.filter(q => selectedCategories.has(q.category));
+            let filteredQuestions = allQuestions.filter(q => selectedSections.has(q.section));
             filteredQuestions = shuffleArray(filteredQuestions);
             questions = filteredQuestions.slice(0, limit);
             
@@ -985,18 +1033,23 @@
             document.getElementById('questionCategory').textContent = question.category;
             
             const sectionBadge = document.getElementById('sectionBadge');
-            if (question.section === 'theory') {
-                sectionBadge.textContent = 'Teoría';
-                sectionBadge.className = 'section-badge theory';
-            } else {
-                sectionBadge.textContent = 'Código';
-                sectionBadge.className = 'section-badge code';
-            }
+            const sectionLabels = {
+                'theory': 'Teoría',
+                'code': 'Código', 
+                'cbi': 'CBI',
+                'sql': 'SQL',
+                'diagram': 'Diagrama'
+            };
+            sectionBadge.textContent = sectionLabels[question.section] || question.section;
+            sectionBadge.className = `section-badge ${question.section}`;
             
-            // Render question with optional code block
+            // Render question with optional code block and diagram note
             let questionHTML = `<p class="question-text">${question.question}</p>`;
             if (question.code) {
                 questionHTML += `<pre class="code-block">${escapeHtml(question.code)}</pre>`;
+            }
+            if (question.diagramNote) {
+                questionHTML += `<div class="diagram-note"><strong>📌 Nota del diagrama:</strong> ${question.diagramNote}</div>`;
             }
             document.getElementById('questionContent').innerHTML = questionHTML;
             
@@ -1142,6 +1195,13 @@
 
             const container = document.getElementById('reviewContainer');
             const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            const sectionLabels = {
+                'theory': 'Teoría',
+                'code': 'Código', 
+                'cbi': 'CBI',
+                'sql': 'SQL',
+                'diagram': 'Diagrama'
+            };
             
             container.innerHTML = questions.map((question, qIndex) => {
                 const userAnswer = userAnswers[qIndex];
@@ -1152,13 +1212,16 @@
                 if (question.code) {
                     questionContent += `<pre class="code-block">${escapeHtml(question.code)}</pre>`;
                 }
+                if (question.diagramNote) {
+                    questionContent += `<div class="diagram-note"><strong>📌 Nota:</strong> ${question.diagramNote}</div>`;
+                }
 
                 return `
                     <div class="question-card fade-in" style="animation-delay: ${qIndex * 0.02}s">
                         <div class="question-header">
                             <span class="question-number">Pregunta ${qIndex + 1}</span>
                             <span class="question-category">${question.category}</span>
-                            <span class="section-badge ${question.section}">${question.section === 'theory' ? 'Teoría' : 'Código'}</span>
+                            <span class="section-badge ${question.section}">${sectionLabels[question.section]}</span>
                             <span style="margin-left: auto; font-size: 1.5rem;">
                                 ${isUnanswered ? '⚠️' : (isCorrect ? '✅' : '❌')}
                             </span>
@@ -1208,7 +1271,7 @@
             correctCount = 0;
             incorrectCount = 0;
             
-            renderCategories();
+            renderSections();
         }
 
         init();
