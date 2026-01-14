@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         :root {
             --bg-primary: #0d1117;
@@ -54,7 +55,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 2rem;
             position: relative;
@@ -227,6 +228,56 @@
             overflow-x: auto;
             white-space: pre-wrap;
             color: #c9d1d9;
+        }
+
+        .diagram-container {
+            background: #1a1f2e;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .diagram-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .diagram-option {
+            background: #151922;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .diagram-option:hover {
+            border-color: var(--accent-pink);
+        }
+
+        .diagram-option h4 {
+            color: var(--accent-pink);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .diagram-option.correct-diagram {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .diagram-option.incorrect-diagram {
+            border-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
         }
 
         .options-list { display: flex; flex-direction: column; gap: 0.8rem; }
@@ -522,6 +573,7 @@
             .navigation { flex-direction: column; }
             .btn { width: 100%; justify-content: center; }
             .code-block { font-size: 0.75rem; }
+            .diagram-grid { grid-template-columns: 1fr; }
         }
 
         .hidden { display: none !important; }
@@ -558,21 +610,6 @@
         .section-badge.cbi { background: var(--accent-cyan); color: white; }
         .section-badge.sql { background: var(--accent-green); color: white; }
         .section-badge.diagram { background: var(--accent-pink); color: white; }
-
-        .diagram-note {
-            background: rgba(236, 72, 153, 0.1);
-            border: 1px solid var(--accent-pink);
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 1rem 0;
-            font-size: 0.9rem;
-            color: var(--accent-pink);
-        }
-
-        .diagram-note strong {
-            display: block;
-            margin-bottom: 0.5rem;
-        }
     </style>
 </head>
 <body>
@@ -744,6 +781,295 @@
     </div>
 
     <script>
+        // Initialize Mermaid
+        mermaid.initialize({ 
+            startOnLoad: false,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#f0f6fc',
+                primaryBorderColor: '#30363d',
+                lineColor: '#8b949e',
+                secondaryColor: '#21262d',
+                tertiaryColor: '#161b22',
+                background: '#0d1117',
+                mainBkg: '#21262d',
+                nodeBorder: '#30363d',
+                clusterBkg: '#161b22',
+                titleColor: '#f0f6fc',
+                edgeLabelBackground: '#21262d'
+            },
+            flowchart: {
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        // Diagram definitions for flowchart questions
+        const diagramDefinitions = {
+            // Question 118 - Digital Clock
+            clock_A: `flowchart TD
+    A([Inicio]) --> B[H=0]
+    B --> C[M=0]
+    C --> D[S=0]
+    D --> E[/Escribir H:M:S/]
+    E --> F[S=S+1]
+    F --> G{S=60?}
+    G -->|NO| H{M=60?}
+    G -->|SI| I[S=0]
+    I --> J[M=M+1]
+    J --> H
+    H -->|NO| K{H=24?}
+    H -->|SI| L[M=0]
+    L --> M[H=H+1]
+    M --> K
+    K -->|NO| N[Esperar 1 seg]
+    K -->|SI| O[H=0]
+    O --> N
+    N --> E`,
+            clock_B: `flowchart TD
+    A([Inicio]) --> B[H=0]
+    B --> C[M=0]
+    C --> D[S=0]
+    D --> E[/Escribir H:M:S/]
+    E --> F[S=S+1]
+    F --> G{S=60?}
+    G -->|SI| H{M=60?}
+    G -->|NO| I[S=0]
+    I --> J[M=M+1]
+    J --> H
+    H --> K[Esperar 1 seg]
+    K --> E`,
+            clock_C: `flowchart TD
+    A([Inicio]) --> B[H=0]
+    B --> C[M=0]
+    C --> D[S=0]
+    D --> E[/Escribir H:M:S/]
+    E --> F[S=S+1]
+    F --> G{S=60?}
+    G -->|NO| H[S=0]
+    G -->|SI| I[Esperar 1 seg]
+    H --> J[M=M+1]
+    J --> K{H=24?}
+    K -->|SI| L[H=0]
+    K -->|NO| I
+    L --> I
+    I --> E`,
+            clock_D: `flowchart TD
+    A([Inicio]) --> B[H=0]
+    B --> C[M=0]
+    C --> D[S=0]
+    D --> E[/Escribir H:M:S/]
+    E --> F[S=S+1]
+    F --> G{S=60?}
+    G -->|NO| N[Esperar 1 seg]
+    G -->|SI| I[S=0]
+    I --> J[M=M+1]
+    J --> H{M=60?}
+    H -->|NO| N
+    H -->|SI| L[M=0]
+    L --> M[H=H+1]
+    M --> K{H=24?}
+    K -->|NO| N
+    K -->|SI| O[H=0]
+    O --> N
+    N --> E`,
+
+            // Question 119 - Sum Times
+            sumtime_A: `flowchart TD
+    A([Inicio]) --> B[h1,h2 = hh:mm:ss]
+    B --> C[ma=0, ha=0]
+    C --> D[suma_seg = ss1+ss2]
+    D --> E{suma_seg > 60?}
+    E -->|SI| F[suma_seg = suma_seg-60]
+    F --> G[ma = 1]
+    G --> H[suma_min = mm1+mm2+ma]
+    E -->|NO| H
+    H --> I{suma_min > 60?}
+    I -->|SI| J[suma_min = suma_min-60]
+    J --> K[ha = 1]
+    K --> L[suma_hr = hh1+hh2+ha]
+    I -->|NO| L
+    L --> M[/Imprimir resultado/]
+    M --> N([Fin])`,
+            sumtime_B: `flowchart TD
+    A([Inicio]) --> B[h1,h2 = hh:mm:ss]
+    B --> C[suma_seg = ss1+ss2]
+    C --> D{suma_seg > 59?}
+    D -->|SI| E[suma_seg = suma_seg-60]
+    E --> F[ma = 59]
+    D -->|NO| G[suma_min = mm1+mm2]
+    F --> G
+    G --> H[/Imprimir resultado/]
+    H --> I([Fin])`,
+            sumtime_C: `flowchart TD
+    A([Inicio]) --> B[h1,h2 = hh:mm:ss]
+    B --> C[suma_seg = ss1+ss2]
+    C --> D[suma_min = mm1+mm2]
+    D --> E[suma_hr = hh1+hh2]
+    E --> F[/Imprimir resultado/]
+    F --> G([Fin])`,
+
+            // Question 120 - Leap Year
+            leap_A: `flowchart TD
+    A([Inicio]) --> B[/Leer A/]
+    B --> C{A MOD 4 = 0?}
+    C -->|NO| D[/A no es bisiesto/]
+    C -->|SI| E{A MOD 100 = 0?}
+    E -->|NO| F[/A es bisiesto/]
+    E -->|SI| G{A MOD 400 = 0?}
+    G -->|SI| F
+    G -->|NO| D
+    D --> H([Fin])
+    F --> H`,
+            leap_B: `flowchart TD
+    A([Inicio]) --> B[/Leer A/]
+    B --> C{A MOD 4 = 0?}
+    C -->|NO| D[/A no es bisiesto/]
+    C -->|SI| E{A MOD 100 = 0?}
+    E -->|SI| F{A MOD 400 = 0?}
+    F -->|SI| G[/A es bisiesto/]
+    F -->|NO| D
+    E -->|NO| G
+    D --> H([Fin])
+    G --> H`,
+            leap_C: `flowchart TD
+    A([Inicio]) --> B[/Leer A/]
+    B --> C{A MOD 4 = 0?}
+    C -->|NO| D[/A es bisiesto/]
+    C -->|SI| E{A MOD 100 = 0?}
+    E -->|NO| F[/A no es bisiesto/]
+    E -->|SI| D
+    D --> G([Fin])
+    F --> G`,
+
+            // Question 121 - Days Elapsed
+            days_A: `flowchart TD
+    A([Inicio]) --> B[/Leer fecha aaaa/mm/dd/]
+    B --> C[n=1, Diat=0]
+    C --> D{año%4=0?}
+    D -->|SI| E{año%100=0 AND año%400=0?}
+    E -->|SI| F[Año bisiesto]
+    E -->|NO| G[Año normal]
+    D -->|NO| G
+    F --> H{n < mes?}
+    G --> I{n < mes?}
+    H -->|SI| J{mes=2?}
+    I -->|SI| K{mes=2?}
+    J -->|SI| L[Diat=Diat+29]
+    J -->|NO| M[Evaluar días del mes]
+    K -->|SI| N[Diat=Diat+28]
+    K -->|NO| M
+    L --> O[n=n+1]
+    N --> O
+    M --> O
+    O --> H
+    H -->|NO| P[Diat=Diat+dia]
+    I -->|NO| P
+    P --> Q[/Imprimir Diat/]
+    Q --> R([Fin])`,
+            days_B: `flowchart TD
+    A([Inicio]) --> B[/Leer fecha/]
+    B --> C[Diat = mes * 30 + dia]
+    C --> D[/Imprimir Diat/]
+    D --> E([Fin])`,
+
+            // Question 122 - Sorted List
+            sorted_A: `flowchart TD
+    A([Inicio]) --> B[Lista vacia, n=0, i=0]
+    B --> C[n=n+1]
+    C --> D[/Leer Lista n/]
+    D --> E{Agregar más?}
+    E -->|SI| C
+    E -->|NO| F{Lista vacía?}
+    F -->|SI| G[/Sin números/]
+    F -->|NO| H[i=Lista.length]
+    H --> I{Lista i > Lista i+1?}
+    I -->|NO| J[i++]
+    J --> K{i=Lista.length?}
+    K -->|NO| I
+    K -->|SI| L{Lista i < Lista i+1?}
+    L -->|NO| M[/No ordenada/]
+    L -->|SI| N[/Ascendente/]
+    I -->|SI| O{todos >?}
+    O -->|SI| P[/Descendente/]
+    O -->|NO| M
+    G --> Q([Fin])
+    M --> Q
+    N --> Q
+    P --> Q`,
+            sorted_B: `flowchart TD
+    A([Inicio]) --> B[Lista, n=0]
+    B --> C[/Leer elementos/]
+    C --> D{Lista i > Lista i+1?}
+    D -->|SI| E[/Ascendente/]
+    D -->|NO| F[/Descendente/]
+    E --> G([Fin])
+    F --> G`,
+
+            // Question 123 - Thousands Separator
+            separator: `flowchart TD
+    A([Inicio]) --> B[y=0, n=0]
+    B --> C[/Dame número = Cadena/]
+    C --> D[n = Long cadena]
+    D --> E[/Imprime cadena n/]
+    E --> F[y=y+1]
+    F --> G[n=n-1]
+    G --> H{n < 1?}
+    H -->|SI| I([Fin])
+    H -->|NO| J{y < 3?}
+    J -->|SI| E
+    J -->|NO| K[/Imprime coma/]
+    K --> L[y=0]
+    L --> E`,
+
+            // Question 124 - Even/Odd Sum
+            evenodd_A: `flowchart TD
+    A([Inicio]) --> B[S=0, P=0, R=0]
+    B --> C[/Leer N/]
+    C --> D[/Leer A/]
+    D --> E[R = A mod 2]
+    E --> F{R = 0?}
+    F -->|SI| G[P = P + A]
+    F -->|NO| H[S = S + A]
+    G --> I[N = N - 1]
+    H --> I
+    I --> J{N = 0?}
+    J -->|NO| D
+    J -->|SI| K[/Escribir S, P/]
+    K --> L([Fin])`,
+            evenodd_B: `flowchart TD
+    A([Inicio]) --> B[S=0, P=1, R=0]
+    B --> C[/Leer N/]
+    C --> D[/Leer A/]
+    D --> E[R = A mod 2]
+    E --> F{R = 0?}
+    F -->|SI| G[P = P + S]
+    F -->|NO| H[S = S + P]
+    G --> I([Fin])
+    H --> I`,
+
+            // Question 125 - File Update
+            files_correct: `flowchart TD
+    A([Inicio]) --> B[Abrir SALDOS, PAGOS]
+    B --> C[/Leer SALDOS/]
+    C --> D[/Leer PAGOS/]
+    D --> E{EOF SALDOS y PAGOS?}
+    E -->|SI| F([Fin])
+    E -->|NO| G{SALDOS vs PAGOS?}
+    G -->|>| H[ERROR: Pago cuenta inexistente]
+    G -->|=| I[Saldo = Saldo - Importe]
+    G -->|<| J[Guardar sin cambios]
+    I --> K[Fecha = Fecha último pago]
+    H --> L[/Leer PAGOS/]
+    K --> M[Guardar en ACTUALIZADOS]
+    J --> N[/Leer SALDOS/]
+    M --> O[/Leer SALDOS y PAGOS/]
+    L --> E
+    N --> E
+    O --> E`
+        };
+
         // Complete Question Database - 125 questions
         const allQuestions = [
             // ========== SECCIÓN TEORÍA JAVA (57 preguntas) ==========
@@ -872,14 +1198,63 @@
             {id:117,category:"SQL",section:"sql",question:"Instrucción para filtrar, que solo traiga un dato cuando tiene más datos similares:",options:["UNIQUE","DISTINCT","SINGLE","FIRST"],correct:1},
             
             // ========== SECCIÓN DIAGRAMAS DE FLUJO (8 preguntas) ==========
-            {id:118,category:"Reloj Digital",section:"diagram",question:"Diagrama de flujo que muestra el funcionamiento de un reloj digital, el cual escribe la hora cada segundo. ¿Cuál es el diagrama correcto?",diagramNote:"El diagrama debe: Inicializar H=0, M=0, S=0; Escribir H:M:S; Incrementar S; Si S=60 entonces S=0 y M=M+1; Si M=60 entonces M=0 y H=H+1; Si H=24 entonces H=0; Esperar 1 segundo; Repetir.",options:["Diagrama A - Verifica S=60 con NO arriba, SI abajo","Diagrama B - Verifica S=60 con SI arriba, NO abajo","Diagrama C - Verifica H=24 con SI arriba, NO abajo (invertido)","Diagrama D - Flujo correcto: NO a izquierda, SI continúa el reset"],correct:3},
-            {id:119,category:"Suma Tiempos",section:"diagram",question:"Diagrama de flujo para sumar dos tiempos (hh:mm:ss). ¿Cuál maneja correctamente el acarreo de segundos y minutos?",diagramNote:"Debe: Sumar segundos, si >60 restar 60 y sumar 1 a minutos; Sumar minutos, si >60 restar 60 y sumar 1 a horas; El acarreo debe usar ma=1 y ha=1 correctamente.",options:["Diagrama que usa ma=1 cuando suma_seg > 60","Diagrama que usa ma=59 como comparación","Diagrama que suma directamente sin verificar acarreo","Diagrama que usa ha=12 para el acarreo de horas"],correct:0},
-            {id:120,category:"Año Bisiesto",section:"diagram",question:"Un año es bisiesto si es múltiplo de 4, exceptuando los múltiplos de 100, que sólo son bisiestos cuando son múltiplos además de 400. ¿Cuál diagrama es correcto?",diagramNote:"Lógica correcta: Si (A MOD 4 = 0) Y ((A MOD 100 ≠ 0) O (A MOD 400 = 0)) entonces ES BISIESTO.",options:["Diagrama a) - Verifica MOD 4, luego MOD 100 hacia NO, luego MOD 400","Diagrama b) - Verifica MOD 4, MOD 100 hacia SI, MOD 400 hacia SI = bisiesto","Diagrama c) - MOD 4=NO va a 'es bisiesto' (INCORRECTO)","Diagrama b) es el correcto - flujo: MOD4→SI→MOD100→SI→MOD400→SI=bisiesto, MOD100→NO=bisiesto"],correct:1},
-            {id:121,category:"Días Transcurridos",section:"diagram",question:"Diagrama para calcular los días transcurridos en el año dada una fecha. ¿Cuál considera correctamente los años bisiestos y los días por mes?",diagramNote:"Debe verificar año bisiesto (febrero=29 o 28), considerar meses de 30 días (abril, junio, sept, nov) y meses de 31 días.",options:["Diagrama que solo suma 30 días por mes","Diagrama que verifica año%4=0, año%100=0, año%400=0 para bisiesto y diferencia días por mes","Diagrama que no considera febrero como caso especial","Diagrama que usa 28 días fijos para febrero"],correct:1},
-            {id:122,category:"Lista Ordenada",section:"diagram",question:"Diagrama de flujo que determina si una lista está ordenada de manera ascendente o descendente. ¿Cuál es el correcto?",diagramNote:"Debe comparar Lista[i] con Lista[i+1] para todos los elementos, determinando si todos cumplen < (ascendente), > (descendente), o ninguno (no ordenada).",options:["Diagrama A - Compara Lista[i] > Lista[i+1], si todos NO = ascendente, si todos SI = descendente","Diagrama B - Lógica invertida en las comparaciones finales","Diagrama C - Solo detecta ascendente, no descendente","Diagrama A es correcto - detecta ambos casos y 'no ordenada'"],correct:0},
-            {id:123,category:"Separador Miles",section:"diagram",question:"Diagrama 100: Cadena números y separación de miles. El diagrama imprime los dígitos de un número agregando comas cada 3 dígitos. ¿Cuál es la lógica correcta?",diagramNote:"Usa contador y=0, incrementa con cada dígito impreso, cuando y=3 imprime coma y reinicia y=0.",options:["Imprime coma cuando y < 3","Imprime coma cuando y = 3, luego y = 0","Imprime coma después de cada dígito","No usa contador, imprime coma fija"],correct:1},
-            {id:124,category:"Suma Pares Impares",section:"diagram",question:"Diagrama que lee N números y calcula la suma de los pares e impares por separado. ¿Cuál usa correctamente R = A mod 2?",diagramNote:"Si R=0 entonces es PAR (suma a P), si R≠0 entonces es IMPAR (suma a S).",options:["Diagrama a) - R = A mod 2, si R=0 entonces P=P+A (correcto para pares)","Diagrama b) - R = A mod 2, si R=0 entonces P=P+S (incorrecto)","Diagrama c) - R = A mod N (incorrecto, debería ser mod 2)","Diagrama a) es correcto - separa correctamente pares e impares"],correct:0},
-            {id:125,category:"Archivos",section:"diagram",question:"Diagrama para actualizar y generar archivos de SALDOS con PAGOS. Cuando SALDOS = PAGOS (mismo número de cuenta), ¿qué operación se realiza?",diagramNote:"Compara número de cuenta de SALDOS vs PAGOS: Si >, error pago a cuenta inexistente; Si =, actualiza saldo; Si <, guarda registro sin cambios.",options:["ERROR - Pago a una cuenta inexistente","Saldo = Saldo - Importe_pago, Fecha = Fecha de último pago","Guardar registros sin modificar","Leer siguiente registro de PAGOS únicamente"],correct:1}
+            {id:118,category:"Reloj Digital",section:"diagram",question:"Diagrama de flujo que muestra el funcionamiento de un reloj digital, el cual escribe la hora cada segundo. ¿Cuál es el diagrama correcto?",
+                diagrams: [
+                    {label: "Diagrama A", key: "clock_A"},
+                    {label: "Diagrama B", key: "clock_B"},
+                    {label: "Diagrama C", key: "clock_C"},
+                    {label: "Diagrama D", key: "clock_D"}
+                ],
+                options:["Diagrama A","Diagrama B","Diagrama C","Diagrama D - Flujo correcto con manejo de acarreo"],correct:3},
+            
+            {id:119,category:"Suma Tiempos",section:"diagram",question:"Diagrama de flujo para sumar dos tiempos (hh:mm:ss). ¿Cuál maneja correctamente el acarreo de segundos y minutos?",
+                diagrams: [
+                    {label: "Diagrama A - ma=1 cuando >60", key: "sumtime_A"},
+                    {label: "Diagrama B - ma=59", key: "sumtime_B"},
+                    {label: "Diagrama C - Sin acarreo", key: "sumtime_C"}
+                ],
+                options:["Diagrama A - Usa ma=1 cuando suma_seg > 60 (correcto)","Diagrama B - Usa ma=59 como comparación","Diagrama C - Suma directamente sin verificar acarreo"],correct:0},
+            
+            {id:120,category:"Año Bisiesto",section:"diagram",question:"Un año es bisiesto si es múltiplo de 4, exceptuando los múltiplos de 100, que sólo son bisiestos cuando son múltiplos además de 400. ¿Cuál diagrama es correcto?",
+                diagrams: [
+                    {label: "Diagrama A", key: "leap_A"},
+                    {label: "Diagrama B", key: "leap_B"},
+                    {label: "Diagrama C (incorrecto)", key: "leap_C"}
+                ],
+                options:["Diagrama A - MOD4→SI, MOD100→NO = bisiesto","Diagrama B - MOD4→SI, MOD100→SI, MOD400→SI = bisiesto (correcto)","Diagrama C - Lógica invertida (incorrecto)"],correct:1},
+            
+            {id:121,category:"Días Transcurridos",section:"diagram",question:"Diagrama para calcular los días transcurridos en el año dada una fecha. ¿Cuál considera correctamente los años bisiestos y los días por mes?",
+                diagrams: [
+                    {label: "Diagrama Completo", key: "days_A"},
+                    {label: "Diagrama Simple", key: "days_B"}
+                ],
+                options:["Diagrama completo - Verifica bisiesto y días por mes (correcto)","Diagrama simple - Solo multiplica mes × 30 (incorrecto)"],correct:0},
+            
+            {id:122,category:"Lista Ordenada",section:"diagram",question:"Diagrama de flujo que determina si una lista está ordenada de manera ascendente o descendente. ¿Cuál es el correcto?",
+                diagrams: [
+                    {label: "Diagrama A - Detecta ambos", key: "sorted_A"},
+                    {label: "Diagrama B - Solo uno", key: "sorted_B"}
+                ],
+                options:["Diagrama A - Detecta ascendente, descendente y no ordenada (correcto)","Diagrama B - Lógica simplificada que no detecta todos los casos"],correct:0},
+            
+            {id:123,category:"Separador Miles",section:"diagram",question:"Diagrama 100: Cadena números y separación de miles. El diagrama imprime los dígitos de un número agregando comas cada 3 dígitos. ¿Cuál es la lógica correcta?",
+                diagrams: [
+                    {label: "Diagrama Separador", key: "separator"}
+                ],
+                options:["Imprime coma cuando y < 3","Imprime coma cuando y = 3, luego y = 0 (correcto)","Imprime coma después de cada dígito","No usa contador, imprime coma fija"],correct:1},
+            
+            {id:124,category:"Suma Pares Impares",section:"diagram",question:"Diagrama que lee N números y calcula la suma de los pares e impares por separado. ¿Cuál usa correctamente R = A mod 2?",
+                diagrams: [
+                    {label: "Diagrama A - R=0 → Par", key: "evenodd_A"},
+                    {label: "Diagrama B - Incorrecto", key: "evenodd_B"}
+                ],
+                options:["Diagrama A - R=A mod 2, si R=0 entonces P=P+A (correcto)","Diagrama B - R=A mod 2, si R=0 entonces P=P+S (incorrecto)"],correct:0},
+            
+            {id:125,category:"Archivos",section:"diagram",question:"Diagrama para actualizar y generar archivos de SALDOS con PAGOS. Cuando SALDOS = PAGOS (mismo número de cuenta), ¿qué operación se realiza?",
+                diagrams: [
+                    {label: "Diagrama Actualización", key: "files_correct"}
+                ],
+                options:["ERROR - Pago a una cuenta inexistente","Saldo = Saldo - Importe_pago, Fecha = Fecha de último pago (correcto)","Guardar registros sin modificar","Leer siguiente registro de PAGOS únicamente"],correct:1}
         ];
 
         // State
@@ -947,7 +1322,6 @@
                 element.classList.add('selected');
             }
             
-            // Check if all are selected
             if (selectedSections.size === Object.keys(sections).length) {
                 document.querySelector('[data-section="all"]').classList.add('selected');
             }
@@ -1022,7 +1396,7 @@
             document.getElementById('progressBar').style.width = `${progress}%`;
         }
 
-        function renderQuestion() {
+        async function renderQuestion() {
             const question = questions[currentQuestionIndex];
             const isAnswered = userAnswers[currentQuestionIndex] !== undefined;
             const userAnswer = userAnswers[currentQuestionIndex];
@@ -1043,15 +1417,35 @@
             sectionBadge.textContent = sectionLabels[question.section] || question.section;
             sectionBadge.className = `section-badge ${question.section}`;
             
-            // Render question with optional code block and diagram note
+            // Render question with optional code block and diagrams
             let questionHTML = `<p class="question-text">${question.question}</p>`;
             if (question.code) {
                 questionHTML += `<pre class="code-block">${escapeHtml(question.code)}</pre>`;
             }
-            if (question.diagramNote) {
-                questionHTML += `<div class="diagram-note"><strong>📌 Nota del diagrama:</strong> ${question.diagramNote}</div>`;
+            
+            // Render Mermaid diagrams for diagram questions
+            if (question.diagrams && question.diagrams.length > 0) {
+                questionHTML += `<div class="diagram-grid">`;
+                question.diagrams.forEach((diagram, idx) => {
+                    const diagramDef = diagramDefinitions[diagram.key];
+                    if (diagramDef) {
+                        questionHTML += `
+                            <div class="diagram-option" id="diagram-${currentQuestionIndex}-${idx}">
+                                <h4>${diagram.label}</h4>
+                                <div class="mermaid" id="mermaid-${currentQuestionIndex}-${idx}">${diagramDef}</div>
+                            </div>
+                        `;
+                    }
+                });
+                questionHTML += `</div>`;
             }
+            
             document.getElementById('questionContent').innerHTML = questionHTML;
+            
+            // Re-render mermaid diagrams
+            if (question.diagrams && question.diagrams.length > 0) {
+                await mermaid.run();
+            }
             
             const questionCard = document.getElementById('questionCard');
             questionCard.classList.remove('answered-correct', 'answered-incorrect');
@@ -1189,7 +1583,7 @@
             document.getElementById('gradeText').textContent = `${gradeEmoji} ${gradeText}`;
         }
 
-        function reviewAnswers() {
+        async function reviewAnswers() {
             document.getElementById('resultsScreen').classList.add('hidden');
             document.getElementById('reviewScreen').classList.remove('hidden');
 
@@ -1203,7 +1597,9 @@
                 'diagram': 'Diagrama'
             };
             
-            container.innerHTML = questions.map((question, qIndex) => {
+            let reviewHTML = '';
+            
+            questions.forEach((question, qIndex) => {
                 const userAnswer = userAnswers[qIndex];
                 const isCorrect = answerResults[qIndex];
                 const isUnanswered = userAnswer === undefined;
@@ -1212,11 +1608,25 @@
                 if (question.code) {
                     questionContent += `<pre class="code-block">${escapeHtml(question.code)}</pre>`;
                 }
-                if (question.diagramNote) {
-                    questionContent += `<div class="diagram-note"><strong>📌 Nota:</strong> ${question.diagramNote}</div>`;
+                
+                // Add diagrams for review
+                if (question.diagrams && question.diagrams.length > 0) {
+                    questionContent += `<div class="diagram-grid">`;
+                    question.diagrams.forEach((diagram, idx) => {
+                        const diagramDef = diagramDefinitions[diagram.key];
+                        if (diagramDef) {
+                            questionContent += `
+                                <div class="diagram-option">
+                                    <h4>${diagram.label}</h4>
+                                    <div class="mermaid">${diagramDef}</div>
+                                </div>
+                            `;
+                        }
+                    });
+                    questionContent += `</div>`;
                 }
 
-                return `
+                reviewHTML += `
                     <div class="question-card fade-in" style="animation-delay: ${qIndex * 0.02}s">
                         <div class="question-header">
                             <span class="question-number">Pregunta ${qIndex + 1}</span>
@@ -1251,7 +1661,12 @@
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
+            
+            container.innerHTML = reviewHTML;
+            
+            // Re-render all mermaid diagrams in review
+            await mermaid.run();
         }
 
         function backToResults() {
