@@ -1205,7 +1205,7 @@
                     {label: "Diagrama C", key: "clock_C"},
                     {label: "Diagrama D", key: "clock_D"}
                 ],
-                options:["Diagrama A","Diagrama B","Diagrama C","Diagrama D - Flujo correcto con manejo de acarreo"],correct:3},
+                options:["Diagrama A","Diagrama B","Diagrama C","Diagrama D"],correct:3},
             
             {id:119,category:"Suma Tiempos",section:"diagram",question:"Diagrama de flujo para sumar dos tiempos (hh:mm:ss). ¿Cuál maneja correctamente el acarreo de segundos y minutos?",
                 diagrams: [
@@ -1213,48 +1213,48 @@
                     {label: "Diagrama B - ma=59", key: "sumtime_B"},
                     {label: "Diagrama C - Sin acarreo", key: "sumtime_C"}
                 ],
-                options:["Diagrama A - Usa ma=1 cuando suma_seg > 60 (correcto)","Diagrama B - Usa ma=59 como comparación","Diagrama C - Suma directamente sin verificar acarreo"],correct:0},
+                options:["Diagrama A - Usa ma=1 cuando suma_seg > 60","Diagrama B - Usa ma=59 como comparación","Diagrama C - Suma directamente sin verificar acarreo"],correct:0},
             
             {id:120,category:"Año Bisiesto",section:"diagram",question:"Un año es bisiesto si es múltiplo de 4, exceptuando los múltiplos de 100, que sólo son bisiestos cuando son múltiplos además de 400. ¿Cuál diagrama es correcto?",
                 diagrams: [
                     {label: "Diagrama A", key: "leap_A"},
                     {label: "Diagrama B", key: "leap_B"},
-                    {label: "Diagrama C (incorrecto)", key: "leap_C"}
+                    {label: "Diagrama C", key: "leap_C"}
                 ],
-                options:["Diagrama A - MOD4→SI, MOD100→NO = bisiesto","Diagrama B - MOD4→SI, MOD100→SI, MOD400→SI = bisiesto (correcto)","Diagrama C - Lógica invertida (incorrecto)"],correct:1},
+                options:["Diagrama A - MOD4→SI, MOD100→NO = bisiesto","Diagrama B - MOD4→SI, MOD100→SI, MOD400→SI = bisiesto","Diagrama C"],correct:1},
             
             {id:121,category:"Días Transcurridos",section:"diagram",question:"Diagrama para calcular los días transcurridos en el año dada una fecha. ¿Cuál considera correctamente los años bisiestos y los días por mes?",
                 diagrams: [
                     {label: "Diagrama Completo", key: "days_A"},
                     {label: "Diagrama Simple", key: "days_B"}
                 ],
-                options:["Diagrama completo - Verifica bisiesto y días por mes (correcto)","Diagrama simple - Solo multiplica mes × 30 (incorrecto)"],correct:0},
+                options:["Diagrama completo - Verifica bisiesto y días por mes","Diagrama simple - Solo multiplica mes × 30"],correct:0},
             
             {id:122,category:"Lista Ordenada",section:"diagram",question:"Diagrama de flujo que determina si una lista está ordenada de manera ascendente o descendente. ¿Cuál es el correcto?",
                 diagrams: [
                     {label: "Diagrama A - Detecta ambos", key: "sorted_A"},
                     {label: "Diagrama B - Solo uno", key: "sorted_B"}
                 ],
-                options:["Diagrama A - Detecta ascendente, descendente y no ordenada (correcto)","Diagrama B - Lógica simplificada que no detecta todos los casos"],correct:0},
+                options:["Diagrama A - Detecta ascendente, descendente y no ordenada","Diagrama B - Lógica simplificada que no detecta todos los casos"],correct:0},
             
             {id:123,category:"Separador Miles",section:"diagram",question:"Diagrama 100: Cadena números y separación de miles. El diagrama imprime los dígitos de un número agregando comas cada 3 dígitos. ¿Cuál es la lógica correcta?",
                 diagrams: [
                     {label: "Diagrama Separador", key: "separator"}
                 ],
-                options:["Imprime coma cuando y < 3","Imprime coma cuando y = 3, luego y = 0 (correcto)","Imprime coma después de cada dígito","No usa contador, imprime coma fija"],correct:1},
+                options:["Imprime coma cuando y < 3","Imprime coma cuando y = 3, luego y = 0","Imprime coma después de cada dígito","No usa contador, imprime coma fija"],correct:1},
             
             {id:124,category:"Suma Pares Impares",section:"diagram",question:"Diagrama que lee N números y calcula la suma de los pares e impares por separado. ¿Cuál usa correctamente R = A mod 2?",
                 diagrams: [
                     {label: "Diagrama A - R=0 → Par", key: "evenodd_A"},
                     {label: "Diagrama B - Incorrecto", key: "evenodd_B"}
                 ],
-                options:["Diagrama A - R=A mod 2, si R=0 entonces P=P+A (correcto)","Diagrama B - R=A mod 2, si R=0 entonces P=P+S (incorrecto)"],correct:0},
+                options:["Diagrama A - R=A mod 2, si R=0 entonces P=P+A","Diagrama B - R=A mod 2, si R=0 entonces P=P+S"],correct:0},
             
             {id:125,category:"Archivos",section:"diagram",question:"Diagrama para actualizar y generar archivos de SALDOS con PAGOS. Cuando SALDOS = PAGOS (mismo número de cuenta), ¿qué operación se realiza?",
                 diagrams: [
                     {label: "Diagrama Actualización", key: "files_correct"}
                 ],
-                options:["ERROR - Pago a una cuenta inexistente","Saldo = Saldo - Importe_pago, Fecha = Fecha de último pago (correcto)","Guardar registros sin modificar","Leer siguiente registro de PAGOS únicamente"],correct:1}
+                options:["ERROR - Pago a una cuenta inexistente","Saldo = Saldo - Importe_pago, Fecha = Fecha de último pago","Guardar registros sin modificar","Leer siguiente registro de PAGOS únicamente"],correct:1}
         ];
 
         // State
