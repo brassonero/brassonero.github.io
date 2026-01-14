@@ -652,14 +652,14 @@
                     <div class="info-icon">📊</div>
                     <div class="info-text">
                         <h4>CBI / BI</h4>
-                        <p>5 preguntas</p>
+                        <p>14 preguntas</p>
                     </div>
                 </div>
                 <div class="info-item">
                     <div class="info-icon">🗄️</div>
                     <div class="info-text">
                         <h4>SQL / Bases de Datos</h4>
-                        <p>10 preguntas</p>
+                        <p>11 preguntas</p>
                     </div>
                 </div>
                 <div class="info-item">
@@ -680,8 +680,8 @@
 
             <div class="question-limit">
                 <label>Número de preguntas para el examen:</label>
-                <input type="number" id="questionLimit" min="10" max="125" value="125">
-                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-125)</span>
+                <input type="number" id="questionLimit" min="10" max="135" value="135">
+                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-135)</span>
             </div>
 
             <div class="category-selector">
@@ -1178,14 +1178,23 @@
             {id:101,category:"Interfaces",section:"code",question:"Seleccione una respuesta:",code:"class num {\n    int x=9;\n}\ninterface blob {\n    final num n = new num();\n    final Integer number = 1;\n}\nclass test implements blob {\n    public static void main ( String [] args ) {\n        n.x = 10; // 1\n        number++; //2\n    }\n}",options:["Error Runtime en línea 1","Compila con error en línea 1","Compila y corre bien","Error de compilador en línea 2"],correct:3},
             {id:102,category:"Arrays",section:"code",question:"Selecciona una respuesta:",code:"int [] arr = new int[] { 1, 2, 3, 4};\nString [] arrstr = Arrays.toString(arr);\nfor (String s : arrstr)\n{\n    System.out.println(s);\n}",options:["Imprime 1,2,3,4","Error Runtime","Ninguno de los anteriores","Compila con error (Arrays.toString devuelve String, no String[])"],correct:3},
             
-            // ========== SECCIÓN CBI / BI (5 preguntas) ==========
+            // ========== SECCIÓN CBI / BI (14 preguntas) ==========
             {id:103,category:"Protección de Datos",section:"cbi",question:"Según la ley de protección de datos, ¿cuáles se consideran como personales y privados?",options:["Correo, nombre, domicilio","Edad, religión, teléfono","Domicilio, edad, teléfono","Teléfono, domicilio, correo electrónico"],correct:0},
             {id:104,category:"Protección de Datos",section:"cbi",question:"Es correcto descargar la información que se tiene en reportes o procesos ETL donde se muestran los datos personales y sensibles, de acuerdo a la ley de protección de datos:",options:["VERDADERO","FALSO"],correct:1},
             {id:105,category:"Protección de Datos",section:"cbi",question:"Es correcto compartir información de los reportes o tablas que consulto en las herramientas BI del banco:",options:["VERDADERO","FALSO"],correct:1},
             {id:106,category:"Business Intelligence",section:"cbi",question:"El término 'Real Time Business Intelligence' está incorporado / dirigido a:",options:["EIS (Sistemas de información ejecutiva)","DSS (Sistemas de toma de decisiones)","Toma de decisiones operacionales","Todas las anteriores"],correct:3},
             {id:107,category:"JackBe Presto",section:"cbi",question:"Una de las ventajas más importantes de la herramienta JackBe Presto, con respecto a otras herramientas...",options:["Se puede acceder desde el iPad","Combina una gran gama de colores y tipo de gráficos en sus tableros","Facilita el acceso a diversas fuentes de información (host, distribuido, windows)","Todas las anteriores"],correct:2},
+            {id:126,category:"Modelo de Datos BI",section:"cbi",question:"¿Cuál es el primer paso para definir un modelo de datos para BI?",options:["Definir el modelo físico","Definir el proceso de negocio","Analizar las fuentes de datos","Implementar la solución de usuario de negocio"],correct:1},
+            {id:127,category:"Usuarios BI",section:"cbi",question:"¿A qué segmento de usuarios va dirigido el estilo de BI Ad Hoc Query?",options:["Analistas de negocio","Exploradores de información","Consumidores de información y ejecutivos","Todas las anteriores"],correct:0},
+            {id:128,category:"Modelo de Datos BI",section:"cbi",question:"¿Cuál es el modelo de datos adecuado para cualquier solución BI?",options:["Tabla del Host","Copo de nieve","Relacional","Multidimensional"],correct:3},
+            {id:129,category:"Soluciones BI",section:"cbi",question:"¿Qué solución de BI utilizarías para presentar información a la dirección general?",options:["Alertas y entrega de reportes","Análisis estadístico","Reporte empresarial","Reporte administrativo"],correct:2},
+            {id:130,category:"Elementos BI",section:"cbi",question:"Elija cuál de las siguientes NO se considera un elemento de BI:",options:["Reporte gerencial","Reporte administrativo","Análisis estadísticos"],correct:1},
+            {id:131,category:"Sistemas DSS",section:"cbi",question:"¿Qué es un sistema DSS (EIS, MIS)?",options:["Es un sistema que permite analizar información","Es un sistema que soporta al proceso de toma de decisiones","Es una base de datos multidimensional"],correct:1},
+            {id:132,category:"Datamart",section:"cbi",question:"¿Qué es un Datamart?",options:["Almacén de datos a nivel de área de negocio","Almacén de datos a nivel empresa","Sistema transaccional","Base de datos operacional"],correct:0},
+            {id:133,category:"Datawarehouse",section:"cbi",question:"¿Qué es un Datawarehouse?",options:["Almacén de datos a nivel de área de negocio","Almacén de datos a nivel empresa","Sistema transaccional","Base de datos operacional"],correct:1},
+            {id:134,category:"Sistemas Empresariales",section:"cbi",question:"¿Qué es un ERP (Enterprise Resource Planning)?",options:["Sistema de planificación de recursos empresariales que integra procesos de negocio","Sistema de gestión de relaciones con clientes","Sistema de gestión de base de datos","Sistema operativo empresarial"],correct:0},
             
-            // ========== SECCIÓN SQL / BASES DE DATOS (10 preguntas) ==========
+            // ========== SECCIÓN SQL / BASES DE DATOS (11 preguntas) ==========
             {id:108,category:"Tablas",section:"sql",question:"Si una tabla es tan grande que rebasa el tamaño máximo de un VSAM o el estándar de la instalación, entonces necesitamos:",options:["Ampliar el espacio","Generar una tabla espejo","Particionar","Darle un compress"],correct:2},
             {id:109,category:"SQL",section:"sql",question:"¿Qué es SQL?",options:["Es un programa para extraer datos","Es un manejador de Base de datos","Es un lenguaje de manipulación de datos","Es una utilería de manipulación de datos"],correct:2},
             {id:110,category:"Tablas",section:"sql",question:"Si una tabla es 7x24, al solicitar una modificación a la estructura de la misma, debemos solicitar:",options:["Un Estanding","Se realice en fin de semana","Ampliar el espacio","No se permite"],correct:0},
@@ -1196,6 +1205,7 @@
             {id:115,category:"SQL",section:"sql",question:"¿Qué es Storage Group?",options:["Un tipo de índice","Un conjunto de bases de datos","Una partición de tabla","Un tipo de constraint"],correct:1},
             {id:116,category:"SQL",section:"sql",question:"¿Para qué sirve ORDER BY?",options:["Para filtrar registros","Para agrupar registros","Para ordenar los resultados","Para limitar registros"],correct:2},
             {id:117,category:"SQL",section:"sql",question:"Instrucción para filtrar, que solo traiga un dato cuando tiene más datos similares:",options:["UNIQUE","DISTINCT","SINGLE","FIRST"],correct:1},
+            {id:135,category:"Funciones SQL",section:"sql",question:"La función MAX se usa para:",options:["Devolver el valor máximo de una columna","No es una función SQL","Devuelve el número de filas","Devuelve el último valor"],correct:0},
             
             // ========== SECCIÓN DIAGRAMAS DE FLUJO (8 preguntas) ==========
             {id:118,category:"Reloj Digital",section:"diagram",question:"Diagrama de flujo que muestra el funcionamiento de un reloj digital, el cual escribe la hora cada segundo. ¿Cuál es el diagrama correcto?",
@@ -1221,7 +1231,7 @@
                     {label: "Diagrama B", key: "leap_B"},
                     {label: "Diagrama C", key: "leap_C"}
                 ],
-                options:["Diagrama A - MOD4→SI, MOD100→NO = bisiesto","Diagrama B - MOD4→SI, MOD100→SI, MOD400→SI = bisiesto","Diagrama C"],correct:1},
+                options:["Diagrama A - MOD4→SI, MOD100→NO = bisiesto","Diagrama B - MOD4→SI, MOD100→SI, MOD400→SI = bisiesto","Diagrama C - Lógica invertida"],correct:1},
             
             {id:121,category:"Días Transcurridos",section:"diagram",question:"Diagrama para calcular los días transcurridos en el año dada una fecha. ¿Cuál considera correctamente los años bisiestos y los días por mes?",
                 diagrams: [
@@ -1269,8 +1279,8 @@
         const sections = {
             'theory': { name: '📖 Teoría Java', count: 57 },
             'code': { name: '💻 Análisis de Código', count: 45 },
-            'cbi': { name: '📊 CBI / BI', count: 5 },
-            'sql': { name: '🗄️ SQL / Bases de Datos', count: 10 },
+            'cbi': { name: '📊 CBI / BI', count: 14 },
+            'sql': { name: '🗄️ SQL / Bases de Datos', count: 11 },
             'diagram': { name: '📐 Diagramas de Flujo', count: 8 }
         };
 
@@ -1284,7 +1294,7 @@
             grid.innerHTML = `
                 <div class="category-chip selected" onclick="toggleAllSections(this)" data-section="all">
                     <div class="category-chip-name">📚 Todas las secciones</div>
-                    <div class="category-chip-count">125 preguntas</div>
+                    <div class="category-chip-count">135 preguntas</div>
                 </div>
             `;
 
@@ -1333,8 +1343,8 @@
                 return;
             }
 
-            let limit = parseInt(document.getElementById('questionLimit').value) || 125;
-            limit = Math.max(10, Math.min(125, limit));
+            let limit = parseInt(document.getElementById('questionLimit').value) || 135;
+            limit = Math.max(10, Math.min(135, limit));
 
             let filteredQuestions = allQuestions.filter(q => selectedSections.has(q.section));
             filteredQuestions = shuffleArray(filteredQuestions);
