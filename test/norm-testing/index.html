@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Norma de Testing BBVA - Completa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a1628;
+            --bg-secondary: #0f2847;
+            --bg-tertiary: #1a3a5c;
+            --bg-card: #122a46;
+            --accent-blue: #004481;
+            --accent-light-blue: #1973b8;
+            --accent-cyan: #00a9e0;
+            --accent-green: #00c389;
+            --accent-red: #e63946;
+            --accent-yellow: #ffc107;
+            --accent-orange: #ff6b35;
+            --accent-purple: #7c3aed;
+            --text-primary: #ffffff;
+            --text-secondary: #a3c1e0;
+            --text-muted: #6b8eb3;
+            --border-color: #1e4976;
+            --glow-blue: 0 0 20px rgba(0, 68, 129, 0.4);
+            --glow-cyan: 0 0 20px rgba(0, 169, 224, 0.3);
+            --glow-green: 0 0 20px rgba(0, 195, 137, 0.3);
+            --glow-red: 0 0 20px rgba(230, 57, 70, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 68, 129, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 68, 129, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), var(--accent-green), var(--accent-blue));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 70px; height: 70px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: var(--glow-blue);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p { color: var(--text-secondary); font-size: 1.1rem; margin-top: 0.5rem; }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover { border-color: var(--accent-cyan); box-shadow: var(--glow-cyan); }
+        .stat-card.correct-stat { border-color: var(--accent-green); }
+        .stat-card.incorrect-stat { border-color: var(--accent-red); }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .stat-value.correct { color: var(--accent-green); }
+        .stat-value.incorrect { color: var(--accent-red); }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.3rem;
+        }
+
+        .progress-container {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover { border-color: rgba(0, 169, 224, 0.3); }
+        .question-card.answered-correct { border-color: var(--accent-green); box-shadow: var(--glow-green); }
+        .question-card.answered-incorrect { border-color: var(--accent-red); box-shadow: var(--glow-red); }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .question-category {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .module-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .module-badge.m1 { background: var(--accent-blue); color: white; }
+        .module-badge.m2 { background: var(--accent-cyan); color: white; }
+        .module-badge.m3 { background: var(--accent-green); color: white; }
+        .module-badge.m4 { background: var(--accent-orange); color: white; }
+        .module-badge.m5 { background: var(--accent-purple); color: white; }
+        .module-badge.m6 { background: var(--accent-red); color: white; }
+
+        .options-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 169, 224, 0.05);
+        }
+
+        .option.correct {
+            border-color: var(--accent-green);
+            background: rgba(0, 195, 137, 0.15);
+            box-shadow: var(--glow-green);
+        }
+
+        .option.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(230, 57, 70, 0.15);
+            box-shadow: var(--glow-red);
+        }
+
+        .option.disabled { cursor: not-allowed; opacity: 0.7; }
+        .option.show-correct { border-color: var(--accent-green); background: rgba(0, 195, 137, 0.1); }
+
+        .option-letter {
+            width: 36px; height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .option:hover:not(.disabled) .option-letter { background: var(--accent-cyan); color: white; }
+        .option.correct .option-letter { background: var(--accent-green); color: white; }
+        .option.incorrect .option-letter { background: var(--accent-red); color: white; }
+        .option.show-correct .option-letter { background: var(--accent-green); color: white; }
+
+        .option-text { flex: 1; color: var(--text-primary); font-size: 0.95rem; }
+
+        .option-feedback {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-feedback.correct { color: var(--accent-green); }
+        .option-feedback.incorrect { color: var(--accent-red); }
+
+        .feedback-message {
+            margin-top: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-message.correct {
+            background: rgba(0, 195, 137, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .feedback-message.incorrect {
+            background: rgba(230, 57, 70, 0.15);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .feedback-icon { font-size: 1.5rem; }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.9rem 2rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: white;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-cyan); }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover { border-color: var(--accent-cyan); background: var(--bg-secondary); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .question-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+            gap: 0.3rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .nav-btn {
+            width: 36px; height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .nav-btn.current { background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)); border-color: transparent; color: white; }
+        .nav-btn.correct { background: var(--accent-green); border-color: transparent; color: white; }
+        .nav-btn.incorrect { background: var(--accent-red); border-color: transparent; color: white; }
+
+        .results-container { text-align: center; padding: 3rem; }
+
+        .results-score {
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .results-grade { font-size: 2rem; margin-bottom: 2rem; }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .result-stat { background: var(--bg-tertiary); padding: 1.5rem; border-radius: 12px; }
+
+        .result-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .result-stat-value.correct { color: var(--accent-green); }
+        .result-stat-value.incorrect { color: var(--accent-red); }
+        .result-stat-value.unanswered { color: var(--accent-yellow); }
+
+        .start-screen { text-align: center; padding: 3rem; }
+        .start-screen h2 { font-size: 2rem; margin-bottom: 1.5rem; }
+
+        .start-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .info-item {
+            background: var(--bg-tertiary);
+            padding: 1.2rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-icon {
+            width: 45px; height: 45px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .info-text h4 { font-size: 0.9rem; color: var(--text-muted); font-weight: 400; }
+        .info-text p { font-size: 1.1rem; color: var(--text-primary); font-weight: 500; }
+
+        .category-selector { margin: 2rem 0; }
+        .category-selector h3 { margin-bottom: 1rem; color: var(--text-secondary); }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .category-chip {
+            padding: 0.8rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .category-chip:hover { border-color: var(--accent-cyan); }
+        .category-chip.selected { border-color: var(--accent-cyan); background: rgba(0, 169, 224, 0.1); }
+        .category-chip-name { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; }
+        .category-chip-count { font-size: 0.8rem; color: var(--text-muted); }
+
+        .question-limit {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .question-limit label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); }
+
+        .question-limit input {
+            width: 100px;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .header h1 { font-size: 1.5rem; }
+            .question-text { font-size: 1rem; }
+            .start-info { grid-template-columns: 1fr; }
+            .results-stats { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 195, 137, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(0, 195, 137, 0); }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(230, 57, 70, 0); }
+        }
+
+        .option.correct { animation: pulse-green 0.5s ease; }
+        .option.incorrect { animation: pulse-red 0.5s ease; }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🧪</div>
+                <div>
+                    <h1>Norma de Testing BBVA</h1>
+                    <p>De la teoría a la práctica - Evaluación Completa</p>
+                </div>
+            </div>
+        </header>
+
+        <div id="startScreen" class="question-card start-screen">
+            <h2>Evaluación Exhaustiva de la Norma de Testing</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Curso completo con preguntas de cada párrafo del documento oficial.<br>
+                Recibirás retroalimentación inmediata en cada respuesta.
+            </p>
+
+            <div class="start-info">
+                <div class="info-item">
+                    <div class="info-icon" style="background: var(--accent-blue);">📚</div>
+                    <div class="info-text">
+                        <h4>Módulo 1</h4>
+                        <p>Fundamentos (25 preguntas)</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon" style="background: var(--accent-cyan);">📋</div>
+                    <div class="info-text">
+                        <h4>Módulo 2</h4>
+                        <p>Introducción (18 preguntas)</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon" style="background: var(--accent-green);">⚖️</div>
+                    <div class="info-text">
+                        <h4>Módulo 3</h4>
+                        <p>Principios (21 preguntas)</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon" style="background: var(--accent-orange);">📝</div>
+                    <div class="info-text">
+                        <h4>Módulo 4</h4>
+                        <p>Directrices (57 preguntas)</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon" style="background: var(--accent-purple);">🔬</div>
+                    <div class="info-text">
+                        <h4>Módulo 5</h4>
+                        <p>Tipologías (44 preguntas)</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon" style="background: var(--accent-red);">🔄</div>
+                    <div class="info-text">
+                        <h4>Módulo 6</h4>
+                        <p>Proceso E2E (20 preguntas)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-limit">
+                <label>Número de preguntas para el examen:</label>
+                <input type="number" id="questionLimit" min="10" max="185" value="185">
+                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-185)</span>
+            </div>
+
+            <div class="category-selector">
+                <h3>Filtrar por módulos (opcional):</h3>
+                <div class="category-grid" id="categoryGrid"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="startExam()" style="margin-top: 1rem; padding: 1rem 3rem;">
+                🚀 Comenzar Evaluación
+            </button>
+        </div>
+
+        <div id="examScreen" class="hidden">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" id="currentQuestion">1</div>
+                    <div class="stat-label">Actual</div>
+                </div>
+                <div class="stat-card correct-stat">
+                    <div class="stat-value correct" id="correctCount">0</div>
+                    <div class="stat-label">Correctas</div>
+                </div>
+                <div class="stat-card incorrect-stat">
+                    <div class="stat-value incorrect" id="incorrectCount">0</div>
+                    <div class="stat-label">Incorrectas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalQuestions">185</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <div class="question-nav" id="questionNav"></div>
+
+            <div class="question-card fade-in" id="questionCard">
+                <div class="question-header">
+                    <span class="question-number" id="questionNumber">Pregunta 1</span>
+                    <span class="question-category" id="questionCategory">Categoría</span>
+                    <span class="module-badge" id="moduleBadge">M1</span>
+                </div>
+                <div id="questionContent">
+                    <p class="question-text" id="questionText">Texto de la pregunta...</p>
+                </div>
+                <div class="options-list" id="optionsList"></div>
+                <div id="feedbackContainer"></div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">← Anterior</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Siguiente →</button>
+                <button class="btn btn-primary hidden" id="finishBtn" onclick="finishExam()">🏁 Finalizar</button>
+            </div>
+        </div>
+
+        <div id="resultsScreen" class="hidden">
+            <div class="question-card results-container">
+                <h2 style="margin-bottom: 1rem;">Resultados de la Evaluación</h2>
+                <div class="results-score" id="finalScore">0%</div>
+                <div class="results-grade" id="gradeText">Calificación</div>
+                
+                <div class="results-stats">
+                    <div class="result-stat">
+                        <div class="result-stat-value correct" id="finalCorrectCount">0</div>
+                        <div class="stat-label">Correctas</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value incorrect" id="finalIncorrectCount">0</div>
+                        <div class="stat-label">Incorrectas</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="result-stat-value unanswered" id="finalUnansweredCount">0</div>
+                        <div class="stat-label">Sin responder</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="reviewAnswers()">📋 Revisar Respuestas</button>
+                    <button class="btn btn-primary" onclick="restartExam()">🔄 Nuevo Examen</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviewScreen" class="hidden">
+            <div class="question-card" style="margin-bottom: 1rem;">
+                <h2 style="margin-bottom: 0.5rem;">Revisión de Respuestas</h2>
+                <p style="color: var(--text-secondary);">Las respuestas correctas se muestran en verde</p>
+            </div>
+            <div id="reviewContainer"></div>
+            <div class="navigation">
+                <button class="btn btn-primary" onclick="backToResults()">← Volver a Resultados</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Complete Question Database - 185 questions about BBVA Testing Norm
+        const allQuestions = [
+            // ========== MÓDULO 1: FUNDAMENTOS DEL TESTING (25 preguntas) ==========
+            {id:1,module:"m1",category:"Necesidad Testing",question:"¿Por qué es necesario el testing de software?",options:["Para cumplir requisitos legales únicamente","Para evaluar el riesgo del creador y usuarios del software antes de disponibilizarlo","Para reducir costos de desarrollo","Para documentar el código"],correct:1},
+            {id:2,module:"m1",category:"Analogía",question:"Según el curso, ¿te montarías en un coche en el que no se hubiese probado...?",options:["El motor","El freno","Los vidrios","La pintura"],correct:1},
+            {id:3,module:"m1",category:"Software Actual",question:"El software en las empresas actuales ha pasado de ser un centro de coste a ser:",options:["Un gasto necesario","Un elemento diferenciador fundamental en el mercado","Una obligación legal","Un requisito de auditoría"],correct:1},
+            {id:4,module:"m1",category:"Proceso Humano",question:"La creación del software es un proceso esencialmente:",options:["Automatizado","Humano y por lo tanto propenso a errores","Perfecto","Mecánico"],correct:1},
+            {id:5,module:"m1",category:"Riesgo Creador",question:"Evaluar el software antes de disponibilizarlo ayuda a evaluar el riesgo del creador, como por ejemplo:",options:["Riesgo de mercado","Riesgo reputacional si el software falla","Riesgo ambiental","Riesgo político"],correct:1},
+            {id:6,module:"m1",category:"Riesgo Usuario",question:"¿Por qué es especialmente importante evaluar el riesgo que asumen los usuarios al usar software crítico como un sistema de banca?",options:["Porque es costoso","Porque los usuarios confían sus operaciones financieras al sistema","Porque es complejo","Porque es nuevo"],correct:1},
+            {id:7,module:"m1",category:"Definición Testing",question:"El testing (o proceso de testing) es aquel durante el cual se evalúa:",options:["El costo del software","El estado o 'calidad' del software mediante la ejecución de pruebas","El diseño visual","La documentación"],correct:1},
+            {id:8,module:"m1",category:"Definición Prueba",question:"Una prueba, de forma general, podría pensarse como:",options:["Un documento de especificaciones","Un conjunto de pasos aplicados sobre un sistema software y una comprobación de que la salida es la esperada","Un reporte de errores","Una reunión de equipo"],correct:1},
+            {id:9,module:"m1",category:"SDLC",question:"De forma ideal, el proceso de testing debe estar:",options:["Solo al final del desarrollo","Integrado a lo largo de todo el SDLC","Solo en la fase de diseño","Únicamente en producción"],correct:1},
+            {id:10,module:"m1",category:"Fases Testing",question:"Un proceso de testing completo contiene:",options:["Una fase","Dos fases: verificación y validación","Tres fases","Cuatro fases"],correct:1},
+            {id:11,module:"m1",category:"Verificación",question:"Durante la fase de verificación, el equipo técnico comprueba que:",options:["El software cubre las necesidades del usuario","El sistema se construyó bien (acorde a sus requisitos)","El software es rentable","El código está documentado"],correct:1},
+            {id:12,module:"m1",category:"Validación",question:"Durante la fase de validación, el Product Owner comprueba que:",options:["El código no tiene errores de sintaxis","Se construyó un buen sistema (cubre las necesidades del usuario)","El sistema es seguro","El software está optimizado"],correct:1},
+            {id:13,module:"m1",category:"Requisitos Funcionales",question:"Los requisitos funcionales de un sistema especifican:",options:["Las condiciones de operación","Las acciones que el sistema debe habilitar (ej. realizar transferencias)","Los tiempos de respuesta","La arquitectura técnica"],correct:1},
+            {id:14,module:"m1",category:"Requisitos No Funcionales",question:"Los requisitos no funcionales especifican las condiciones en las que el sistema deberá operar, como:",options:["Las funciones del negocio","Rendimiento, seguridad, accesibilidad","Los usuarios del sistema","El presupuesto del proyecto"],correct:1},
+            {id:15,module:"m1",category:"Happy Paths",question:"Durante el proceso de testing, ¿es suficiente probar únicamente escenarios de éxito esperados o 'happy paths'?",options:["Sí, es suficiente","No, también se deben probar caminos alternos y situaciones de error","Solo si el tiempo lo permite","Depende del presupuesto"],correct:1},
+            {id:16,module:"m1",category:"Defectos Ocultos",question:"¿Dónde suelen 'ocultarse' los defectos según el documento?",options:["En los happy paths","En caminos alternos y situaciones de error","En la documentación","En el código comentado"],correct:1},
+            {id:17,module:"m1",category:"Defecto Definición",question:"Un defecto en software se define como:",options:["Un error de diseño visual","Un paso, proceso o definición de datos incorrecto","Una solicitud de cambio","Una mejora propuesta"],correct:1},
+            {id:18,module:"m1",category:"Testing Obligatorio",question:"¿El proceso de testing es opcional en el Grupo BBVA?",options:["Sí, depende del proyecto","No, la Norma de testing obliga a pasar exhaustivos procesos de testing","Solo para proyectos grandes","Solo para proyectos críticos"],correct:1},
+            {id:19,module:"m1",category:"IA Testing",question:"¿Las herramientas de IA como GitHub Copilot eliminan la necesidad de testing?",options:["Sí, la IA no comete errores","No, dichas herramientas también son propensas a cometer errores","Solo para código simple","Depende del lenguaje"],correct:1},
+            {id:20,module:"m1",category:"Público Objetivo",question:"¿Cuál es el público objetivo del curso de Norma de Testing?",options:["Solo desarrolladores","Equipos de desarrollo, QC, App Owners, Release Managers, Change Leads, Service Owners","Solo testers","Solo gerentes"],correct:1},
+            {id:21,module:"m1",category:"Objetivo Curso",question:"El objetivo general del curso es comprender y aplicar los principios y directrices de la Norma para asegurar:",options:["Solo la velocidad de desarrollo","La calidad, seguridad y cumplimiento normativo del software","Solo la documentación","Solo el presupuesto"],correct:1},
+            {id:22,module:"m1",category:"Verificación Frase",question:"La frase que resume la fase de verificación es:",options:["Se construyó un buen sistema","El sistema se construyó bien","El sistema es seguro","El sistema es rápido"],correct:1},
+            {id:23,module:"m1",category:"Validación Frase",question:"La frase que resume la fase de validación es:",options:["El sistema se construyó bien","Se construyó un buen sistema","El sistema cumple estándares","El sistema está documentado"],correct:1},
+            {id:24,module:"m1",category:"Software Diferenciador",question:"En un mercado cada vez más globalizado y competitivo, el software se ha convertido en:",options:["Un gasto obligatorio","Un elemento diferenciador fundamental","Una carga administrativa","Un requisito legal únicamente"],correct:1},
+            {id:25,module:"m1",category:"Riesgo Económico",question:"El riesgo económico del creador del software se refiere a:",options:["El costo de desarrollo","Que los usuarios no terminen usando su software porque no cubre sus expectativas","El precio de las licencias","El costo del hardware"],correct:1},
+
+            // ========== MÓDULO 2: INTRODUCCIÓN A LA NORMA (18 preguntas) ==========
+            {id:26,module:"m2",category:"ADN BBVA",question:"En el Grupo BBVA, el testing forma parte de:",options:["Las políticas opcionales","Nuestro ADN","Los proyectos especiales","Las auditorías externas"],correct:1},
+            {id:27,module:"m2",category:"Objetivo Norma",question:"La Norma de Testing tiene como objetivo establecer:",options:["Solo los costos de pruebas","Los principios y directrices que rigen el proceso de testing dentro del Grupo BBVA","Solo la documentación","Solo los plazos"],correct:1},
+            {id:28,module:"m2",category:"Regulaciones",question:"La Norma de Testing reúne los criterios de distintas regulaciones como:",options:["ISO 9001, ISO 14001","DORA, SOX, EBA/GL/2019/4","ITIL, COBIT","PCI-DSS, HIPAA"],correct:1},
+            {id:29,module:"m2",category:"Propósito Calidad",question:"Uno de los propósitos de la Norma es garantizar un nivel adecuado de:",options:["Velocidad y costo","Calidad y seguridad","Documentación y diseño","Personal y recursos"],correct:1},
+            {id:30,module:"m2",category:"Propósito Requisitos",question:"La Norma busca asegurar el cumplimiento de:",options:["Los plazos de entrega","Los requisitos esperados","Los presupuestos","Los contratos"],correct:1},
+            {id:31,module:"m2",category:"Propósito Defectos",question:"La Norma busca prevenir la introducción de defectos que comprometan:",options:["El presupuesto","La estabilidad de las aplicaciones y la integridad de la información","El diseño visual","La velocidad de desarrollo"],correct:1},
+            {id:32,module:"m2",category:"Pilar Estratégico",question:"La Norma de Testing es considerada en BBVA como:",options:["Un documento opcional","Un pilar estratégico para proteger la confianza de los clientes","Una guía de referencia","Un manual técnico"],correct:1},
+            {id:33,module:"m2",category:"Alcance Desarrollo Propio",question:"Los desarrollos propios BBVA son soluciones donde BBVA asume:",options:["Responsabilidad parcial","La responsabilidad total en todas las fases del SDLC","Solo la responsabilidad de diseño","Solo la responsabilidad de pruebas"],correct:1},
+            {id:34,module:"m2",category:"Alcance Terceros",question:"Los componentes software de terceros integrados en desarrollos propios BBVA son:",options:["Software desarrollado internamente","Piezas de software que se compran de proveedores externos y se integran","Herramientas de desarrollo","Servidores de producción"],correct:1},
+            {id:35,module:"m2",category:"Sistemas TIC",question:"El testing de software asegura que el software de los sistemas TIC funcione de manera:",options:["Solo rápida","Efectiva, segura y alineada con los objetivos estratégicos y operativos de BBVA","Solo documentada","Solo económica"],correct:1},
+            {id:36,module:"m2",category:"Tipos Software",question:"El alcance de la Norma incluye el testing de:",options:["Solo desarrollos propios","Solo componentes de terceros","Desarrollos propios BBVA y componentes de terceros integrados","Solo sistemas legacy"],correct:2},
+            {id:37,module:"m2",category:"Documento Único",question:"La Norma de Testing reúne en un único documento todos los criterios de:",options:["Los contratos con proveedores","Las distintas regulaciones que impactan al Grupo BBVA respecto al testing","Las capacitaciones","Los manuales de usuario"],correct:1},
+            {id:38,module:"m2",category:"Confianza Clientes",question:"La Norma de Testing protege:",options:["Solo los intereses de BBVA","La confianza de nuestros clientes y la solidez de nuestras operaciones","Solo los datos internos","La propiedad intelectual"],correct:1},
+            {id:39,module:"m2",category:"Estándares",question:"Al desarrollar software, la Norma asegura que cumplimos con:",options:["Solo requisitos de velocidad","Estándares técnicos y regulatorios","Solo requisitos de diseño","Solo requisitos de costo"],correct:1},
+            {id:40,module:"m2",category:"Defectos Tipo",question:"La Norma busca prevenir la introducción de defectos ya sea de manera:",options:["Solo involuntaria","Involuntaria o voluntaria","Solo voluntaria","Solo accidental"],correct:1},
+            {id:41,module:"m2",category:"Testing Conjunto",question:"El testing de software es un conjunto de:",options:["Documentos y reportes","Acciones y actividades para asegurar que el software funcione correctamente","Reuniones y capacitaciones","Contratos y acuerdos"],correct:1},
+            {id:42,module:"m2",category:"Objetivos Estratégicos",question:"El software debe estar alineado con los objetivos:",options:["Solo técnicos","Estratégicos y operativos de BBVA","Solo financieros","Solo legales"],correct:1},
+            {id:43,module:"m2",category:"SDLC Responsabilidad",question:"En desarrollos propios, BBVA asume la responsabilidad total en todas las fases del:",options:["Diseño","SDLC (Ciclo de vida de desarrollo del software)","Testing únicamente","Despliegue únicamente"],correct:1},
+
+            // ========== MÓDULO 3: PRINCIPIOS FUNDAMENTALES (21 preguntas) ==========
+            {id:44,module:"m3",category:"Cantidad Principios",question:"¿Cuántos principios fundamentales tiene la Norma de Testing?",options:["5","6","7","8"],correct:2},
+            {id:45,module:"m3",category:"Marco Referencia",question:"Los principios de la Norma establecen:",options:["Reglas opcionales","Un marco de referencia único respecto al proceso de testing en el Grupo BBVA","Sugerencias de mejora","Estándares de la industria"],correct:1},
+            {id:46,module:"m3",category:"Prevalencia Legal",question:"El principio de prevalencia legal y regulatoria establece que en caso de conflictos:",options:["Se aplicará la regulación más antigua","Se aplicará la regulación de mayor rango","Se ignorarán las regulaciones locales","Todas tienen el mismo peso"],correct:1},
+            {id:47,module:"m3",category:"Concurrencia",question:"El principio de concurrencia/solapamiento establece que en caso de conflictos:",options:["Se aplicará la más antigua","Se aplicará la más restrictiva","Se ignorarán los conflictos","Se consultará al regulador"],correct:1},
+            {id:48,module:"m3",category:"Viabilidad Técnica",question:"Según el principio de viabilidad técnica, si no es viable técnicamente ejecutar un tipo de prueba:",options:["Se debe ejecutar de todas formas","Podría no ejecutarse, documentando el motivo como excepción","Se elimina el requerimiento","Se contrata un proveedor"],correct:1},
+            {id:49,module:"m3",category:"Viabilidad Económica",question:"Según el principio de viabilidad económica, si no es viable económicamente ejecutar un tipo de prueba:",options:["Se debe ejecutar de todas formas","Podría no ejecutarse, documentando el motivo e implementando controles compensatorios","Se reduce la calidad","Se elimina la funcionalidad"],correct:1},
+            {id:50,module:"m3",category:"Proporcionalidad",question:"El principio de proporcionalidad basado en riesgo/criticidad establece que:",options:["Todas las apps requieren el mismo testing","Cuanto más crítico es un sistema, más riguroso deberá ser el testing","Solo sistemas nuevos requieren testing exhaustivo","Depende del presupuesto"],correct:1},
+            {id:51,module:"m3",category:"Automatización",question:"El principio de máxima automatización establece que se priorizará:",options:["Procedimientos manuales","La creación de pruebas automáticas y mecanismos automatizados frente a procedimientos manuales","Solo la documentación","Solo las reuniones"],correct:1},
+            {id:52,module:"m3",category:"Shift-Left",question:"El principio de 'shift-left' establece que el testing debe hacerse:",options:["Solo al final del SDLC","Desde las fases más tempranas del SDLC","Solo en producción","Solo en preproducción"],correct:1},
+            {id:53,module:"m3",category:"Shift-Left Traducción",question:"¿Qué significa 'shift-left' en español?",options:["Desplazamiento a la derecha","Desplazamiento a la izquierda","Movimiento central","Cambio de dirección"],correct:1},
+            {id:54,module:"m3",category:"Excepciones",question:"Cuando no es viable ejecutar un tipo de prueba, se debe documentar el motivo como:",options:["Un error","Una excepción a la Norma","Un defecto","Una mejora"],correct:1},
+            {id:55,module:"m3",category:"Controles Compensatorios",question:"Al documentar una excepción a la Norma, siempre que sea posible se debe:",options:["Ignorar los riesgos","Implementar controles compensatorios para mitigar los riesgos","Transferir la responsabilidad","Escalar al regulador"],correct:1},
+            {id:56,module:"m3",category:"Sistema Crítico",question:"Según el principio de proporcionalidad, un sistema bancario crítico requiere:",options:["El mismo testing que cualquier sistema","Testing más riguroso que sistemas no críticos","Menos testing","Solo pruebas manuales"],correct:1},
+            {id:57,module:"m3",category:"Pruebas Automáticas",question:"¿Qué se prioriza según el principio de máxima automatización?",options:["Pruebas manuales","Pruebas automáticas y mecanismos automatizados","Documentación manual","Revisiones manuales"],correct:1},
+            {id:58,module:"m3",category:"Beneficio Shift-Left",question:"¿Cuál es el beneficio principal del principio 'shift-left'?",options:["Reducir documentación","Encontrar y corregir problemas lo antes posible","Eliminar pruebas de integración","Reducir el equipo de QA"],correct:1},
+            {id:59,module:"m3",category:"Principio 1",question:"El primer principio de la Norma es:",options:["Máxima automatización","Prevalencia legal y regulatoria","Shift-left","Proporcionalidad"],correct:1},
+            {id:60,module:"m3",category:"Principio 6",question:"El sexto principio de la Norma es:",options:["Viabilidad técnica","Concurrencia","Máxima automatización","Proporcionalidad"],correct:2},
+            {id:61,module:"m3",category:"Principio 7",question:"El séptimo y último principio de la Norma es:",options:["Máxima automatización","Proporcionalidad","Desplazamiento a la izquierda o 'shift-left'","Viabilidad económica"],correct:2},
+            {id:62,module:"m3",category:"Conflicto Mayor Rango",question:"Si hay conflicto entre regulaciones, ¿qué principio aplica la de mayor rango?",options:["Concurrencia","Prevalencia legal y regulatoria","Viabilidad técnica","Proporcionalidad"],correct:1},
+            {id:63,module:"m3",category:"Conflicto Restrictiva",question:"Si hay conflicto entre regulaciones, ¿qué principio aplica la más restrictiva?",options:["Prevalencia legal","Concurrencia/solapamiento","Viabilidad económica","Shift-left"],correct:1},
+            {id:64,module:"m3",category:"Documentar Inviabilidad",question:"La inviabilidad técnica o económica debe documentarse como:",options:["Un defecto en el código","Una excepción a la Norma","Un error de proceso","Una mejora futura"],correct:1},
+
+            // ========== MÓDULO 4: DIRECTRICES (57 preguntas) ==========
+            {id:65,module:"m4",category:"Probar Antes Producción",question:"Todo software desarrollado en BBVA debe ser probado:",options:["Solo en la primera versión","Previamente a su pase a producción, sin importar versión o naturaleza","Solo si es evolutivo mayor","Solo con datos sensibles"],correct:1},
+            {id:66,module:"m4",category:"Evolutivo",question:"Un evolutivo software es:",options:["Una corrección de errores","Cada entrega incremental de código/funcionalidad","Un documento de diseño","Una reunión de seguimiento"],correct:1},
+            {id:67,module:"m4",category:"Correctivo",question:"Un correctivo es una entrega cuya finalidad es:",options:["Agregar funcionalidades nuevas","Corregir errores detectados en versiones anteriores","Mejorar el rendimiento","Actualizar documentación"],correct:1},
+            {id:68,module:"m4",category:"Validación Requerimientos",question:"El objetivo de validación de requerimientos asegura que la solución hace exactamente:",options:["Lo que el desarrollador quiso","Lo que se pidió (requerimientos funcionales y no funcionales)","Lo más rápido posible","Lo más económico"],correct:1},
+            {id:69,module:"m4",category:"Verificación Técnica",question:"La verificación técnica confirma que el software cumple con:",options:["Las expectativas del usuario","Los estándares internos de operación y seguridad en BBVA","Los plazos de entrega","El presupuesto asignado"],correct:1},
+            {id:70,module:"m4",category:"CUC",question:"¿Qué es el Centro Único de Conocimiento (CUC)?",options:["Una herramienta de desarrollo","El almacenamiento y respaldo de documentación del Checklist de Validación Técnica","Una base de datos de producción","Un servidor de pruebas"],correct:1},
+            {id:71,module:"m4",category:"Trazabilidad",question:"La trazabilidad del requerimiento implica registrar:",options:["Solo el código fuente","Requerimiento, pruebas diseñadas/ejecutadas, resultados e identificador del cambio","Solo los defectos","Solo las fechas"],correct:1},
+            {id:72,module:"m4",category:"C204",question:"El documento C204 en BBVA México es:",options:["Un documento de arquitectura","El formato estándar de matriz de casos de prueba","Un reporte financiero","Un manual de usuario"],correct:1},
+            {id:73,module:"m4",category:"C204 Contenido",question:"El documento C204 contiene información como:",options:["Solo código fuente","Fechas, maquetas, ligas de Jira, casos de prueba, defectos y evidencias","Solo presupuesto","Solo personal asignado"],correct:1},
+            {id:74,module:"m4",category:"Plan Pruebas",question:"El Plan de Pruebas Estratégico es de cumplimiento:",options:["Opcional","Obligatorio","Recomendado","Sugerido"],correct:1},
+            {id:75,module:"m4",category:"Tipos Pruebas Plan",question:"El Plan de Pruebas Estratégico exige planeación detallada de:",options:["5 tipos de pruebas","7 tipos de pruebas","10 tipos de pruebas","3 tipos de pruebas"],correct:2},
+            {id:76,module:"m4",category:"Generador Plan",question:"¿Quién debe generar el Plan de Pruebas Estratégico en la fase de Diseño?",options:["El desarrollador","El App Owner Principal en colaboración con los App Owners de servicios N2","El cliente","El proveedor"],correct:1},
+            {id:77,module:"m4",category:"Plan Actualización",question:"El Plan de Pruebas Estratégico debe mantenerse actualizado:",options:["Solo al inicio","A lo largo de todas las etapas del SDLC","Solo al final","Solo en pruebas"],correct:1},
+            {id:78,module:"m4",category:"Requisitos Críticos",question:"El plan de pruebas debe asegurar la cobertura de todos los requisitos considerados:",options:["Opcionales","Críticos o relevantes (de mayor importancia o riesgo asociado)","Menores","Documentales"],correct:1},
+            {id:79,module:"m4",category:"Operativa Relevante",question:"Una operativa relevante es aquella que sin su funcionamiento:",options:["No pasa nada","El servicio perdería uno de sus principales cometidos","Se ahorraría presupuesto","Se reduciría personal"],correct:1},
+            {id:80,module:"m4",category:"Ejemplo Operativa",question:"Un ejemplo de operativa relevante en banca móvil sería:",options:["Cambiar el color de la app","El envío de transferencias","Ver el historial de notificaciones","Cambiar la foto de perfil"],correct:1},
+            {id:81,module:"m4",category:"CIDA",question:"Las etiquetas CIDA se refieren a:",options:["Código, Interfaz, Datos, Aplicación","Continuidad de negocio, Confidencialidad, Integridad, Autenticidad","Control, Información, Diseño, Arquitectura","Calidad, Innovación, Desarrollo, Automatización"],correct:1},
+            {id:82,module:"m4",category:"Criterios Operativa",question:"Una operativa puede ser relevante si es de las más usadas del sistema o si:",options:["Es la más nueva","Es propensa a fallos","Es la más simple","Tiene menos código"],correct:1},
+            {id:83,module:"m4",category:"Pruebas Operativas",question:"Las operativas relevantes debieran probarse en términos de:",options:["Solo velocidad","Profundidad, volumen de pruebas y frecuencia","Solo documentación","Solo automatización"],correct:1},
+            {id:84,module:"m4",category:"Entornos Previos",question:"Las pruebas se deben realizar en:",options:["Entornos de producción","Entornos previos (desarrollo o pruebas separados de producción)","Cualquier entorno disponible","Solo el entorno local"],correct:1},
+            {id:85,module:"m4",category:"Pruebas Producción",question:"Realizar pruebas en entornos de producción:",options:["Es la práctica habitual","NO es práctica habitual, debe gestionarse como excepción","Es obligatorio","Es preferido"],correct:1},
+            {id:86,module:"m4",category:"Datos Reales",question:"Usar datos reales (especialmente sensibles) en entornos de prueba:",options:["Es recomendado","No es una práctica recomendada porque no tienen la misma seguridad","Es obligatorio","Es la mejor práctica"],correct:1},
+            {id:87,module:"m4",category:"HAD",question:"¿Qué herramienta descarga y enmascara datos de producción a entornos previos?",options:["Jenkins","HAD","SonarQube","JIRA"],correct:1},
+            {id:88,module:"m4",category:"Enmascaramiento",question:"El enmascaramiento o anonimización consiste en:",options:["Eliminar todos los datos","Modificar los datos para que no se pueda identificar a las personas reales","Copiar los datos sin cambios","Encriptar los datos"],correct:1},
+            {id:89,module:"m4",category:"Seguridad Equivalente",question:"Si no se pueden enmascarar los datos, el entorno de prueba debe tener:",options:["Menos seguridad","Las mismas medidas de seguridad que producción","Solo control de acceso","Solo monitoreo"],correct:1},
+            {id:90,module:"m4",category:"Tiempo Limitado",question:"Los datos reales en entornos de prueba deben eliminarse:",options:["Nunca","Una vez finalizadas las pruebas","Después de un año","Solo si hay auditoría"],correct:1},
+            {id:91,module:"m4",category:"Caso Insatisfactorio",question:"Un caso de prueba se considera insatisfactorio cuando:",options:["El código es complejo","La ejecución no termina, se interrumpe, o el resultado no es el esperado","Hay mucha documentación","El tiempo excede lo planeado"],correct:1},
+            {id:92,module:"m4",category:"Gestión Error Corregido",question:"Un error gestionado como 'corregido' significa que:",options:["Se ignoró","La causa del error se elimina y la prueba pasa correctamente","Se documentó para después","Se transfirió a otro equipo"],correct:1},
+            {id:93,module:"m4",category:"Gestión Error Falso Positivo",question:"Un error marcado como 'falso positivo' significa que:",options:["Es un error grave","Se comprueba que no era un error real","Es un error menor","Debe corregirse urgentemente"],correct:1},
+            {id:94,module:"m4",category:"Gestión Error Asumido",question:"Un error 'asumido' significa que:",options:["Se corrigió","Se confirma el error pero se decide que su impacto es mínimo o tolerable","Se ignoró","Se eliminó"],correct:1},
+            {id:95,module:"m4",category:"Responsable Asumir Error",question:"La decisión de asumir un error recae bajo la responsabilidad del:",options:["Desarrollador","Service Owner","Tester","Proveedor"],correct:1},
+            {id:96,module:"m4",category:"Criticidad Defecto",question:"Al registrar un defecto, el PO/App Owner y desarrollador determinan su criticidad como:",options:["Urgente o Normal","Alta, Media o Baja","Crítica o No Crítica","1, 2 o 3"],correct:1},
+            {id:97,module:"m4",category:"Bugs JIRA",question:"Al término de las pruebas del C204, los fallos se registran en Jira como:",options:["Tasks","Stories","Bugs","Epics"],correct:2},
+            {id:98,module:"m4",category:"FDS",question:"FDS (Frontline Development Support) es el proceso global para:",options:["Desarrollo de código","Gestión de incidentes en Entornos Previos (EEPP)","Diseño de interfaces","Capacitación de personal"],correct:1},
+            {id:99,module:"m4",category:"Incidencia Definición",question:"Una 'incidencia' se define como cualquier interrupción:",options:["Planificada de un servicio","Parcial o total, no planificada de un servicio de TI","Solo total de un servicio","Solo de hardware"],correct:1},
+            {id:100,module:"m4",category:"Helix",question:"¿Cuál es la herramienta principal para gestión de tickets de incidentes (INC)?",options:["JIRA","Helix","ServiceNow","Remedy"],correct:1},
+            {id:101,module:"m4",category:"Deuda Técnica",question:"La deuda técnica surge de:",options:["Buen código","Atajos o problemas de calidad pospuestos","Documentación excesiva","Pruebas exhaustivas"],correct:1},
+            {id:102,module:"m4",category:"Deuda Técnica Gestión",question:"La deuda técnica debe:",options:["Acumularse indefinidamente","Gestionarse y saldarse en lugar de acumularse indefinidamente","Ignorarse","Transferirse a otros equipos"],correct:1},
+            {id:103,module:"m4",category:"Responsable Deuda",question:"¿Quién es el responsable final de la deuda técnica?",options:["El desarrollador","El Product Owner (o Service Owner para mantenimientos)","El tester","El arquitecto"],correct:1},
+            {id:104,module:"m4",category:"Acumulación Deuda",question:"La acumulación de deuda técnica con el tiempo vuelve al software:",options:["Más rápido","Inestable, conduce a insatisfacción del usuario y puede llevar a un incidente productivo","Más seguro","Más documentado"],correct:1},
+            {id:105,module:"m4",category:"Evidencias Obligatorio",question:"El registro y almacén de evidencias de todas las pruebas es:",options:["Opcional","Obligatorio","Solo para auditorías","Solo para pruebas manuales"],correct:1},
+            {id:106,module:"m4",category:"Retención General",question:"El tiempo de retención general de evidencias es:",options:["1 mes","Mínimo 3 meses o las últimas 10 ejecuciones (lo que ocurra primero)","6 meses","1 año"],correct:1},
+            {id:107,module:"m4",category:"Retención DORA SOX",question:"Para sistemas bajo DORA o SOX, el tiempo de retención de evidencias es:",options:["3 meses","6 meses","Mínimo 12 meses (por requisitos de auditoría)","24 meses"],correct:2},
+            {id:108,module:"m4",category:"Administrador Evidencias",question:"¿Quiénes deben ser los administradores de las carpetas con evidencias?",options:["Los desarrolladores","El Service Owner y App Owners","Los testers","El proveedor"],correct:1},
+            {id:109,module:"m4",category:"Acceso Evidencias",question:"El acceso general a las evidencias debe quedar como:",options:["Público","Restringido (solo personas autorizadas por el propietario)","Abierto a todo el equipo","Sin restricciones"],correct:1},
+            {id:110,module:"m4",category:"Riesgos Terceros",question:"Los componentes de software de terceros pueden introducir riesgos si:",options:["Son muy nuevos","Están obsoletos o han sido modificados maliciosamente (code tampering)","Son gratuitos","Son de código abierto"],correct:1},
+            {id:111,module:"m4",category:"SCA",question:"SCA (Software Composition Analysis) sirve para:",options:["Analizar el diseño visual","Identificar riesgos en el código de terceros","Medir el rendimiento","Documentar el código"],correct:1},
+            {id:112,module:"m4",category:"SAST",question:"SAST (Análisis Estático de Seguridad) sirve para:",options:["Probar la interfaz","Buscar vulnerabilidades en el código","Medir la velocidad","Documentar requisitos"],correct:1},
+            {id:113,module:"m4",category:"Firmas Integridad",question:"La verificación de firmas de integridad asegura que los componentes:",options:["Están documentados","No han sido manipulados","Son rápidos","Son compatibles"],correct:1},
+            {id:114,module:"m4",category:"Pruebas Obligatorias",question:"Las pruebas obligatorias para TODOS los desarrollos propios incluyen unitarias, integración, regresión (cuando aplique), análisis estático, aceptación y:",options:["Solo rendimiento","Verificaciones postproducción","Solo seguridad","Solo accesibilidad"],correct:1},
+            {id:115,module:"m4",category:"Pruebas Rendimiento Oblig",question:"Las pruebas de rendimiento son obligatorias para desarrollos categorizados como críticos por:",options:["Seguridad","Disponibilidad según DORA","Costo","Complejidad"],correct:1},
+            {id:116,module:"m4",category:"Pruebas Accesibilidad Oblig",question:"Las pruebas de accesibilidad son obligatorias para desarrollos dentro del alcance de:",options:["DORA","La Ley y Reglamento de Accesibilidad","SOX","EBA"],correct:1},
+            {id:117,module:"m4",category:"Comportamientos Bloqueantes",question:"Para desarrollos críticos bajo DORA o SOX, se establecen comportamientos bloqueantes que provocan:",options:["Una advertencia","La interrupción del circuito de construcción y despliegue","Solo un reporte","Una notificación"],correct:1},
+            {id:118,module:"m4",category:"Responsabilidad Ejecución",question:"La ejecución de todos los tipos de pruebas es responsabilidad de:",options:["El cliente","El equipo de desarrollo","El proveedor externo","Solo el área de QA"],correct:1},
+            {id:119,module:"m4",category:"Release Manager Resp",question:"El Release Manager y el App Owner son responsables de asegurar que las pruebas de verificación técnica:",options:["Se documenten","Se realicen y superen satisfactoriamente antes de la subida a producción","Se pospongan","Se eliminen"],correct:1},
+            {id:120,module:"m4",category:"PO Responsabilidad",question:"El Product Owner es responsable de certificar que:",options:["El código está optimizado","Todos los requerimientos del usuario han sido probados y se han cumplido los criterios de aceptación","El presupuesto se cumplió","El diseño es moderno"],correct:1},
+            {id:121,module:"m4",category:"Matriz RACI",question:"La Norma de testing incluye una matriz RACI que detalla:",options:["Solo los costos","Los roles involucrados tanto para nuevos desarrollos como para mantenimientos","Solo las fechas","Solo las herramientas"],correct:1},
+
+            // ========== MÓDULO 5: TIPOLOGÍAS DE PRUEBAS (44 preguntas) ==========
+            {id:122,module:"m5",category:"Tipos Pruebas",question:"La Norma establece la planificación de cuántos tipos de pruebas por cada Servicio N2:",options:["5","7","10","12"],correct:2},
+            {id:123,module:"m5",category:"Análisis Estático",question:"El análisis estático de código se realiza:",options:["Ejecutando el código","Inspeccionando el código fuente sin ejecutarlo","Solo en producción","Durante las pruebas de usuario"],correct:1},
+            {id:124,module:"m5",category:"Análisis Estático Objetivo",question:"El análisis estático busca detectar problemas como:",options:["Errores de red","Código duplicado, variables no usadas, errores comunes de programación","Problemas de hardware","Errores de servidor"],correct:1},
+            {id:125,module:"m5",category:"Análisis Estático Shift Left",question:"El análisis estático es una práctica de:",options:["Shift Right","Shift Left (encontrar y corregir problemas lo antes posible)","Shift Down","Shift Up"],correct:1},
+            {id:126,module:"m5",category:"SonarQube",question:"¿Qué herramienta se menciona para análisis estático en BBVA?",options:["Jenkins","SonarQube","Git","Docker"],correct:1},
+            {id:127,module:"m5",category:"Quality Gate",question:"El resultado del análisis estático debe cumplir con Sonar Quality Gate one-standard que exige:",options:["50% cobertura","0% Critical Issues, 0% Major Issues, 0% Security Issues","Solo sin errores críticos","100% documentación"],correct:1},
+            {id:128,module:"m5",category:"Bloqueo Análisis Estático",question:"La falta de ejecución o resultados insatisfactorios en el análisis estático:",options:["Se documenta","Bloquean el proceso de construcción y despliegue del software","Se ignora","Se pospone"],correct:1},
+            {id:129,module:"m5",category:"Defecto Seguridad Media",question:"Cualquier defecto de seguridad de severidad 'Media' o 'Baja' que no se corrija debe ser documentado como:",options:["Error ignorado","Deuda técnica asumida","Bug menor","Mejora futura"],correct:1},
+            {id:130,module:"m5",category:"Pruebas Unitarias",question:"Las pruebas unitarias verifican:",options:["El sistema completo","El funcionamiento de un componente individual del sistema en aislamiento","Solo la interfaz de usuario","Solo las conexiones de red"],correct:1},
+            {id:131,module:"m5",category:"Test Doubles",question:"Para aislar el componente bajo prueba en pruebas unitarias, se emplean:",options:["Bases de datos de producción","Test doubles (e.g., mocks) que simulan los componentes con los que interactúa","Usuarios reales","Servidores de producción"],correct:1},
+            {id:132,module:"m5",category:"Pruebas Unitarias Ejecución",question:"Las pruebas unitarias suelen ejecutarse en:",options:["Solo producción","El entorno local del desarrollador y/o en los pipelines de integración continua","Solo preproducción","Solo al final del proyecto"],correct:1},
+            {id:133,module:"m5",category:"Cobertura Unitarias",question:"¿Cuál es el umbral mínimo de cobertura para pruebas unitarias?",options:["50%","60%","70%","80%"],correct:3},
+            {id:134,module:"m5",category:"Bloqueo Unitarias",question:"La falta de ejecución o resultados insatisfactorios en las pruebas unitarias:",options:["Se permite continuar","Bloquean el proceso de construcción y despliegue del software","Se documenta solamente","Se notifica al cliente"],correct:1},
+            {id:135,module:"m5",category:"Pruebas Integración",question:"Las pruebas de integración verifican:",options:["Componentes individuales","La interacción entre diferentes módulos o sistemas cuando se combinan","Solo el código fuente","Solo la documentación"],correct:1},
+            {id:136,module:"m5",category:"Integración Objetivo",question:"Las pruebas de integración aseguran que el sistema completo funcione como:",options:["Componentes separados","Un todo cohesivo","Partes independientes","Módulos aislados"],correct:1},
+            {id:137,module:"m5",category:"Integración Tipo",question:"Las pruebas de integración pueden ser:",options:["Solo manuales","Manuales o automáticas","Solo automáticas","Solo documentales"],correct:1},
+            {id:138,module:"m5",category:"Pruebas Regresión",question:"Las pruebas de regresión aseguran que los cambios recientes no han introducido defectos en:",options:["Nuevo código","Funcionalidades existentes que antes funcionaban correctamente","Solo la interfaz","Solo la base de datos"],correct:1},
+            {id:139,module:"m5",category:"Regresión Automatización",question:"Idealmente, las pruebas de regresión deberían ser:",options:["Manuales","Automatizadas para mayor eficiencia","Solo documentales","Solo al final"],correct:1},
+            {id:140,module:"m5",category:"Regresión Obligatoriedad",question:"Las pruebas de regresión son obligatorias en:",options:["Solo versiones mayores","Versiones menores y parches obligatoriamente, y versiones mayores si hay dependencias","Solo nuevos desarrollos","Solo correctivos"],correct:1},
+            {id:141,module:"m5",category:"Pruebas Aceptación",question:"Las pruebas de aceptación validan que el software cumple con:",options:["Los estándares de código","Las necesidades del negocio y los usuarios finales","Solo requisitos técnicos","Solo requisitos de velocidad"],correct:1},
+            {id:142,module:"m5",category:"Ejecutor Aceptación",question:"Las pruebas de aceptación debieran ejecutarse por:",options:["Solo desarrolladores","El Product Owner (aunque a veces por QA Testers o miembros del equipo)","Solo el equipo de infraestructura","El proveedor externo"],correct:1},
+            {id:143,module:"m5",category:"Aceptación Entorno",question:"Las pruebas de aceptación se ejecutan contra entornos con características similares a:",options:["Desarrollo","Producción (e.g., preproducción)","Local","Testing"],correct:1},
+            {id:144,module:"m5",category:"Aceptación Aprobación",question:"Para los desarrollos propios de BBVA, ¿quién debe dar aprobación explícita en pruebas de aceptación?",options:["El desarrollador","El Product Owner","El tester","El arquitecto"],correct:1},
+            {id:145,module:"m5",category:"Pruebas Seguridad",question:"Las pruebas de seguridad evalúan el software para identificar:",options:["Errores de diseño","Vulnerabilidades y protección contra ataques y accesos no autorizados","Problemas de velocidad","Errores de documentación"],correct:1},
+            {id:146,module:"m5",category:"Seguridad Obligatoriedad",question:"Las pruebas de seguridad son obligatorias para desarrollos cuyos componentes se cataloguen como críticos desde el punto de vista de:",options:["Rendimiento","Seguridad","Costo","Complejidad"],correct:1},
+            {id:147,module:"m5",category:"Hacking Ético",question:"El Hacking Ético tiene como objetivo detectar vulnerabilidades que afecten:",options:["Solo rendimiento","Confidencialidad, integridad o disponibilidad de los datos y activos","Solo diseño","Solo documentación"],correct:1},
+            {id:148,module:"m5",category:"Pruebas UI",question:"Las pruebas de interfaz de usuario (UI) verifican que:",options:["El código está optimizado","La parte visual y las interacciones funcionan correctamente","Las bases de datos están sincronizadas","El servidor responde rápido"],correct:1},
+            {id:149,module:"m5",category:"UI Elementos",question:"Las pruebas de UI verifican que los botones hacen lo que deben, la información se muestra clara, y:",options:["El código es eficiente","La navegación es intuitiva y la aplicación responde como se espera","Los servidores están configurados","Las bases de datos están optimizadas"],correct:1},
+            {id:150,module:"m5",category:"Performance Testing",question:"Las pruebas de rendimiento/capacidad se centran en:",options:["Funcionalidad correcta","Velocidad, estabilidad y eficiencia del software bajo diferentes condiciones","Seguridad","Accesibilidad"],correct:1},
+            {id:151,module:"m5",category:"Load Testing",question:"Las pruebas de carga (Load Testing) simulan:",options:["Fallos del sistema","El uso esperado del sistema","Ataques de seguridad","Errores de usuario"],correct:1},
+            {id:152,module:"m5",category:"Stress Testing",question:"Las pruebas de estrés (Stress Testing):",options:["Simulan uso normal","Empujan el sistema más allá de sus límites para ver cómo se comporta","Verifican funcionalidad básica","Prueban la interfaz"],correct:1},
+            {id:153,module:"m5",category:"Capacity Testing",question:"Las pruebas de capacidad (Capacity Testing) determinan:",options:["El costo del sistema","Cuántos usuarios o transacciones puede manejar el sistema","El tamaño del código","El número de errores"],correct:1},
+            {id:154,module:"m5",category:"Código Ineficiente",question:"La búsqueda de código ineficiente identifica partes del código que podrían:",options:["Eliminarse","Optimizarse para ser más rápidas","Documentarse mejor","Moverse a otro módulo"],correct:1},
+            {id:155,module:"m5",category:"Rendimiento Obligatoriedad",question:"Las pruebas de rendimiento son obligatorias para desarrollos categorizados como críticos por disponibilidad según:",options:["SOX","DORA","EBA","PCI"],correct:1},
+            {id:156,module:"m5",category:"Deployment Quality",question:"¿Quién es responsable de ejecutar las pruebas de rendimiento?",options:["Solo desarrolladores","Deployment Quality (DQ / Red Team)","Solo testers","El cliente"],correct:1},
+            {id:157,module:"m5",category:"Pruebas Accesibilidad",question:"Las pruebas de accesibilidad hacen las aplicaciones accesibles para personas con:",options:["Solo discapacidad visual","Discapacidades visuales, auditivas, de movilidad o deficiencias cognitivas","Solo discapacidad auditiva","Solo discapacidad motriz"],correct:1},
+            {id:158,module:"m5",category:"Accesibilidad Obligatoriedad",question:"Las pruebas de accesibilidad son obligatorias para desarrollos declarados en alcance de:",options:["DORA","La Ley y Reglamento de Accesibilidad","SOX","EBA"],correct:1},
+            {id:159,module:"m5",category:"Accesibilidad Cambio UI",question:"Las pruebas de accesibilidad aplican siempre que el cambio cree o modifique:",options:["Una base de datos","Una interfaz de usuario","Un servidor","Una API"],correct:1},
+            {id:160,module:"m5",category:"Verificación Postproducción",question:"La verificación postproducción se realiza:",options:["Antes del despliegue","Después de que el software ha sido desplegado exitosamente en producción","Durante el desarrollo","Durante el diseño"],correct:1},
+            {id:161,module:"m5",category:"Objetivo Postproducción",question:"El objetivo de la verificación postproducción es confirmar que el software:",options:["Está documentado","Se comporta como se espera en el ambiente real","Está optimizado","Está seguro"],correct:1},
+            {id:162,module:"m5",category:"Postproducción Repetir",question:"La verificación postproducción NO se trata de:",options:["Verificar el funcionamiento","Repetir todo el testing, sino realizar pruebas esenciales","Confirmar el despliegue","Detectar problemas"],correct:1},
+            {id:163,module:"m5",category:"Bloqueo Postproducción",question:"¿Aplica bloqueo del pipeline de CI/CD para la verificación postproducción?",options:["Sí, siempre","No, ya que el código ya está desplegado en Producción","Solo para sistemas críticos","Solo para nuevos desarrollos"],correct:1},
+            {id:164,module:"m5",category:"No Conformidad Grave",question:"Si durante la verificación postproducción se detecta una no conformidad grave, esta debe:",options:["Ignorarse","Registrarse y darle alta prioridad para ser resuelta, incluso por encima de otros requerimientos","Documentarse para el siguiente release","Transferirse a otro equipo"],correct:1},
+            {id:165,module:"m5",category:"Shapers",question:"En la verificación postproducción, además de DEV, ¿quiénes son responsables de su ejecución?",options:["Solo QA","Shapers (Áreas involucradas)","Solo el cliente","Solo el proveedor"],correct:1},
+
+            // ========== MÓDULO 6: PROCESO E2E (20 preguntas) ==========
+            {id:166,module:"m6",category:"Integración Testing",question:"El proceso de testing está profundamente integrado en:",options:["Solo la fase de pruebas","Todo el ciclo de vida de desarrollo de software","Solo el despliegue","Solo el diseño"],correct:1},
+            {id:167,module:"m6",category:"Playbooks ONE",question:"El proceso de testing está relacionado con las prácticas descritas en:",options:["Los manuales de usuario","Los playbooks de ONE","Los contratos con proveedores","Los reportes financieros"],correct:1},
+            {id:168,module:"m6",category:"Macroprocesos",question:"El Proceso de Creación E2E contiene:",options:["3 macroprocesos","5 macroprocesos","7 macroprocesos","10 macroprocesos"],correct:2},
+            {id:169,module:"m6",category:"Ideación",question:"En la fase de Ideación y Evaluación de Requerimientos se deben definir claramente:",options:["Solo el código","Los criterios de aceptación y los requisitos de calidad y seguridad","Solo el diseño","Solo el presupuesto"],correct:1},
+            {id:170,module:"m6",category:"Beneficio Identificación",question:"La identificación temprana de los requisitos de testing evita:",options:["Documentación","Retrabajos en fases posteriores","Reuniones","Capacitaciones"],correct:1},
+            {id:171,module:"m6",category:"Fase Diseño E2E",question:"Durante la fase de Diseño del proceso E2E, se debe elaborar:",options:["Solo el código","El Plan de Pruebas Estratégico","Solo la documentación de usuario","El presupuesto"],correct:1},
+            {id:172,module:"m6",category:"Diseño Definiciones",question:"En la fase de Diseño se definen los tipos de pruebas, los entornos de ejecución, los datos de prueba y:",options:["El presupuesto","Los criterios de aceptación","El personal","Los contratos"],correct:1},
+            {id:173,module:"m6",category:"Fase Desarrollo E2E",question:"En la fase de Desarrollo, el equipo es responsable de la construcción de componentes tecnológicos y:",options:["Solo documentación","La realización de pruebas unitarias","Solo despliegue","Solo diseño"],correct:1},
+            {id:174,module:"m6",category:"Desarrollo Actualización",question:"Durante la fase de Desarrollo se debe actualizar el plan de pruebas y:",options:["El presupuesto","El plan de retorno","El contrato","El diseño visual"],correct:1},
+            {id:175,module:"m6",category:"Pruebas E2E Fase",question:"La fase de Pruebas E2E es donde se valida que el desarrollo funcione correctamente en:",options:["Producción","Un entorno de calidad","El entorno local","El servidor de backup"],correct:1},
+            {id:176,module:"m6",category:"Despliegue Calidad",question:"En la fase de Pruebas E2E, el desarrollo se despliega en:",options:["Producción directamente","Entornos de prueba y/o calidad","Solo el entorno local","Solo preproducción"],correct:1},
+            {id:177,module:"m6",category:"C204 Refinamiento",question:"Durante la ambientación y generación de datos se refinan los:",options:["Contratos","Casos de Prueba (C204)","Diseños visuales","Presupuestos"],correct:1},
+            {id:178,module:"m6",category:"OCTA",question:"OCTA se menciona en el contexto de pruebas de:",options:["Seguridad","Rendimiento","Integración","Unitarias"],correct:1},
+            {id:179,module:"m6",category:"RMP",question:"El RMP (Riesgo Mitigado por Pruebas) representa:",options:["El costo del proyecto","El valor de la calidad del software","El número de defectos","El tiempo de desarrollo"],correct:1},
+            {id:180,module:"m6",category:"VoBo Pruebas",question:"¿Quién otorga el visto bueno (Vo.Bo.) a las pruebas?",options:["El desarrollador","El Service Owner","El tester","El cliente"],correct:1},
+            {id:181,module:"m6",category:"Automatización E2E",question:"En la fase de Pruebas E2E se prioriza la automatización con herramientas como:",options:["Solo Word y Excel","HAD NextGen, ACIS, IA","Solo herramientas manuales","Solo documentación"],correct:1},
+            {id:182,module:"m6",category:"Roles Clave E2E",question:"Los roles clave en la fase de Pruebas E2E incluyen Scrum Master, Scrum Team, Deployment Quality, Information Security y:",options:["Solo el cliente","Service Owner, Data, Arquitectura, entre otros","Solo el proveedor","Solo QA"],correct:1},
+            {id:183,module:"m6",category:"Delegación BEx",question:"En la fase de Delegación al BEx se asegura la evidencia del correcto funcionamiento y se delega:",options:["El código fuente","La funcionalidad productiva a equipos BEx","El presupuesto","El diseño"],correct:1},
+            {id:184,module:"m6",category:"Gestión Cambios",question:"La fase de Gestión de Cambios implica la instalación en:",options:["Entornos de prueba","Ambientes productivos de la funcionalidad desarrollada","Solo preproducción","Solo calidad"],correct:1},
+            {id:185,module:"m6",category:"Verificación Post Gestión",question:"En la fase de Gestión de Cambios, el testing se enfoca en la validación de la implantación y:",options:["El diseño","La verificación post-producción","El presupuesto","La documentación"],correct:1}
+        ];
+
+        // State
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        let answerResults = {};
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let selectedModules = new Set();
+
+        const modules = {
+            'm1': { name: '📚 Módulo 1: Fundamentos', count: 25 },
+            'm2': { name: '📋 Módulo 2: Introducción', count: 18 },
+            'm3': { name: '⚖️ Módulo 3: Principios', count: 21 },
+            'm4': { name: '📝 Módulo 4: Directrices', count: 57 },
+            'm5': { name: '🔬 Módulo 5: Tipologías', count: 44 },
+            'm6': { name: '🔄 Módulo 6: Proceso E2E', count: 20 }
+        };
+
+        function init() {
+            renderModules();
+        }
+
+        function renderModules() {
+            const grid = document.getElementById('categoryGrid');
+            
+            grid.innerHTML = `
+                <div class="category-chip selected" onclick="toggleAllModules(this)" data-module="all">
+                    <div class="category-chip-name">📚 Todos los módulos</div>
+                    <div class="category-chip-count">185 preguntas</div>
+                </div>
+            `;
+
+            Object.entries(modules).forEach(([key, value]) => {
+                grid.innerHTML += `
+                    <div class="category-chip selected" onclick="toggleModule('${key}', this)" data-module="${key}">
+                        <div class="category-chip-name">${value.name}</div>
+                        <div class="category-chip-count">${value.count} preguntas</div>
+                    </div>
+                `;
+            });
+
+            selectedModules = new Set(Object.keys(modules));
+        }
+
+        function toggleAllModules(element) {
+            const allChips = document.querySelectorAll('.category-chip');
+            if (element.classList.contains('selected')) {
+                allChips.forEach(chip => chip.classList.remove('selected'));
+                selectedModules.clear();
+            } else {
+                allChips.forEach(chip => chip.classList.add('selected'));
+                selectedModules = new Set(Object.keys(modules));
+            }
+        }
+
+        function toggleModule(module, element) {
+            document.querySelector('[data-module="all"]').classList.remove('selected');
+            
+            if (selectedModules.has(module)) {
+                selectedModules.delete(module);
+                element.classList.remove('selected');
+            } else {
+                selectedModules.add(module);
+                element.classList.add('selected');
+            }
+            
+            if (selectedModules.size === Object.keys(modules).length) {
+                document.querySelector('[data-module="all"]').classList.add('selected');
+            }
+        }
+
+        function startExam() {
+            if (selectedModules.size === 0) {
+                alert('Por favor selecciona al menos un módulo');
+                return;
+            }
+
+            let limit = parseInt(document.getElementById('questionLimit').value) || 185;
+            limit = Math.max(10, Math.min(185, limit));
+
+            let filteredQuestions = allQuestions.filter(q => selectedModules.has(q.module));
+            filteredQuestions = shuffleArray(filteredQuestions);
+            questions = filteredQuestions.slice(0, limit);
+            
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            answerResults = {};
+            correctCount = 0;
+            incorrectCount = 0;
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('examScreen').classList.remove('hidden');
+            
+            document.getElementById('totalQuestions').textContent = questions.length;
+            
+            renderQuestionNav();
+            renderQuestion();
+            updateStats();
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function renderQuestionNav() {
+            const nav = document.getElementById('questionNav');
+            nav.innerHTML = '';
+            
+            questions.forEach((_, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                if (index === currentQuestionIndex) btn.classList.add('current');
+                if (answerResults[index] === true) btn.classList.add('correct');
+                if (answerResults[index] === false) btn.classList.add('incorrect');
+                btn.textContent = index + 1;
+                btn.onclick = () => goToQuestion(index);
+                nav.appendChild(btn);
+            });
+        }
+
+        function goToQuestion(index) {
+            currentQuestionIndex = index;
+            renderQuestion();
+            renderQuestionNav();
+        }
+
+        function updateStats() {
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+            
+            const answeredCount = Object.keys(userAnswers).length;
+            const progress = (answeredCount / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function renderQuestion() {
+            const question = questions[currentQuestionIndex];
+            const isAnswered = userAnswers[currentQuestionIndex] !== undefined;
+            const userAnswer = userAnswers[currentQuestionIndex];
+            const isCorrect = answerResults[currentQuestionIndex];
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('questionNumber').textContent = `Pregunta ${currentQuestionIndex + 1}`;
+            document.getElementById('questionCategory').textContent = question.category;
+            
+            const moduleBadge = document.getElementById('moduleBadge');
+            const moduleLabels = {
+                'm1': 'Módulo 1',
+                'm2': 'Módulo 2',
+                'm3': 'Módulo 3',
+                'm4': 'Módulo 4',
+                'm5': 'Módulo 5',
+                'm6': 'Módulo 6'
+            };
+            moduleBadge.textContent = moduleLabels[question.module] || question.module;
+            moduleBadge.className = `module-badge ${question.module}`;
+            
+            document.getElementById('questionContent').innerHTML = `<p class="question-text">${question.question}</p>`;
+            
+            const questionCard = document.getElementById('questionCard');
+            questionCard.classList.remove('answered-correct', 'answered-incorrect');
+            if (isAnswered) {
+                questionCard.classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+            }
+            
+            const optionsList = document.getElementById('optionsList');
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            
+            optionsList.innerHTML = question.options.map((option, index) => {
+                let className = 'option';
+                let feedback = '';
+                
+                if (isAnswered) {
+                    className += ' disabled';
+                    if (index === question.correct) {
+                        className += ' correct';
+                        if (index === userAnswer) {
+                            feedback = '<span class="option-feedback correct">✓ ¡Correcto!</span>';
+                        } else {
+                            className += ' show-correct';
+                            feedback = '<span class="option-feedback correct">✓ Respuesta correcta</span>';
+                        }
+                    } else if (index === userAnswer) {
+                        className += ' incorrect';
+                        feedback = '<span class="option-feedback incorrect">✗ Incorrecto</span>';
+                    }
+                }
+                
+                return `
+                    <div class="${className}" onclick="${isAnswered ? '' : `selectOption(${index})`}">
+                        <span class="option-letter">${letters[index]}</span>
+                        <span class="option-text">${option}</span>
+                        ${feedback}
+                    </div>
+                `;
+            }).join('');
+
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            if (isAnswered) {
+                if (isCorrect) {
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback-message correct">
+                            <span class="feedback-icon">✅</span>
+                            <span>¡Excelente! Has respondido correctamente.</span>
+                        </div>
+                    `;
+                } else {
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback-message incorrect">
+                            <span class="feedback-icon">❌</span>
+                            <span>Respuesta incorrecta. La respuesta correcta está marcada en verde.</span>
+                        </div>
+                    `;
+                }
+            } else {
+                feedbackContainer.innerHTML = '';
+            }
+
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                document.getElementById('nextBtn').classList.add('hidden');
+                document.getElementById('finishBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('nextBtn').classList.remove('hidden');
+                document.getElementById('finishBtn').classList.add('hidden');
+            }
+        }
+
+        function selectOption(optionIndex) {
+            if (userAnswers[currentQuestionIndex] !== undefined) return;
+            
+            const question = questions[currentQuestionIndex];
+            const isCorrect = optionIndex === question.correct;
+            
+            userAnswers[currentQuestionIndex] = optionIndex;
+            answerResults[currentQuestionIndex] = isCorrect;
+            
+            if (isCorrect) {
+                correctCount++;
+            } else {
+                incorrectCount++;
+            }
+            
+            updateStats();
+            renderQuestion();
+            renderQuestionNav();
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+                renderQuestionNav();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+                renderQuestionNav();
+            }
+        }
+
+        function finishExam() {
+            const unanswered = questions.length - Object.keys(userAnswers).length;
+            const score = Math.round((correctCount / questions.length) * 100);
+
+            document.getElementById('examScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            
+            document.getElementById('finalScore').textContent = `${score}%`;
+            document.getElementById('finalCorrectCount').textContent = correctCount;
+            document.getElementById('finalIncorrectCount').textContent = incorrectCount;
+            document.getElementById('finalUnansweredCount').textContent = unanswered;
+
+            let gradeText = '';
+            let gradeEmoji = '';
+            
+            if (score >= 90) { gradeText = 'Excelente'; gradeEmoji = '🏆'; }
+            else if (score >= 80) { gradeText = 'Muy Bien'; gradeEmoji = '🎉'; }
+            else if (score >= 70) { gradeText = 'Aprobado'; gradeEmoji = '✅'; }
+            else if (score >= 60) { gradeText = 'Necesita Mejorar'; gradeEmoji = '📚'; }
+            else { gradeText = 'No Aprobado'; gradeEmoji = '❌'; }
+
+            document.getElementById('gradeText').textContent = `${gradeEmoji} ${gradeText}`;
+        }
+
+        function reviewAnswers() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.remove('hidden');
+
+            const container = document.getElementById('reviewContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            const moduleLabels = {
+                'm1': 'Módulo 1',
+                'm2': 'Módulo 2',
+                'm3': 'Módulo 3',
+                'm4': 'Módulo 4',
+                'm5': 'Módulo 5',
+                'm6': 'Módulo 6'
+            };
+            
+            container.innerHTML = questions.map((question, qIndex) => {
+                const userAnswer = userAnswers[qIndex];
+                const isCorrect = answerResults[qIndex];
+                const isUnanswered = userAnswer === undefined;
+
+                return `
+                    <div class="question-card fade-in" style="animation-delay: ${qIndex * 0.02}s">
+                        <div class="question-header">
+                            <span class="question-number">Pregunta ${qIndex + 1}</span>
+                            <span class="question-category">${question.category}</span>
+                            <span class="module-badge ${question.module}">${moduleLabels[question.module]}</span>
+                            <span style="margin-left: auto; font-size: 1.5rem;">
+                                ${isUnanswered ? '⚠️' : (isCorrect ? '✅' : '❌')}
+                            </span>
+                        </div>
+                        <p class="question-text">${question.question}</p>
+                        <div class="options-list">
+                            ${question.options.map((option, oIndex) => {
+                                let className = 'option disabled';
+                                let feedback = '';
+                                
+                                if (oIndex === question.correct) {
+                                    className += ' correct';
+                                    feedback = '<span class="option-feedback correct">✓ Correcta</span>';
+                                } else if (oIndex === userAnswer && !isCorrect) {
+                                    className += ' incorrect';
+                                    feedback = '<span class="option-feedback incorrect">Tu respuesta</span>';
+                                }
+                                
+                                return `
+                                    <div class="${className}">
+                                        <span class="option-letter">${letters[oIndex]}</span>
+                                        <span class="option-text">${option}</span>
+                                        ${feedback}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function backToResults() {
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+        }
+
+        function restartExam() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            answerResults = {};
+            correctCount = 0;
+            incorrectCount = 0;
+            
+            renderModules();
+        }
+
+        init();
+    </script>
+</body>
+</html>
