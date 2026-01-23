@@ -117,6 +117,17 @@
 
         .header p { color: var(--text-secondary); font-size: 1.1rem; margin-top: 0.5rem; }
 
+        .fix-badge {
+            display: inline-block;
+            background: var(--accent-green);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
         .stats-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -557,6 +568,7 @@
                 <div>
                     <h1>Norma de Testing BBVA</h1>
                     <p>De la teoría a la práctica - Evaluación Completa</p>
+                    <span class="fix-badge">✓ Opciones aleatorizadas</span>
                 </div>
             </div>
         </header>
@@ -565,7 +577,8 @@
             <h2>Evaluación Exhaustiva de la Norma de Testing</h2>
             <p style="color: var(--text-secondary); margin-bottom: 1rem;">
                 Curso completo con preguntas de cada párrafo del documento oficial.<br>
-                Recibirás retroalimentación inmediata en cada respuesta.
+                Recibirás retroalimentación inmediata en cada respuesta.<br>
+                <strong style="color: var(--accent-green);">Las opciones de respuesta se mezclan aleatoriamente en cada examen.</strong>
             </p>
 
             <div class="start-info">
@@ -729,9 +742,9 @@
             {id:8,module:"m1",category:"Definición Prueba",question:"Una prueba, de forma general, podría pensarse como:",options:["Un documento de especificaciones","Un conjunto de pasos aplicados sobre un sistema software y una comprobación de que la salida es la esperada","Un reporte de errores","Una reunión de equipo"],correct:1},
             {id:9,module:"m1",category:"SDLC",question:"De forma ideal, el proceso de testing debe estar:",options:["Solo al final del desarrollo","Integrado a lo largo de todo el SDLC","Solo en la fase de diseño","Únicamente en producción"],correct:1},
             {id:10,module:"m1",category:"Fases Testing",question:"Un proceso de testing completo contiene:",options:["Una fase","Dos fases: verificación y validación","Tres fases","Cuatro fases"],correct:1},
-            {id:11,module:"m1",category:"Verificación",question:"Durante la fase de verificación, el equipo técnico comprueba que:",options:["El software cubre las necesidades del usuario","El sistema se construyó bien (acorde a sus requisitos)","El software es rentable","El código está documentado"],correct:1},
+            {id:11,module:"m1",category:"Verificación",question:"Durante la fase de verificación, el equipo técnico comprueba que:",options:["El software cubre las necesidades del usuario","El sistema se construyó bien","El software es rentable","El código está documentado"],correct:1},
             {id:12,module:"m1",category:"Validación",question:"Durante la fase de validación, el Product Owner comprueba que:",options:["El código no tiene errores de sintaxis","Se construyó un buen sistema (cubre las necesidades del usuario)","El sistema es seguro","El software está optimizado"],correct:1},
-            {id:13,module:"m1",category:"Requisitos Funcionales",question:"Los requisitos funcionales de un sistema especifican:",options:["Las condiciones de operación","Las acciones que el sistema debe habilitar (ej. realizar transferencias)","Los tiempos de respuesta","La arquitectura técnica"],correct:1},
+            {id:13,module:"m1",category:"Requisitos Funcionales",question:"Los requisitos funcionales de un sistema especifican:",options:["Las condiciones de operación","Las acciones que el sistema debe habilitar","Los tiempos de respuesta","La arquitectura técnica"],correct:1},
             {id:14,module:"m1",category:"Requisitos No Funcionales",question:"Los requisitos no funcionales especifican las condiciones en las que el sistema deberá operar, como:",options:["Las funciones del negocio","Rendimiento, seguridad, accesibilidad","Los usuarios del sistema","El presupuesto del proyecto"],correct:1},
             {id:15,module:"m1",category:"Happy Paths",question:"Durante el proceso de testing, ¿es suficiente probar únicamente escenarios de éxito esperados o 'happy paths'?",options:["Sí, es suficiente","No, también se deben probar caminos alternos y situaciones de error","Solo si el tiempo lo permite","Depende del presupuesto"],correct:1},
             {id:16,module:"m1",category:"Defectos Ocultos",question:"¿Dónde suelen 'ocultarse' los defectos según el documento?",options:["En los happy paths","En caminos alternos y situaciones de error","En la documentación","En el código comentado"],correct:1},
@@ -763,7 +776,7 @@
             {id:40,module:"m2",category:"Defectos Tipo",question:"La Norma busca prevenir la introducción de defectos ya sea de manera:",options:["Solo involuntaria","Involuntaria o voluntaria","Solo voluntaria","Solo accidental"],correct:1},
             {id:41,module:"m2",category:"Testing Conjunto",question:"El testing de software es un conjunto de:",options:["Documentos y reportes","Acciones y actividades para asegurar que el software funcione correctamente","Reuniones y capacitaciones","Contratos y acuerdos"],correct:1},
             {id:42,module:"m2",category:"Objetivos Estratégicos",question:"El software debe estar alineado con los objetivos:",options:["Solo técnicos","Estratégicos y operativos de BBVA","Solo financieros","Solo legales"],correct:1},
-            {id:43,module:"m2",category:"SDLC Responsabilidad",question:"En desarrollos propios, BBVA asume la responsabilidad total en todas las fases del:",options:["Diseño","SDLC (Ciclo de vida de desarrollo del software)","Testing únicamente","Despliegue únicamente"],correct:1},
+            {id:43,module:"m2",category:"SDLC Responsabilidad",question:"En desarrollos propios, BBVA asume la responsabilidad total en todas las fases del:",options:["Diseño","SDLC","Testing únicamente","Despliegue únicamente"],correct:1},
 
             // ========== MÓDULO 3: PRINCIPIOS FUNDAMENTALES (21 preguntas) ==========
             {id:44,module:"m3",category:"Cantidad Principios",question:"¿Cuántos principios fundamentales tiene la Norma de Testing?",options:["5","6","7","8"],correct:2},
@@ -792,7 +805,7 @@
             {id:65,module:"m4",category:"Probar Antes Producción",question:"Todo software desarrollado en BBVA debe ser probado:",options:["Solo en la primera versión","Previamente a su pase a producción, sin importar versión o naturaleza","Solo si es evolutivo mayor","Solo con datos sensibles"],correct:1},
             {id:66,module:"m4",category:"Evolutivo",question:"Un evolutivo software es:",options:["Una corrección de errores","Cada entrega incremental de código/funcionalidad","Un documento de diseño","Una reunión de seguimiento"],correct:1},
             {id:67,module:"m4",category:"Correctivo",question:"Un correctivo es una entrega cuya finalidad es:",options:["Agregar funcionalidades nuevas","Corregir errores detectados en versiones anteriores","Mejorar el rendimiento","Actualizar documentación"],correct:1},
-            {id:68,module:"m4",category:"Validación Requerimientos",question:"El objetivo de validación de requerimientos asegura que la solución hace exactamente:",options:["Lo que el desarrollador quiso","Lo que se pidió (requerimientos funcionales y no funcionales)","Lo más rápido posible","Lo más económico"],correct:1},
+            {id:68,module:"m4",category:"Validación Requerimientos",question:"El objetivo de validación de requerimientos asegura que la solución hace exactamente:",options:["Lo que el desarrollador quiso","Lo que se pidió","Lo más rápido posible","Lo más económico"],correct:1},
             {id:69,module:"m4",category:"Verificación Técnica",question:"La verificación técnica confirma que el software cumple con:",options:["Las expectativas del usuario","Los estándares internos de operación y seguridad en BBVA","Los plazos de entrega","El presupuesto asignado"],correct:1},
             {id:70,module:"m4",category:"CUC",question:"¿Qué es el Centro Único de Conocimiento (CUC)?",options:["Una herramienta de desarrollo","El almacenamiento y respaldo de documentación del Checklist de Validación Técnica","Una base de datos de producción","Un servidor de pruebas"],correct:1},
             {id:71,module:"m4",category:"Trazabilidad",question:"La trazabilidad del requerimiento implica registrar:",options:["Solo el código fuente","Requerimiento, pruebas diseñadas/ejecutadas, resultados e identificador del cambio","Solo los defectos","Solo las fechas"],correct:1},
@@ -802,13 +815,13 @@
             {id:75,module:"m4",category:"Tipos Pruebas Plan",question:"El Plan de Pruebas Estratégico exige planeación detallada de:",options:["5 tipos de pruebas","7 tipos de pruebas","10 tipos de pruebas","3 tipos de pruebas"],correct:2},
             {id:76,module:"m4",category:"Generador Plan",question:"¿Quién debe generar el Plan de Pruebas Estratégico en la fase de Diseño?",options:["El desarrollador","El App Owner Principal en colaboración con los App Owners de servicios N2","El cliente","El proveedor"],correct:1},
             {id:77,module:"m4",category:"Plan Actualización",question:"El Plan de Pruebas Estratégico debe mantenerse actualizado:",options:["Solo al inicio","A lo largo de todas las etapas del SDLC","Solo al final","Solo en pruebas"],correct:1},
-            {id:78,module:"m4",category:"Requisitos Críticos",question:"El plan de pruebas debe asegurar la cobertura de todos los requisitos considerados:",options:["Opcionales","Críticos o relevantes (de mayor importancia o riesgo asociado)","Menores","Documentales"],correct:1},
+            {id:78,module:"m4",category:"Requisitos Críticos",question:"El plan de pruebas debe asegurar la cobertura de todos los requisitos considerados:",options:["Opcionales","Críticos o relevantes","Menores","Documentales"],correct:1},
             {id:79,module:"m4",category:"Operativa Relevante",question:"Una operativa relevante es aquella que sin su funcionamiento:",options:["No pasa nada","El servicio perdería uno de sus principales cometidos","Se ahorraría presupuesto","Se reduciría personal"],correct:1},
             {id:80,module:"m4",category:"Ejemplo Operativa",question:"Un ejemplo de operativa relevante en banca móvil sería:",options:["Cambiar el color de la app","El envío de transferencias","Ver el historial de notificaciones","Cambiar la foto de perfil"],correct:1},
             {id:81,module:"m4",category:"CIDA",question:"Las etiquetas CIDA se refieren a:",options:["Código, Interfaz, Datos, Aplicación","Continuidad de negocio, Confidencialidad, Integridad, Autenticidad","Control, Información, Diseño, Arquitectura","Calidad, Innovación, Desarrollo, Automatización"],correct:1},
             {id:82,module:"m4",category:"Criterios Operativa",question:"Una operativa puede ser relevante si es de las más usadas del sistema o si:",options:["Es la más nueva","Es propensa a fallos","Es la más simple","Tiene menos código"],correct:1},
             {id:83,module:"m4",category:"Pruebas Operativas",question:"Las operativas relevantes debieran probarse en términos de:",options:["Solo velocidad","Profundidad, volumen de pruebas y frecuencia","Solo documentación","Solo automatización"],correct:1},
-            {id:84,module:"m4",category:"Entornos Previos",question:"Las pruebas se deben realizar en:",options:["Entornos de producción","Entornos previos (desarrollo o pruebas separados de producción)","Cualquier entorno disponible","Solo el entorno local"],correct:1},
+            {id:84,module:"m4",category:"Entornos Previos",question:"Las pruebas se deben realizar en:",options:["Entornos de producción","Entornos previos","Cualquier entorno disponible","Solo el entorno local"],correct:1},
             {id:85,module:"m4",category:"Pruebas Producción",question:"Realizar pruebas en entornos de producción:",options:["Es la práctica habitual","NO es práctica habitual, debe gestionarse como excepción","Es obligatorio","Es preferido"],correct:1},
             {id:86,module:"m4",category:"Datos Reales",question:"Usar datos reales (especialmente sensibles) en entornos de prueba:",options:["Es recomendado","No es una práctica recomendada porque no tienen la misma seguridad","Es obligatorio","Es la mejor práctica"],correct:1},
             {id:87,module:"m4",category:"HAD",question:"¿Qué herramienta descarga y enmascara datos de producción a entornos previos?",options:["Jenkins","HAD","SonarQube","JIRA"],correct:1},
@@ -830,10 +843,10 @@
             {id:103,module:"m4",category:"Responsable Deuda",question:"¿Quién es el responsable final de la deuda técnica?",options:["El desarrollador","El Product Owner (o Service Owner para mantenimientos)","El tester","El arquitecto"],correct:1},
             {id:104,module:"m4",category:"Acumulación Deuda",question:"La acumulación de deuda técnica con el tiempo vuelve al software:",options:["Más rápido","Inestable, conduce a insatisfacción del usuario y puede llevar a un incidente productivo","Más seguro","Más documentado"],correct:1},
             {id:105,module:"m4",category:"Evidencias Obligatorio",question:"El registro y almacén de evidencias de todas las pruebas es:",options:["Opcional","Obligatorio","Solo para auditorías","Solo para pruebas manuales"],correct:1},
-            {id:106,module:"m4",category:"Retención General",question:"El tiempo de retención general de evidencias es:",options:["1 mes","Mínimo 3 meses o las últimas 10 ejecuciones (lo que ocurra primero)","6 meses","1 año"],correct:1},
+            {id:106,module:"m4",category:"Retención General",question:"El tiempo de retención general de evidencias es:",options:["1 mes","Mínimo 3 meses o las últimas 10 ejecuciones","6 meses","1 año"],correct:1},
             {id:107,module:"m4",category:"Retención DORA SOX",question:"Para sistemas bajo DORA o SOX, el tiempo de retención de evidencias es:",options:["3 meses","6 meses","Mínimo 12 meses (por requisitos de auditoría)","24 meses"],correct:2},
             {id:108,module:"m4",category:"Administrador Evidencias",question:"¿Quiénes deben ser los administradores de las carpetas con evidencias?",options:["Los desarrolladores","El Service Owner y App Owners","Los testers","El proveedor"],correct:1},
-            {id:109,module:"m4",category:"Acceso Evidencias",question:"El acceso general a las evidencias debe quedar como:",options:["Público","Restringido (solo personas autorizadas por el propietario)","Abierto a todo el equipo","Sin restricciones"],correct:1},
+            {id:109,module:"m4",category:"Acceso Evidencias",question:"El acceso general a las evidencias debe quedar como:",options:["Público","Restringido","Abierto a todo el equipo","Sin restricciones"],correct:1},
             {id:110,module:"m4",category:"Riesgos Terceros",question:"Los componentes de software de terceros pueden introducir riesgos si:",options:["Son muy nuevos","Están obsoletos o han sido modificados maliciosamente (code tampering)","Son gratuitos","Son de código abierto"],correct:1},
             {id:111,module:"m4",category:"SCA",question:"SCA (Software Composition Analysis) sirve para:",options:["Analizar el diseño visual","Identificar riesgos en el código de terceros","Medir el rendimiento","Documentar el código"],correct:1},
             {id:112,module:"m4",category:"SAST",question:"SAST (Análisis Estático de Seguridad) sirve para:",options:["Probar la interfaz","Buscar vulnerabilidades en el código","Medir la velocidad","Documentar requisitos"],correct:1},
@@ -851,13 +864,13 @@
             {id:122,module:"m5",category:"Tipos Pruebas",question:"La Norma establece la planificación de cuántos tipos de pruebas por cada Servicio N2:",options:["5","7","10","12"],correct:2},
             {id:123,module:"m5",category:"Análisis Estático",question:"El análisis estático de código se realiza:",options:["Ejecutando el código","Inspeccionando el código fuente sin ejecutarlo","Solo en producción","Durante las pruebas de usuario"],correct:1},
             {id:124,module:"m5",category:"Análisis Estático Objetivo",question:"El análisis estático busca detectar problemas como:",options:["Errores de red","Código duplicado, variables no usadas, errores comunes de programación","Problemas de hardware","Errores de servidor"],correct:1},
-            {id:125,module:"m5",category:"Análisis Estático Shift Left",question:"El análisis estático es una práctica de:",options:["Shift Right","Shift Left (encontrar y corregir problemas lo antes posible)","Shift Down","Shift Up"],correct:1},
+            {id:125,module:"m5",category:"Análisis Estático Shift Left",question:"El análisis estático es una práctica de:",options:["Shift Right","Shift Left","Shift Down","Shift Up"],correct:1},
             {id:126,module:"m5",category:"SonarQube",question:"¿Qué herramienta se menciona para análisis estático en BBVA?",options:["Jenkins","SonarQube","Git","Docker"],correct:1},
             {id:127,module:"m5",category:"Quality Gate",question:"El resultado del análisis estático debe cumplir con Sonar Quality Gate one-standard que exige:",options:["50% cobertura","0% Critical Issues, 0% Major Issues, 0% Security Issues","Solo sin errores críticos","100% documentación"],correct:1},
             {id:128,module:"m5",category:"Bloqueo Análisis Estático",question:"La falta de ejecución o resultados insatisfactorios en el análisis estático:",options:["Se documenta","Bloquean el proceso de construcción y despliegue del software","Se ignora","Se pospone"],correct:1},
             {id:129,module:"m5",category:"Defecto Seguridad Media",question:"Cualquier defecto de seguridad de severidad 'Media' o 'Baja' que no se corrija debe ser documentado como:",options:["Error ignorado","Deuda técnica asumida","Bug menor","Mejora futura"],correct:1},
             {id:130,module:"m5",category:"Pruebas Unitarias",question:"Las pruebas unitarias verifican:",options:["El sistema completo","El funcionamiento de un componente individual del sistema en aislamiento","Solo la interfaz de usuario","Solo las conexiones de red"],correct:1},
-            {id:131,module:"m5",category:"Test Doubles",question:"Para aislar el componente bajo prueba en pruebas unitarias, se emplean:",options:["Bases de datos de producción","Test doubles (e.g., mocks) que simulan los componentes con los que interactúa","Usuarios reales","Servidores de producción"],correct:1},
+            {id:131,module:"m5",category:"Test Doubles",question:"Para aislar el componente bajo prueba en pruebas unitarias, se emplean:",options:["Bases de datos de producción","Test doubles","Usuarios reales","Servidores de producción"],correct:1},
             {id:132,module:"m5",category:"Pruebas Unitarias Ejecución",question:"Las pruebas unitarias suelen ejecutarse en:",options:["Solo producción","El entorno local del desarrollador y/o en los pipelines de integración continua","Solo preproducción","Solo al final del proyecto"],correct:1},
             {id:133,module:"m5",category:"Cobertura Unitarias",question:"¿Cuál es el umbral mínimo de cobertura para pruebas unitarias?",options:["50%","60%","70%","80%"],correct:3},
             {id:134,module:"m5",category:"Bloqueo Unitarias",question:"La falta de ejecución o resultados insatisfactorios en las pruebas unitarias:",options:["Se permite continuar","Bloquean el proceso de construcción y despliegue del software","Se documenta solamente","Se notifica al cliente"],correct:1},
@@ -869,7 +882,7 @@
             {id:140,module:"m5",category:"Regresión Obligatoriedad",question:"Las pruebas de regresión son obligatorias en:",options:["Solo versiones mayores","Versiones menores y parches obligatoriamente, y versiones mayores si hay dependencias","Solo nuevos desarrollos","Solo correctivos"],correct:1},
             {id:141,module:"m5",category:"Pruebas Aceptación",question:"Las pruebas de aceptación validan que el software cumple con:",options:["Los estándares de código","Las necesidades del negocio y los usuarios finales","Solo requisitos técnicos","Solo requisitos de velocidad"],correct:1},
             {id:142,module:"m5",category:"Ejecutor Aceptación",question:"Las pruebas de aceptación debieran ejecutarse por:",options:["Solo desarrolladores","El Product Owner (aunque a veces por QA Testers o miembros del equipo)","Solo el equipo de infraestructura","El proveedor externo"],correct:1},
-            {id:143,module:"m5",category:"Aceptación Entorno",question:"Las pruebas de aceptación se ejecutan contra entornos con características similares a:",options:["Desarrollo","Producción (e.g., preproducción)","Local","Testing"],correct:1},
+            {id:143,module:"m5",category:"Aceptación Entorno",question:"Las pruebas de aceptación se ejecutan contra entornos con características similares a:",options:["Desarrollo","Producción","Local","Testing"],correct:1},
             {id:144,module:"m5",category:"Aceptación Aprobación",question:"Para los desarrollos propios de BBVA, ¿quién debe dar aprobación explícita en pruebas de aceptación?",options:["El desarrollador","El Product Owner","El tester","El arquitecto"],correct:1},
             {id:145,module:"m5",category:"Pruebas Seguridad",question:"Las pruebas de seguridad evalúan el software para identificar:",options:["Errores de diseño","Vulnerabilidades y protección contra ataques y accesos no autorizados","Problemas de velocidad","Errores de documentación"],correct:1},
             {id:146,module:"m5",category:"Seguridad Obligatoriedad",question:"Las pruebas de seguridad son obligatorias para desarrollos cuyos componentes se cataloguen como críticos desde el punto de vista de:",options:["Rendimiento","Seguridad","Costo","Complejidad"],correct:1},
@@ -891,12 +904,12 @@
             {id:162,module:"m5",category:"Postproducción Repetir",question:"La verificación postproducción NO se trata de:",options:["Verificar el funcionamiento","Repetir todo el testing, sino realizar pruebas esenciales","Confirmar el despliegue","Detectar problemas"],correct:1},
             {id:163,module:"m5",category:"Bloqueo Postproducción",question:"¿Aplica bloqueo del pipeline de CI/CD para la verificación postproducción?",options:["Sí, siempre","No, ya que el código ya está desplegado en Producción","Solo para sistemas críticos","Solo para nuevos desarrollos"],correct:1},
             {id:164,module:"m5",category:"No Conformidad Grave",question:"Si durante la verificación postproducción se detecta una no conformidad grave, esta debe:",options:["Ignorarse","Registrarse y darle alta prioridad para ser resuelta, incluso por encima de otros requerimientos","Documentarse para el siguiente release","Transferirse a otro equipo"],correct:1},
-            {id:165,module:"m5",category:"Shapers",question:"En la verificación postproducción, además de DEV, ¿quiénes son responsables de su ejecución?",options:["Solo QA","Shapers (Áreas involucradas)","Solo el cliente","Solo el proveedor"],correct:1},
+            {id:165,module:"m5",category:"Shapers",question:"En la verificación postproducción, además de DEV, ¿quiénes son responsables de su ejecución?",options:["Solo QA","Shapers","Solo el cliente","Solo el proveedor"],correct:1},
 
             // ========== MÓDULO 6: PROCESO E2E (20 preguntas) ==========
             {id:166,module:"m6",category:"Integración Testing",question:"El proceso de testing está profundamente integrado en:",options:["Solo la fase de pruebas","Todo el ciclo de vida de desarrollo de software","Solo el despliegue","Solo el diseño"],correct:1},
             {id:167,module:"m6",category:"Playbooks ONE",question:"El proceso de testing está relacionado con las prácticas descritas en:",options:["Los manuales de usuario","Los playbooks de ONE","Los contratos con proveedores","Los reportes financieros"],correct:1},
-            {id:168,module:"m6",category:"Macroprocesos",question:"El Proceso de Creación E2E contiene:",options:["3 macroprocesos","5 macroprocesos","7 macroprocesos","10 macroprocesos"],correct:2},
+            {id:168,module:"m6",category:"Macroprocesos",question:"El Proceso de Creación E2E contiene:",options:["3 macroprocesos","5 macroprocesos","7 macroprocesos","10 macroprocesos"],correct:1},
             {id:169,module:"m6",category:"Ideación",question:"En la fase de Ideación y Evaluación de Requerimientos se deben definir claramente:",options:["Solo el código","Los criterios de aceptación y los requisitos de calidad y seguridad","Solo el diseño","Solo el presupuesto"],correct:1},
             {id:170,module:"m6",category:"Beneficio Identificación",question:"La identificación temprana de los requisitos de testing evita:",options:["Documentación","Retrabajos en fases posteriores","Reuniones","Capacitaciones"],correct:1},
             {id:171,module:"m6",category:"Fase Diseño E2E",question:"Durante la fase de Diseño del proceso E2E, se debe elaborar:",options:["Solo el código","El Plan de Pruebas Estratégico","Solo la documentación de usuario","El presupuesto"],correct:1},
@@ -987,6 +1000,32 @@
             }
         }
 
+        // ============================================
+        // KEY FIX: Shuffle options for each question
+        // ============================================
+        function shuffleOptions(question) {
+            // Create array of indices [0, 1, 2, 3]
+            const indices = question.options.map((_, i) => i);
+            
+            // Fisher-Yates shuffle
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+            
+            // Reorder options based on shuffled indices
+            const newOptions = indices.map(i => question.options[i]);
+            
+            // Find new position of correct answer
+            const newCorrect = indices.indexOf(question.correct);
+            
+            return {
+                ...question,
+                options: newOptions,
+                correct: newCorrect
+            };
+        }
+
         function startExam() {
             if (selectedModules.size === 0) {
                 alert('Por favor selecciona al menos un módulo');
@@ -996,9 +1035,17 @@
             let limit = parseInt(document.getElementById('questionLimit').value) || 185;
             limit = Math.max(10, Math.min(185, limit));
 
+            // Filter by selected modules
             let filteredQuestions = allQuestions.filter(q => selectedModules.has(q.module));
+            
+            // Shuffle questions
             filteredQuestions = shuffleArray(filteredQuestions);
-            questions = filteredQuestions.slice(0, limit);
+            
+            // Take only the requested number
+            filteredQuestions = filteredQuestions.slice(0, limit);
+            
+            // SHUFFLE OPTIONS FOR EACH QUESTION - THE KEY FIX!
+            questions = filteredQuestions.map(q => shuffleOptions(q));
             
             currentQuestionIndex = 0;
             userAnswers = {};
