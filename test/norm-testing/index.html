@@ -3,32 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examen Avanzado - Norma de Testing BBVA</title>
+    <title>Examen EXTREMO - Norma de Testing BBVA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0f0f1a;
-            --bg-secondary: #1a1a2e;
-            --bg-tertiary: #25253d;
-            --bg-card: #1e1e32;
-            --accent-blue: #0066cc;
-            --accent-cyan: #00d4ff;
-            --accent-purple: #7c3aed;
-            --accent-pink: #ec4899;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-yellow: #fbbf24;
-            --accent-orange: #f97316;
-            --text-primary: #ffffff;
-            --text-secondary: #b4b4d4;
-            --text-muted: #6b6b8d;
-            --border-color: #2d2d4a;
-            --glow-cyan: 0 0 30px rgba(0, 212, 255, 0.25);
-            --glow-purple: 0 0 30px rgba(124, 58, 237, 0.25);
-            --glow-green: 0 0 20px rgba(16, 185, 129, 0.3);
-            --glow-red: 0 0 20px rgba(239, 68, 68, 0.3);
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --bg-card: #14141e;
+            --accent-red: #dc2626;
+            --accent-orange: #ea580c;
+            --accent-amber: #d97706;
+            --accent-purple: #9333ea;
+            --accent-pink: #db2777;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border-color: #2d2d3a;
+            --glow-red: 0 0 30px rgba(220, 38, 38, 0.3);
+            --glow-purple: 0 0 25px rgba(147, 51, 234, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,11 +43,9 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: 
-                radial-gradient(ellipse at 0% 0%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 100% 100%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 60px 60px, 60px 60px;
+                radial-gradient(ellipse at 20% 80%, rgba(220, 38, 38, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(147, 51, 234, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(234, 88, 12, 0.05) 0%, transparent 60%);
             pointer-events: none;
             z-index: 0;
         }
@@ -79,7 +74,7 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan), var(--accent-pink), var(--accent-purple));
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-orange), var(--accent-purple), var(--accent-red));
             background-size: 300% 100%;
             animation: gradient-shift 4s ease infinite;
         }
@@ -98,20 +93,26 @@
         }
 
         .logo-icon {
-            width: 75px; height: 75px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
             border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.2rem;
-            box-shadow: var(--glow-purple);
+            font-size: 2.5rem;
+            box-shadow: var(--glow-red);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(220, 38, 38, 0.5); }
         }
 
         .header h1 {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -123,25 +124,52 @@
             margin-top: 0.5rem;
         }
 
-        .badge-container {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .badge {
+        .extreme-badge {
             display: inline-block;
-            padding: 0.3rem 0.8rem;
+            padding: 0.4rem 1.2rem;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
             border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: white;
+            margin-top: 1rem;
+            animation: pulse-badge 1.5s ease-in-out infinite;
         }
 
-        .badge-purple { background: var(--accent-purple); color: white; }
-        .badge-red { background: var(--accent-red); color: white; }
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .warning-banner {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(234, 88, 12, 0.1));
+            border: 2px solid var(--accent-red);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .warning-banner h3 {
+            color: var(--accent-red);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warning-banner ul {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .warning-banner li strong {
+            color: var(--accent-orange);
+        }
 
         .stats-bar {
             display: grid;
@@ -159,22 +187,18 @@
             transition: all 0.3s ease;
         }
 
-        .stat-card:hover { transform: translateY(-2px); }
-        .stat-card.correct-stat { border-color: var(--accent-green); }
+        .stat-card.correct-stat { border-color: var(--accent-emerald); }
         .stat-card.incorrect-stat { border-color: var(--accent-red); }
 
         .stat-value {
             font-family: 'JetBrains Mono', monospace;
             font-size: 2rem;
             font-weight: 600;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
-        .stat-value.correct { background: var(--accent-green); -webkit-background-clip: text; }
-        .stat-value.incorrect { background: var(--accent-red); -webkit-background-clip: text; }
+        .stat-value.neutral { background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-value.correct { color: var(--accent-emerald); }
+        .stat-value.incorrect { color: var(--accent-red); }
 
         .stat-label {
             font-size: 0.8rem;
@@ -194,10 +218,9 @@
 
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-orange));
             border-radius: 10px;
             transition: width 0.5s ease;
-            box-shadow: var(--glow-cyan);
         }
 
         .question-card {
@@ -209,8 +232,7 @@
             transition: all 0.3s ease;
         }
 
-        .question-card:hover { border-color: rgba(124, 58, 237, 0.4); }
-        .question-card.answered-correct { border-color: var(--accent-green); box-shadow: var(--glow-green); }
+        .question-card.answered-correct { border-color: var(--accent-emerald); box-shadow: 0 0 25px rgba(16, 185, 129, 0.2); }
         .question-card.answered-incorrect { border-color: var(--accent-red); box-shadow: var(--glow-red); }
 
         .question-header {
@@ -222,7 +244,7 @@
         }
 
         .question-number {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
             color: white;
             font-family: 'JetBrains Mono', monospace;
             font-weight: 600;
@@ -241,25 +263,27 @@
 
         .question-type {
             font-size: 0.7rem;
-            padding: 0.25rem 0.5rem;
+            padding: 0.25rem 0.6rem;
             border-radius: 4px;
             font-weight: 600;
             text-transform: uppercase;
         }
         .question-type.scenario { background: var(--accent-pink); color: white; }
-        .question-type.conceptual { background: var(--accent-purple); color: white; }
+        .question-type.trap { background: var(--accent-red); color: white; }
         .question-type.numerical { background: var(--accent-cyan); color: black; }
-        .question-type.tricky { background: var(--accent-orange); color: white; }
+        .question-type.combined { background: var(--accent-purple); color: white; }
+        .question-type.negative { background: var(--accent-orange); color: white; }
+        .question-type.sequence { background: var(--accent-amber); color: black; }
 
         .difficulty-badge {
             font-size: 0.7rem;
-            padding: 0.25rem 0.5rem;
+            padding: 0.25rem 0.6rem;
             border-radius: 4px;
             font-weight: 600;
         }
+        .difficulty-badge.extreme { background: linear-gradient(135deg, #dc2626, #7f1d1d); color: white; animation: pulse-badge 2s ease-in-out infinite; }
         .difficulty-badge.expert { background: #dc2626; color: white; }
         .difficulty-badge.hard { background: var(--accent-orange); color: white; }
-        .difficulty-badge.medium { background: var(--accent-yellow); color: black; }
 
         .question-text {
             font-size: 1.05rem;
@@ -269,8 +293,9 @@
         }
 
         .scenario-box {
-            background: rgba(124, 58, 237, 0.1);
-            border: 1px solid rgba(124, 58, 237, 0.3);
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.08), rgba(147, 51, 234, 0.08));
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            border-left: 4px solid var(--accent-red);
             border-radius: 12px;
             padding: 1.2rem;
             margin-bottom: 1.5rem;
@@ -279,8 +304,8 @@
             line-height: 1.7;
         }
 
-        .scenario-box strong { color: var(--accent-cyan); }
-        .scenario-box .highlight { background: rgba(0, 212, 255, 0.2); padding: 0.1rem 0.3rem; border-radius: 3px; color: var(--accent-cyan); }
+        .scenario-box strong { color: var(--accent-orange); }
+        .scenario-box .highlight { background: rgba(234, 88, 12, 0.2); padding: 0.1rem 0.3rem; border-radius: 3px; }
 
         .options-list { display: flex; flex-direction: column; gap: 0.75rem; }
 
@@ -297,23 +322,15 @@
         }
 
         .option:hover:not(.disabled) {
-            border-color: var(--accent-purple);
-            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--accent-orange);
+            background: rgba(234, 88, 12, 0.1);
             transform: translateX(4px);
         }
 
-        .option.correct {
-            border-color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.15);
-        }
-
-        .option.incorrect {
-            border-color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.15);
-        }
-
+        .option.correct { border-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.15); }
+        .option.incorrect { border-color: var(--accent-red); background: rgba(220, 38, 38, 0.15); }
         .option.disabled { cursor: not-allowed; opacity: 0.7; }
-        .option.show-correct { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+        .option.show-correct { border-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.1); }
 
         .option-letter {
             width: 38px; height: 38px;
@@ -329,21 +346,15 @@
             flex-shrink: 0;
         }
 
-        .option:hover:not(.disabled) .option-letter { background: var(--accent-purple); color: white; }
-        .option.correct .option-letter { background: var(--accent-green); color: white; }
+        .option:hover:not(.disabled) .option-letter { background: var(--accent-orange); color: white; }
+        .option.correct .option-letter { background: var(--accent-emerald); color: white; }
         .option.incorrect .option-letter { background: var(--accent-red); color: white; }
-        .option.show-correct .option-letter { background: var(--accent-green); color: white; }
+        .option.show-correct .option-letter { background: var(--accent-emerald); color: white; }
 
         .option-text { flex: 1; color: var(--text-primary); font-size: 0.95rem; line-height: 1.5; }
 
-        .option-feedback {
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-left: auto;
-            flex-shrink: 0;
-        }
-
-        .option-feedback.correct { color: var(--accent-green); }
+        .option-feedback { font-size: 0.85rem; font-weight: 500; margin-left: auto; flex-shrink: 0; }
+        .option-feedback.correct { color: var(--accent-emerald); }
         .option-feedback.incorrect { color: var(--accent-red); }
 
         .feedback-message {
@@ -356,33 +367,25 @@
             font-weight: 500;
         }
 
-        .feedback-message.correct {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid var(--accent-green);
-            color: var(--accent-green);
-        }
-
-        .feedback-message.incorrect {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--accent-red);
-            color: var(--accent-red);
-        }
+        .feedback-message.correct { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-emerald); color: var(--accent-emerald); }
+        .feedback-message.incorrect { background: rgba(220, 38, 38, 0.15); border: 1px solid var(--accent-red); color: var(--accent-red); }
 
         .feedback-icon { font-size: 1.5rem; }
 
         .explanation {
             margin-top: 1rem;
-            padding: 1rem 1.2rem;
-            background: rgba(0, 212, 255, 0.08);
-            border-left: 3px solid var(--accent-cyan);
+            padding: 1.2rem;
+            background: rgba(147, 51, 234, 0.08);
+            border-left: 3px solid var(--accent-purple);
             border-radius: 0 10px 10px 0;
             font-size: 0.9rem;
             color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
-        .explanation strong { color: var(--accent-cyan); }
-        .explanation .key-point { color: var(--accent-pink); font-weight: 600; }
+        .explanation strong { color: var(--accent-orange); }
+        .explanation .trap-warning { color: var(--accent-red); font-weight: 600; }
+        .explanation .key-point { color: var(--accent-cyan); }
 
         .navigation {
             display: flex;
@@ -407,20 +410,10 @@
             gap: 0.5rem;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            color: white;
-        }
-
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-purple); }
-
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover { border-color: var(--accent-purple); }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-red); }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { border-color: var(--accent-orange); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         .question-nav {
@@ -451,141 +444,43 @@
             transition: all 0.2s ease;
         }
 
-        .nav-btn:hover { border-color: var(--accent-purple); color: var(--accent-purple); }
-        .nav-btn.current { background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); border-color: transparent; color: white; }
-        .nav-btn.correct { background: var(--accent-green); border-color: transparent; color: white; }
+        .nav-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .nav-btn.current { background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); border-color: transparent; color: white; }
+        .nav-btn.correct { background: var(--accent-emerald); border-color: transparent; color: white; }
         .nav-btn.incorrect { background: var(--accent-red); border-color: transparent; color: white; }
 
         .results-container { text-align: center; padding: 3rem; }
-
-        .results-score {
-            font-size: 5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        }
-
+        .results-score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
         .results-grade { font-size: 2rem; margin-bottom: 2rem; }
-
-        .results-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
+        .results-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 2rem 0; }
         .result-stat { background: var(--bg-tertiary); padding: 1.5rem; border-radius: 14px; }
-
-        .result-stat-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2.2rem;
-            font-weight: 600;
-        }
-
-        .result-stat-value.correct { color: var(--accent-green); }
+        .result-stat-value { font-family: 'JetBrains Mono', monospace; font-size: 2.2rem; font-weight: 600; }
+        .result-stat-value.correct { color: var(--accent-emerald); }
         .result-stat-value.incorrect { color: var(--accent-red); }
-        .result-stat-value.unanswered { color: var(--accent-yellow); }
+        .result-stat-value.unanswered { color: var(--accent-amber); }
 
         .start-screen { text-align: center; padding: 3rem; }
-        .start-screen h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+        .start-screen h2 { font-size: 1.8rem; margin-bottom: 1.5rem; color: var(--accent-orange); }
 
-        .start-info {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin: 2rem 0;
-            text-align: left;
-        }
-
-        .info-item {
-            background: var(--bg-tertiary);
-            padding: 1.2rem;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .info-icon {
-            width: 48px; height: 48px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-        }
-
+        .start-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0; text-align: left; }
+        .info-item { background: var(--bg-tertiary); padding: 1.2rem; border-radius: 14px; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--border-color); }
+        .info-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent-red), var(--accent-orange)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
         .info-text h4 { font-size: 0.85rem; color: var(--text-muted); font-weight: 400; }
         .info-text p { font-size: 1.05rem; color: var(--text-primary); font-weight: 600; }
 
-        .warning-box {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(249, 115, 22, 0.1));
-            border: 1px solid var(--accent-red);
-            border-radius: 14px;
-            padding: 1.2rem;
-            margin: 1.5rem 0;
-            text-align: left;
-        }
-
-        .warning-box h4 {
-            color: var(--accent-red);
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .warning-box p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .warning-box ul {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            padding-left: 1.2rem;
-        }
-
-        .question-limit {
-            margin: 1.5rem 0;
-            padding: 1.2rem;
-            background: var(--bg-tertiary);
-            border-radius: 14px;
-            border: 1px solid var(--border-color);
-        }
-
+        .question-limit { margin: 1.5rem 0; padding: 1.2rem; background: var(--bg-tertiary); border-radius: 14px; border: 1px solid var(--border-color); }
         .question-limit label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); }
-
-        .question-limit input {
-            width: 100px;
-            padding: 0.6rem;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1rem;
-            text-align: center;
-        }
+        .question-limit input { width: 100px; padding: 0.6rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 1rem; text-align: center; }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-orange); }
 
         @media (max-width: 768px) {
             .container { padding: 1rem; }
             .stats-bar { grid-template-columns: repeat(2, 1fr); }
             .header h1 { font-size: 1.5rem; }
-            .question-text { font-size: 1rem; }
             .start-info { grid-template-columns: 1fr; }
             .results-stats { grid-template-columns: 1fr; }
             .navigation { flex-direction: column; }
@@ -594,16 +489,7 @@
 
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.5s ease forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } }
-        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } }
-
-        .option.correct { animation: pulse-green 0.5s ease; }
-        .option.incorrect { animation: pulse-red 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -612,117 +498,97 @@
     <div class="container">
         <header class="header">
             <div class="logo-container">
-                <div class="logo-icon">⚡</div>
+                <div class="logo-icon">🔥</div>
                 <div>
                     <h1>Norma de Testing BBVA</h1>
-                    <p class="subtitle">Examen Avanzado — Nivel Experto</p>
+                    <p class="subtitle">Examen de Certificación — Nivel EXTREMO</p>
                 </div>
             </div>
-            <div class="badge-container">
-                <span class="badge badge-purple">SYSTEMS ENGINEERING</span>
-                <span class="badge badge-red">DIFICULTAD ALTA</span>
-            </div>
+            <div class="extreme-badge">⚠️ DIFICULTAD MÁXIMA ⚠️</div>
         </header>
 
         <div id="startScreen" class="question-card start-screen">
-            <h2>🎯 Evaluación Avanzada</h2>
+            <h2>🎯 Evaluación de Certificación Extrema</h2>
             <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                Examen de nivel experto con preguntas basadas en escenarios reales,<br>
-                casos de uso complejos y distractores desafiantes.
+                Este examen está diseñado para evaluar conocimiento profundo y detallado.<br>
+                Incluye trampas, escenarios complejos y preguntas de combinación múltiple.
             </p>
+
+            <div class="warning-banner">
+                <h3>⚠️ ADVERTENCIAS DEL EXAMEN</h3>
+                <ul>
+                    <li><strong>Preguntas trampa:</strong> Varias respuestas parecen correctas pero solo una lo es</li>
+                    <li><strong>Preguntas negativas:</strong> "¿Cuál NO es correcto?" - Lee con cuidado</li>
+                    <li><strong>Valores exactos:</strong> Se requieren números precisos (80%, 0%, 12 meses)</li>
+                    <li><strong>Escenarios complejos:</strong> Múltiples factores a considerar simultáneamente</li>
+                    <li><strong>Roles específicos:</strong> DEV vs PO vs SO vs AO - diferencias sutiles</li>
+                    <li><strong>Secuencias:</strong> El orden exacto de procesos importa</li>
+                </ul>
+            </div>
 
             <div class="start-info">
                 <div class="info-item">
                     <div class="info-icon">📋</div>
                     <div class="info-text">
                         <h4>Total de preguntas</h4>
-                        <p>55 preguntas</p>
+                        <p>70 preguntas</p>
                     </div>
                 </div>
                 <div class="info-item">
                     <div class="info-icon">🎯</div>
                     <div class="info-text">
-                        <h4>Tipos de preguntas</h4>
-                        <p>Escenarios + Conceptos</p>
+                        <h4>Nivel</h4>
+                        <p>EXTREMO</p>
                     </div>
                 </div>
                 <div class="info-item">
-                    <div class="info-icon">⚠️</div>
+                    <div class="info-icon">⏱️</div>
                     <div class="info-text">
-                        <h4>Dificultad</h4>
-                        <p>Experto / Alta</p>
+                        <h4>Tiempo sugerido</h4>
+                        <p>90 minutos</p>
                     </div>
                 </div>
                 <div class="info-item">
                     <div class="info-icon">✅</div>
                     <div class="info-text">
                         <h4>Para aprobar</h4>
-                        <p>75% mínimo</p>
+                        <p>80% mínimo</p>
                     </div>
                 </div>
             </div>
 
-            <div class="warning-box">
-                <h4>⚠️ Advertencias del Examen</h4>
-                <p>Este examen está diseñado para evaluar comprensión profunda:</p>
-                <ul>
-                    <li>Preguntas basadas en <strong>escenarios reales</strong></li>
-                    <li>Opciones con <strong>diferencias sutiles</strong></li>
-                    <li>Combinaciones de conceptos y responsabilidades</li>
-                    <li>Valores numéricos específicos (umbrales, tiempos)</li>
-                </ul>
-            </div>
-
             <div class="question-limit">
                 <label>Número de preguntas:</label>
-                <input type="number" id="questionLimit" min="10" max="55" value="55">
-                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-55)</span>
+                <input type="number" id="questionLimit" min="10" max="70" value="70">
+                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-70)</span>
             </div>
 
             <button class="btn btn-primary" onclick="startExam()" style="margin-top: 1.5rem; padding: 1rem 3rem; font-size: 1.1rem;">
-                ⚡ Iniciar Examen Avanzado
+                🔥 Iniciar Examen Extremo
             </button>
         </div>
 
         <div id="examScreen" class="hidden">
             <div class="stats-bar">
-                <div class="stat-card">
-                    <div class="stat-value" id="currentQuestion">1</div>
-                    <div class="stat-label">Actual</div>
-                </div>
-                <div class="stat-card correct-stat">
-                    <div class="stat-value correct" id="correctCount">0</div>
-                    <div class="stat-label">Correctas</div>
-                </div>
-                <div class="stat-card incorrect-stat">
-                    <div class="stat-value incorrect" id="incorrectCount">0</div>
-                    <div class="stat-label">Incorrectas</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="totalQuestions">55</div>
-                    <div class="stat-label">Total</div>
-                </div>
+                <div class="stat-card"><div class="stat-value neutral" id="currentQuestion">1</div><div class="stat-label">Actual</div></div>
+                <div class="stat-card correct-stat"><div class="stat-value correct" id="correctCount">0</div><div class="stat-label">Correctas</div></div>
+                <div class="stat-card incorrect-stat"><div class="stat-value incorrect" id="incorrectCount">0</div><div class="stat-label">Incorrectas</div></div>
+                <div class="stat-card"><div class="stat-value neutral" id="totalQuestions">70</div><div class="stat-label">Total</div></div>
             </div>
-
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-            </div>
-
+            <div class="progress-container"><div class="progress-bar" id="progressBar" style="width: 0%"></div></div>
             <div class="question-nav" id="questionNav"></div>
-
             <div class="question-card fade-in" id="questionCard">
                 <div class="question-header">
                     <span class="question-number" id="questionNumber">Pregunta 1</span>
                     <span class="question-category" id="questionCategory">Categoría</span>
-                    <span class="question-type" id="questionType">Escenario</span>
-                    <span class="difficulty-badge" id="difficultyBadge">Experto</span>
+                    <span class="question-type" id="questionType">Tipo</span>
+                    <span class="difficulty-badge" id="difficultyBadge">Dificultad</span>
                 </div>
                 <div id="scenarioBox"></div>
-                <p class="question-text" id="questionText">Texto de la pregunta...</p>
+                <p class="question-text" id="questionText">Texto...</p>
                 <div class="options-list" id="optionsList"></div>
                 <div id="feedbackContainer"></div>
             </div>
-
             <div class="navigation">
                 <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">← Anterior</button>
                 <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Siguiente →</button>
@@ -732,36 +598,25 @@
 
         <div id="resultsScreen" class="hidden">
             <div class="question-card results-container">
-                <h2 style="margin-bottom: 1rem;">Resultados del Examen Avanzado</h2>
+                <h2 style="margin-bottom: 1rem;">Resultados del Examen Extremo</h2>
                 <div class="results-score" id="finalScore">0%</div>
                 <div class="results-grade" id="gradeText">Calificación</div>
-                
                 <div class="results-stats">
-                    <div class="result-stat">
-                        <div class="result-stat-value correct" id="finalCorrectCount">0</div>
-                        <div class="stat-label">Correctas</div>
-                    </div>
-                    <div class="result-stat">
-                        <div class="result-stat-value incorrect" id="finalIncorrectCount">0</div>
-                        <div class="stat-label">Incorrectas</div>
-                    </div>
-                    <div class="result-stat">
-                        <div class="result-stat-value unanswered" id="finalUnansweredCount">0</div>
-                        <div class="stat-label">Sin responder</div>
-                    </div>
+                    <div class="result-stat"><div class="result-stat-value correct" id="finalCorrect">0</div><div class="stat-label">Correctas</div></div>
+                    <div class="result-stat"><div class="result-stat-value incorrect" id="finalIncorrect">0</div><div class="stat-label">Incorrectas</div></div>
+                    <div class="result-stat"><div class="result-stat-value unanswered" id="finalUnanswered">0</div><div class="stat-label">Sin responder</div></div>
                 </div>
-
                 <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                     <button class="btn btn-secondary" onclick="reviewAnswers()">📋 Revisar Respuestas</button>
-                    <button class="btn btn-primary" onclick="restartExam()">🔄 Nuevo Examen</button>
+                    <button class="btn btn-primary" onclick="restartExam()">🔄 Nuevo Intento</button>
                 </div>
             </div>
         </div>
 
         <div id="reviewScreen" class="hidden">
             <div class="question-card" style="margin-bottom: 1rem;">
-                <h2 style="margin-bottom: 0.5rem;">Revisión de Respuestas</h2>
-                <p style="color: var(--text-secondary);">Análisis detallado de cada pregunta</p>
+                <h2 style="margin-bottom: 0.5rem;">Revisión Detallada</h2>
+                <p style="color: var(--text-secondary);">Análisis de cada pregunta con explicaciones</p>
             </div>
             <div id="reviewContainer"></div>
             <div class="navigation">
@@ -772,303 +627,468 @@
 
     <script>
         const allQuestions = [
-            // ========== ESCENARIOS COMPLEJOS ==========
-            {id:1,category:"Escenario",type:"scenario",difficulty:"expert",
-                scenario:"Tu equipo está desarrollando un nuevo módulo para el Core Bancario. El sistema está clasificado como <strong>crítico DORA</strong> y en alcance <strong>SOX</strong>. Durante las pruebas de integración en el pipeline CI/CD, el análisis estático reporta 2 issues de tipo 'Major'.",
-                question:"¿Qué sucederá con el despliegue?",
-                options:["El despliegue continúa con una advertencia en el log","El despliegue es DETENIDO automáticamente por comportamiento bloqueante","Se envía notificación al PO para aprobación manual","El despliegue se programa para horario nocturno"],
-                correct:1,explanation:"Para sistemas críticos DORA/SOX, el Quality Gate de Sonar exige 0% Major. Al tener 2 issues Major, el comportamiento bloqueante DETIENE la construcción y despliegue."},
+            // ===== ESCENARIOS COMPLEJOS MULTI-FACTOR =====
+            {id:1,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
+            scenario:"Sistema <strong>DORA crítico</strong> con cambio de emergencia. El Quality Gate de Sonar muestra: <span class='highlight'>0 Críticos, 1 Mayor, 0 Seguridad</span>. Cobertura: <span class='highlight'>82%</span>. El PO presiona por desplegar hoy porque hay un problema en producción. El SO ya dio Vo.Bo. verbal.",
+            question:"¿Qué debe ocurrir según la Norma?",
+            options:["Proceder con el despliegue porque es emergencia y el SO aprobó verbalmente","El despliegue debe BLOQUEARSE automáticamente por el issue Mayor aunque sea emergencia","Proceder porque la cobertura supera el 80% requerido","Escalar al AO para que autorice la excepción DORA"],
+            correct:1,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> Aunque es emergencia y hay aprobación verbal del SO, el Quality Gate requiere <span class='key-point'>0% Critical, 0% Major, 0% Security</span>. El 1 Mayor bloquea automáticamente. La cobertura (82%) SÍ cumple, pero eso no anula el bloqueo por issues."},
 
-            {id:2,category:"Escenario",type:"scenario",difficulty:"expert",
-                scenario:"Eres App Owner de un servicio N2. El Service Owner ha decidido que un bug detectado sea marcado como <strong>'Asumido'</strong> porque su impacto es tolerable para el negocio.",
-                question:"¿Cuáles son TODAS las implicaciones correctas de esta decisión?",
-                options:["Solo se documenta en Jira y se cierra el ticket","Se documenta, genera deuda técnica, y el SO es responsable de esta decisión","Se escala automáticamente al PO para validación adicional","El bug se elimina del backlog sin documentación"],
-                correct:1,explanation:"Cuando un error es 'Asumido': 1) Debe DOCUMENTARSE, 2) Genera deuda técnica, 3) El Service Owner es el responsable de esta decisión."},
+            {id:2,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
+            scenario:"Aplicación nueva requiere usar <strong>datos de producción</strong> en ambiente de desarrollo para pruebas. El equipo tiene acceso a <strong>HAD</strong> para enmascaramiento. El PO dice que ya se hizo antes sin problemas.",
+            question:"¿Qué combinación de requisitos es CORRECTA?",
+            options:["Solo enmascaramiento HAD es suficiente si el PO lo autoriza","Requiere enmascaramiento HAD + consentimiento DyD-09 + aprobación documentada","Solo se necesita el consentimiento DyD-09 porque HAD ya enmascara","No se pueden usar datos de producción bajo ninguna circunstancia"],
+            correct:1,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> 'Ya se hizo antes' no es justificación válida. Usar datos reales requiere: 1) <span class='key-point'>Enmascaramiento HAD</span>, 2) <span class='key-point'>Control DyD-09</span> (documento de autorización). Ambos son obligatorios."},
 
-            {id:3,category:"Escenario",type:"scenario",difficulty:"hard",
-                scenario:"Tu proyecto necesita usar datos de producción para pruebas porque los datos sintéticos no cubren ciertos escenarios edge-case. El equipo propone copiar directamente la base de datos.",
-                question:"¿Cuál es el procedimiento COMPLETO correcto según la Norma?",
-                options:["Copiar datos y notificar al Service Owner","Usar HAD para enmascarar, asegurar seguridad equivalente, tiempo limitado y obtener consentimiento (DyD-09)","Solicitar aprobación verbal del PO y proceder","Crear un ticket en Jira y esperar aprobación automática"],
-                correct:1,explanation:"Datos reales requieren: 1) Enmascaramiento con HAD, 2) Seguridad equivalente a producción, 3) Tiempo limitado (eliminar al finalizar), 4) Documento de consentimiento (Control DyD-09 del CVT)."},
+            {id:3,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
+            scenario:"Error encontrado en pruebas E2E. El DEV argumenta que es un <strong>Falso Positivo</strong> porque el requerimiento está mal especificado. El PO dice que es un <strong>error real</strong> que debe corregirse. El SO no está disponible.",
+            question:"¿Quién tiene la autoridad FINAL para clasificar este error como Falso Positivo?",
+            options:["El DEV porque tiene el conocimiento técnico","El PO porque es responsable de los requerimientos","El AO porque es el arquitecto del sistema","Solo el SO puede autorizar la clasificación como Falso Positivo"],
+            correct:3,
+            explanation:"Solo el <span class='key-point'>SO (Service Owner)</span> puede autorizar la clasificación como Falso Positivo o Error Asumido. Ni el DEV ni el PO tienen esta autoridad. El AO tiene otras responsabilidades (Plan Estratégico, Hacking Ético)."},
 
-            {id:4,category:"Escenario",type:"scenario",difficulty:"expert",
-                scenario:"El equipo de desarrollo ha completado las pruebas unitarias con <strong>cobertura del 78%</strong> y <strong>100% Pass</strong>. El Change Lead está revisando el CVT para autorizar el pase a producción.",
-                question:"¿Cuál debe ser la decisión del Change Lead?",
-                options:["Aprobar el CVT porque el 100% Pass es lo importante","Rechazar el CVT porque la cobertura mínima requerida es 80%","Aprobar con condición de mejorar cobertura post-producción","Escalar al Service Owner para decisión final"],
-                correct:1,explanation:"El umbral de cobertura para pruebas unitarias es ≥ 80%. Con 78% no se cumple el umbral, por lo que el CVT no puede ser aprobado. La cobertura es un requisito bloqueante."},
+            {id:4,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
+            scenario:"Componente de terceros (librería open source) necesita actualizarse por vulnerabilidad crítica. El proveedor dice que ya pasó sus propias pruebas de seguridad certificadas.",
+            question:"¿Qué pruebas son OBLIGATORIAS según la Norma, independientemente de las certificaciones del proveedor?",
+            options:["Ninguna adicional si el proveedor tiene certificación ISO 27001","Solo SCA para verificar obsolescencia","SCA (obsolescencia/licencias) + SAST (vulnerabilidades) + Verificación de integridad (tampering)","Solo SAST porque es una vulnerabilidad de seguridad"],
+            correct:2,
+            explanation:"Para componentes de terceros siempre se requieren: <span class='key-point'>SCA</span> (obsolescencia y licencias), <span class='key-point'>SAST</span> (vulnerabilidades), y <span class='key-point'>verificación de integridad</span> (tampering). Las certificaciones del proveedor NO eximen de estas pruebas."},
 
-            {id:5,category:"Escenario",type:"scenario",difficulty:"hard",
-                scenario:"Durante la fase de Pruebas E2E, se detecta un defecto en una funcionalidad. El desarrollador insiste que es un 'falso positivo' porque el requerimiento estaba mal especificado.",
-                question:"¿Quién tiene la responsabilidad de determinar si realmente es un Falso Positivo?",
-                options:["Solo el desarrollador que hizo la implementación","El PO/App Owner + DEV conjuntamente","El Service Owner exclusivamente","El Quality Coach del equipo"],
-                correct:1,explanation:"La determinación de Falso Positivo es responsabilidad conjunta del PO/App Owner + DEV, no solo del desarrollador."},
+            {id:5,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
+            scenario:"Sistema <strong>SOX</strong> pasó todas las pruebas hace <span class='highlight'>10 meses</span>. No ha habido cambios. Auditoría solicita evidencias de pruebas.",
+            question:"¿Las evidencias estarán disponibles?",
+            options:["No, las evidencias expiraron a los 3 meses","Sí, sistemas DORA/SOX retienen evidencias por 12 meses","Sí, pero solo si hubo más de 10 ejecuciones","No, porque no hubo cambios recientes que generen nuevas evidencias"],
+            correct:1,
+            explanation:"<span class='key-point'>Sistemas DORA/SOX</span> tienen retención especial: <span class='key-point'>12 meses</span> de evidencias. Los sistemas regulares son 3 meses o 10 ejecuciones. El sistema SOX de 10 meses SÍ tendrá evidencias."},
 
-            {id:6,category:"Escenario",type:"scenario",difficulty:"expert",
-                scenario:"Tu aplicación tiene una interfaz de usuario que fue modificada en este sprint. La aplicación está sujeta a la <strong>Ley de Accesibilidad</strong> del país donde opera.",
-                question:"¿Qué tipo de prueba se vuelve OBLIGATORIA en este caso específico?",
-                options:["Solo pruebas de UI estándar","Pruebas de Accesibilidad porque aplica Ley + hubo cambio en UI","Pruebas de Rendimiento por ser visible al usuario","Pruebas de Seguridad adicionales"],
-                correct:1,explanation:"Las pruebas de Accesibilidad son obligatorias cuando: 1) Aplica Ley de Accesibilidad Y 2) Hubo modificación en la UI. Ambas condiciones se cumplen."},
+            // ===== PREGUNTAS NUMÉRICAS EXACTAS =====
+            {id:6,category:"Valores Exactos",type:"numerical",difficulty:"extreme",
+            question:"¿Cuáles son los umbrales EXACTOS del Quality Gate de Sonar para poder desplegar?",
+            options:["<5% Critical, <5% Major, <5% Security","0% Critical, 0% Major, 0% Security","<1% Critical, <1% Major, 0% Security","0% Critical, <5% Major, 0% Security"],
+            correct:1,
+            explanation:"Los umbrales son <span class='key-point'>exactamente 0%</span> para los tres: Critical, Major y Security. No hay tolerancia. Cualquier valor mayor bloquea el despliegue automáticamente."},
 
-            {id:7,category:"Escenario",type:"scenario",difficulty:"hard",
-                scenario:"El Release Manager detecta que el CVT está incompleto: faltan evidencias de las pruebas de integración. El equipo argumenta que las pruebas sí se ejecutaron pero olvidaron adjuntar evidencias.",
-                question:"¿Qué debe hacer el Release Manager?",
-                options:["Confiar en el equipo y aprobar el pase","DETENER el despliegue hasta que el CVT esté completo con todas las evidencias","Aprobar con la condición de adjuntar evidencias post-producción","Escalar al PO para decisión"],
-                correct:1,explanation:"Regla de Oro #15: CVT incompleto = despliegue DETENIDO. Las evidencias son obligatorias y deben estar completas ANTES del pase a producción."},
+            {id:7,category:"Valores Exactos",type:"numerical",difficulty:"extreme",
+            question:"Para pruebas unitarias, ¿cuál es la combinación CORRECTA de requisitos?",
+            options:["≥80% cobertura, 100% pass rate","≥90% cobertura, ≥95% pass rate","100% cobertura, 100% pass rate","≥75% cobertura, 100% pass rate"],
+            correct:0,
+            explanation:"Pruebas unitarias requieren: <span class='key-point'>≥80% cobertura</span> + <span class='key-point'>100% pass rate</span>. No se requiere 90% ni 100% de cobertura, pero el pass rate sí debe ser 100%."},
 
-            {id:8,category:"Escenario",type:"scenario",difficulty:"expert",
-                scenario:"Tu sistema NO es crítico DORA ni está en alcance SOX. Las pruebas se ejecutaron hace <strong>4 meses</strong> y ahora auditoría solicita las evidencias.",
-                question:"¿Las evidencias deberían estar disponibles según la Norma?",
-                options:["Sí, porque la retención mínima es 6 meses","No necesariamente, porque la retención general es 3 meses o últimas 10 ejecuciones","Sí, porque todas las evidencias se retienen 12 meses","Depende de la decisión del Service Owner"],
-                correct:1,explanation:"Para sistemas generales (no DORA/SOX), la retención mínima es 3 meses o últimas 10 ejecuciones (lo que ocurra primero). A los 4 meses, las evidencias podrían ya no estar disponibles."},
+            {id:8,category:"Valores Exactos",type:"numerical",difficulty:"expert",
+            question:"¿Cuántos tipos de pruebas debe contemplar el Plan de Pruebas por cada Servicio N2?",
+            options:["5 tipos de pruebas","7 tipos de pruebas","10 tipos de pruebas","12 tipos de pruebas"],
+            correct:2,
+            explanation:"El Plan de Pruebas debe contemplar <span class='key-point'>10 tipos de pruebas</span> por cada Servicio N2: Unitarias, Integración, Funcionales, Regresión, Humo, Rendimiento, Seguridad (SAST/DAST), Hacking Ético, Aceptación, Monitoreo Fraude."},
 
-            // ========== PREGUNTAS DE NÚMEROS Y UMBRALES ==========
-            {id:9,category:"Umbrales",type:"numerical",difficulty:"expert",
-                question:"¿Cuáles son los umbrales EXACTOS del Quality Gate de Sonar para el Análisis Estático de Código?",
-                options:["0% Critical, 5% Major, 0% Security","0% Critical, 0% Major, 0% Security","5% Critical, 5% Major, 5% Security","1% Critical, 1% Major, 0% Security"],
-                correct:1,explanation:"Quality Gate de Sonar: 0% Critical, 0% Major, 0% Security. No se permite ningún issue en estas categorías."},
+            {id:9,category:"Valores Exactos",type:"numerical",difficulty:"extreme",
+            question:"¿Cuál es el período de retención de evidencias para un sistema NO crítico (no DORA/SOX)?",
+            options:["3 meses o 10 ejecuciones, lo que ocurra primero","3 meses o 10 ejecuciones, lo que ocurra después","6 meses fijos","12 meses como todos los sistemas"],
+            correct:0,
+            explanation:"Sistemas regulares: <span class='key-point'>3 meses o 10 ejecuciones, lo que ocurra primero</span>. Solo DORA/SOX tienen 12 meses. El criterio es 'lo que ocurra primero', no después."},
 
-            {id:10,category:"Umbrales",type:"numerical",difficulty:"hard",
-                question:"¿Cuál es la cobertura mínima requerida para las pruebas unitarias?",
-                options:["70%","75%","80%","85%"],
-                correct:2,explanation:"La cobertura mínima para pruebas unitarias es ≥ 80% junto con 100% Pass."},
+            // ===== PREGUNTAS TRAMPA DE ROLES =====
+            {id:10,category:"Roles Trampa",type:"trap",difficulty:"extreme",
+            question:"¿Quién EJECUTA las pruebas de Hacking Ético?",
+            options:["El equipo DEV como parte de sus responsabilidades","El PO porque certifica la aceptación","El AO (Application Owner)","Un equipo externo de seguridad independiente"],
+            correct:2,
+            explanation:"<span class='trap-warning'>TRAMPA COMÚN:</span> El <span class='key-point'>AO (Application Owner)</span> ejecuta Hacking Ético. NO el DEV (ejecuta todos los tipos de pruebas excepto Hacking Ético), NO equipos externos necesariamente."},
 
-            {id:11,category:"Umbrales",type:"numerical",difficulty:"hard",
-                question:"¿Cuántos tipos de pruebas deben planificarse en el Plan de Pruebas Estratégico para cada Servicio N2?",
-                options:["5 tipos","7 tipos","8 tipos","10 tipos"],
-                correct:3,explanation:"Se deben planificar los 10 tipos de pruebas para cada Servicio N2."},
+            {id:11,category:"Roles Trampa",type:"trap",difficulty:"extreme",
+            question:"¿Quién es responsable de la Deuda Técnica en un proyecto de MANTENIMIENTO?",
+            options:["El PO (Product Owner) siempre es responsable de la deuda técnica","El SO (Service Owner) en mantenimiento","El DEV porque genera el código","El AO porque es el arquitecto"],
+            correct:1,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> La responsabilidad de Deuda Técnica CAMBIA según el contexto: <span class='key-point'>PO para desarrollos nuevos</span>, <span class='key-point'>SO para mantenimiento</span>. La pregunta específica 'mantenimiento', por lo tanto es el SO."},
 
-            {id:12,category:"Umbrales",type:"numerical",difficulty:"expert",
-                question:"Para sistemas en alcance DORA/SOX, ¿cuál es el tiempo mínimo de retención de evidencias?",
-                options:["3 meses","6 meses","12 meses","24 meses"],
-                correct:2,explanation:"Para DORA/SOX: Mínimo 12 meses de retención (requisitos de auditoría)."},
+            {id:12,category:"Roles Trampa",type:"trap",difficulty:"extreme",
+            question:"¿Quién es responsable de asegurar que el CVT esté completo antes del despliegue?",
+            options:["El DEV porque ejecuta las pruebas","El PO porque certifica la aceptación","El SO porque da el Vo.Bo.","El Change Lead de la instalación"],
+            correct:3,
+            explanation:"El <span class='key-point'>Change Lead</span> es responsable de la completitud del CVT. El SO da Vo.Bo., el PO certifica aceptación, pero la verificación del CVT completo es del Change Lead."},
 
-            {id:13,category:"Umbrales",type:"numerical",difficulty:"medium",
-                question:"Para sistemas generales (no DORA/SOX), la retención de evidencias es:",
-                options:["1 mes o últimas 5 ejecuciones","3 meses o últimas 10 ejecuciones (lo que ocurra primero)","6 meses o últimas 15 ejecuciones","12 meses obligatorio"],
-                correct:1,explanation:"General: 3 meses o últimas 10 ejecuciones (lo que ocurra primero)."},
+            {id:13,category:"Roles Trampa",type:"trap",difficulty:"expert",
+            question:"¿Quién ejecuta las pruebas de Rendimiento y Capacidad para sistemas DORA críticos?",
+            options:["El equipo DEV del proyecto","El PO con apoyo del DEV","El equipo DQ/Red Team","El AO junto con Infrastructure"],
+            correct:2,
+            explanation:"Para sistemas <span class='key-point'>DORA críticos</span>, las pruebas de Rendimiento y Capacidad las ejecuta el <span class='key-point'>equipo DQ/Red Team</span>, no el DEV regular."},
 
-            // ========== PREGUNTAS TRICKY DE ROLES ==========
-            {id:14,category:"Roles",type:"tricky",difficulty:"expert",
-                question:"¿Quién es responsable de la ejecución de TODOS los tipos de pruebas según la Norma?",
-                options:["El Quality Coach (QC)","El App Owner (AO)","El equipo de Desarrollo (DEV)","El Product Owner (PO)"],
-                correct:2,explanation:"DEV es responsable de la EJECUCIÓN de todos los tipos de pruebas. El QC asegura calidad del proceso, el AO asegura umbrales, el PO certifica aceptación."},
+            {id:14,category:"Roles Trampa",type:"trap",difficulty:"extreme",
+            question:"¿Quién genera el Plan Estratégico de Pruebas?",
+            options:["El DEV con apoyo del QA","El PO porque define los requerimientos","El AO (Application Owner)","El Release Manager"],
+            correct:2,
+            explanation:"El <span class='key-point'>AO (Application Owner)</span> genera el Plan Estratégico de Pruebas. NO confundir con el Plan de Pruebas operativo que involucra al DEV."},
 
-            {id:15,category:"Roles",type:"tricky",difficulty:"expert",
-                question:"¿Quién es responsable FINAL de la deuda técnica en MANTENIMIENTOS (no nuevos desarrollos)?",
-                options:["El Product Owner","El Service Owner","El App Owner","El desarrollador"],
-                correct:1,explanation:"El PO es responsable de deuda técnica en nuevos desarrollos. Para MANTENIMIENTOS, el responsable es el Service Owner."},
+            // ===== PREGUNTAS NEGATIVAS =====
+            {id:15,category:"Pregunta Negativa",type:"negative",difficulty:"extreme",
+            question:"¿Cuál de las siguientes NO es una disposición de error válida según la Norma?",
+            options:["Corregido","Falso Positivo","Asumido","Pospuesto"],
+            correct:3,
+            explanation:"Las disposiciones válidas son: <span class='key-point'>Corregido, Falso Positivo, Asumido</span>. '<span class='trap-warning'>Pospuesto</span>' NO existe como disposición en la Norma."},
 
-            {id:16,category:"Roles",type:"tricky",difficulty:"hard",
-                question:"¿Quién genera y mantiene el Plan de Pruebas Estratégico?",
-                options:["El Quality Coach","El Product Owner","El App Owner Principal + App Owners de servicios N2","El Release Manager"],
-                correct:2,explanation:"Responsable del Plan de Pruebas Estratégico: App Owner Principal + App Owners de servicios N2 participantes."},
+            {id:16,category:"Pregunta Negativa",type:"negative",difficulty:"extreme",
+            question:"¿Cuál NO es uno de los 7 Principios de la Norma de Testing?",
+            options:["Prevalencia Legal","Concurrencia","Automatización Total","Viabilidad"],
+            correct:2,
+            explanation:"Los 7 principios incluyen: Prevalencia Legal, Concurrencia, Viabilidad, Proporcionalidad, Shift-Left, <span class='key-point'>Automatización</span> (no 'Total'). '<span class='trap-warning'>Automatización Total</span>' no existe como principio."},
 
-            {id:17,category:"Roles",type:"tricky",difficulty:"hard",
-                question:"¿Quién ejecuta las pruebas de Hacking Ético (HE)?",
-                options:["El equipo de InfoSec exclusivamente","El DQ / Red Team","El App Owner (AO)","El desarrollador senior del equipo"],
-                correct:2,explanation:"Las pruebas de Hacking Ético las ejecuta el App Owner (AO), con apoyo de InfoSec."},
+            {id:17,category:"Pregunta Negativa",type:"negative",difficulty:"expert",
+            question:"¿Cuál NO es responsabilidad del DEV según la Norma?",
+            options:["Ejecutar pruebas unitarias","Ejecutar pruebas de integración","Autorizar errores como Asumidos","Ejecutar pruebas de regresión"],
+            correct:2,
+            explanation:"El DEV ejecuta TODOS los tipos de pruebas. Sin embargo, <span class='key-point'>autorizar errores como Asumidos</span> es responsabilidad exclusiva del <span class='key-point'>SO</span>, no del DEV."},
 
-            {id:18,category:"Roles",type:"tricky",difficulty:"expert",
-                question:"¿Quién es responsable del CVT (Checklist de Validación Técnica)?",
-                options:["El Release Manager","El Service Owner","El Change Lead","El Quality Coach"],
-                correct:2,explanation:"El Change Lead es responsable del CVT. Asegura que todas las evidencias estén completas antes del pase a producción."},
+            {id:18,category:"Pregunta Negativa",type:"negative",difficulty:"extreme",
+            question:"¿Cuál de estas fases NO pertenece al proceso E2E de pruebas?",
+            options:["Ideación","Delegación","Certificación","Gestión de Cambios"],
+            correct:2,
+            explanation:"Las fases E2E son: Ideación → Diseño → Desarrollo → Pruebas E2E → Delegación → Gestión de Cambios. '<span class='trap-warning'>Certificación</span>' NO es una fase del proceso E2E."},
 
-            {id:19,category:"Roles",type:"tricky",difficulty:"hard",
-                question:"¿Quién ejecuta las pruebas de Rendimiento/Capacidad para sistemas críticos DORA?",
-                options:["El equipo de desarrollo","El App Owner","El DQ / Red Team","El Service Owner"],
-                correct:2,explanation:"DQ / Red Team ejecuta las pruebas de Rendimiento/Capacidad para sistemas críticos DORA."},
+            // ===== SECUENCIAS Y ORDEN =====
+            {id:19,category:"Secuencias",type:"sequence",difficulty:"extreme",
+            question:"¿Cuál es el orden CORRECTO del proceso E2E?",
+            options:["Diseño → Ideación → Desarrollo → Pruebas → Delegación → Cambios","Ideación → Desarrollo → Diseño → Pruebas → Cambios → Delegación","Ideación → Diseño → Desarrollo → Pruebas E2E → Delegación → Gestión de Cambios","Ideación → Diseño → Pruebas → Desarrollo → Delegación → Cambios"],
+            correct:2,
+            explanation:"Orden correcto: <span class='key-point'>Ideación → Diseño (Plan de Pruebas) → Desarrollo → Pruebas E2E (RMP) → Delegación → Gestión de Cambios</span>."},
 
-            {id:20,category:"Roles",type:"tricky",difficulty:"expert",
-                question:"¿Quién otorga el Vo.Bo. (Visto Bueno) de las pruebas?",
-                options:["El Product Owner","El Release Manager","El Service Owner","El Change Lead"],
-                correct:2,explanation:"El Service Owner otorga el Vo.Bo. de las pruebas y es responsable de las decisiones de errores asumidos."},
+            {id:20,category:"Secuencias",type:"sequence",difficulty:"expert",
+            question:"¿Cuál es el orden correcto de la trazabilidad según la Norma?",
+            options:["Pruebas → Requerimiento → CRQ → Resultados","Requerimiento → CRQ → Pruebas → Resultados","Requerimiento → Pruebas (C204) → Resultados → CRQ","CRQ → Requerimiento → Pruebas → Resultados"],
+            correct:2,
+            explanation:"Trazabilidad correcta: <span class='key-point'>Requerimiento → Pruebas (C204) → Resultados → CRQ</span>. El CRQ viene al final, después de los resultados."},
 
-            // ========== PREGUNTAS DE 7 PRINCIPIOS ==========
-            {id:21,category:"Principios",type:"conceptual",difficulty:"expert",
-                question:"Si existe conflicto entre dos regulaciones de DIFERENTE rango, ¿cuál se aplica según el Principio 1?",
-                options:["La más reciente","La más restrictiva","La de MAYOR rango","La que determine el Service Owner"],
-                correct:2,explanation:"Principio 1 (Prevalencia Legal): En conflicto entre regulaciones, se aplica la de mayor rango."},
+            // ===== PREGUNTAS DE COMBINACIÓN =====
+            {id:21,category:"Combinación",type:"combined",difficulty:"extreme",
+            question:"Para un sistema DORA crítico, ¿qué combinación de requisitos es correcta?",
+            options:["Quality Gate 0/0/0 + 80% cobertura + evidencias 3 meses","Quality Gate 0/0/0 + 80% cobertura + evidencias 12 meses + pruebas DQ/Red Team","Quality Gate <5/<5/0 + 90% cobertura + evidencias 12 meses","Solo Quality Gate 0/0/0 es diferente para DORA"],
+            correct:1,
+            explanation:"Sistemas DORA críticos: <span class='key-point'>Quality Gate 0/0/0</span> + <span class='key-point'>≥80% cobertura</span> + <span class='key-point'>12 meses retención</span> + <span class='key-point'>pruebas Rendimiento/Capacidad por DQ/Red Team</span>."},
 
-            {id:22,category:"Principios",type:"conceptual",difficulty:"expert",
-                question:"Si existe conflicto entre dos regulaciones del MISMO rango, ¿cuál se aplica según el Principio 2?",
-                options:["La más antigua","La de mayor rango","La MÁS RESTRICTIVA","La que beneficie al proyecto"],
-                correct:2,explanation:"Principio 2 (Concurrencia): En conflicto entre regulaciones del mismo rango, se aplica la más restrictiva."},
+            {id:22,category:"Combinación",type:"combined",difficulty:"extreme",
+            question:"Cuando se detecta un error en producción desde septiembre 2025, ¿qué proceso aplica?",
+            options:["Se registra en Jira y se asigna al DEV","Se abre ticket FDS en Helix y sigue el proceso de incidencias EEPP","Se registra como bug en el backlog del sprint","Se comunica al PO para priorización"],
+            correct:1,
+            explanation:"Desde <span class='key-point'>septiembre 2025</span>, los errores de producción (incidencias EEPP) se gestionan mediante <span class='key-point'>tickets FDS en Helix</span>, no en Jira ni backlog regular."},
 
-            {id:23,category:"Principios",type:"conceptual",difficulty:"hard",
-                question:"Si una prueba no es viable técnicamente, según el Principio 3:",
-                options:["Se omite automáticamente","Puede no ejecutarse, pero debe DOCUMENTARSE como excepción + controles compensatorios","Se traslada a la siguiente fase","El PO decide si se ejecuta"],
-                correct:1,explanation:"Principio 3: Si no es viable técnicamente, puede no ejecutarse. DOCUMENTAR motivo como excepción + controles compensatorios."},
+            // ===== PRINCIPIOS AVANZADOS =====
+            {id:23,category:"Principios",type:"trap",difficulty:"extreme",
+            question:"El principio de 'Concurrencia' establece que:",
+            options:["Todas las pruebas deben ejecutarse en paralelo","Cuando hay conflicto entre normativas, se aplica la más permisiva","Cuando hay conflicto entre normativas, se aplica la MÁS RESTRICTIVA","Las pruebas concurrentes tienen prioridad"],
+            correct:2,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> Concurrencia NO es sobre paralelismo. Significa que cuando hay <span class='key-point'>conflicto entre normativas, se aplica la MÁS RESTRICTIVA</span>."},
 
-            {id:24,category:"Principios",type:"conceptual",difficulty:"hard",
-                question:"El principio de Proporcionalidad (Riesgo/Criticidad) establece que:",
-                options:["Todos los sistemas se prueban igual","Cuanto más crítico el sistema, más riguroso el testing","Solo los sistemas DORA requieren pruebas","La proporción de pruebas depende del presupuesto"],
-                correct:1,explanation:"Principio 5: Cuanto más crítico el sistema, más riguroso el testing. Sistemas DORA críticos = máxima exigencia."},
+            {id:24,category:"Principios",type:"trap",difficulty:"extreme",
+            question:"El principio de 'Prevalencia Legal' significa:",
+            options:["Las pruebas legales tienen prioridad sobre las técnicas","La normativa de mayor rango prevalece sobre las de menor rango","Los requisitos legales deben probarse primero","Solo aplica para sistemas con datos de clientes"],
+            correct:1,
+            explanation:"Prevalencia Legal: <span class='key-point'>La normativa de mayor rango prevalece sobre las de menor rango</span>. Es una jerarquía normativa, no sobre tipos de pruebas."},
 
-            {id:25,category:"Principios",type:"conceptual",difficulty:"medium",
-                question:"¿Qué significa el principio 'Shift-Left'?",
-                options:["Mover el testing a fases finales del SDLC","El testing debe hacerse desde las fases MÁS TEMPRANAS del SDLC","Priorizar pruebas del lado izquierdo de la pantalla","Ejecutar pruebas en paralelo"],
-                correct:1,explanation:"Shift-Left: El testing debe hacerse desde las fases más tempranas del SDLC. Encontrar defectos pronto = menor coste."},
+            {id:25,category:"Principios",type:"trap",difficulty:"expert",
+            question:"El principio de 'Viabilidad' establece que:",
+            options:["Solo se prueban funcionalidades viables técnicamente","Si un control no es viable, se puede omitir sin documentar","Si un control no es viable, se debe documentar la excepción con justificación","Las pruebas no viables se posponen automáticamente"],
+            correct:2,
+            explanation:"Viabilidad: Si un control <span class='key-point'>no es técnicamente viable, se debe documentar la excepción</span> con justificación. No se puede omitir sin documentar."},
 
-            // ========== PREGUNTAS DE PROCESO E2E ==========
-            {id:26,category:"Proceso",type:"conceptual",difficulty:"hard",
-                question:"¿En qué fase del proceso E2E se genera el Plan de Pruebas Estratégico?",
-                options:["Ideación y Evaluación","Diseño","Desarrollo","Pruebas E2E"],
-                correct:1,explanation:"El Plan de Pruebas Estratégico se genera en la fase de Diseño y se mantiene actualizado durante todo el SDLC."},
+            // ===== VERIFICACIÓN VS VALIDACIÓN =====
+            {id:26,category:"Conceptos",type:"trap",difficulty:"extreme",
+            question:"'Verificación' responde a la pregunta:",
+            options:["¿Construimos el sistema correcto?","¿Construimos correctamente el sistema? (Built right?)","¿El usuario está satisfecho?","¿El sistema es seguro?"],
+            correct:1,
+            explanation:"<span class='key-point'>Verificación = '¿Construimos correctamente el sistema?' (Built right?)</span>. Validación = '¿Construimos el sistema correcto?' (Built good system?). Son conceptos diferentes."},
 
-            {id:27,category:"Proceso",type:"conceptual",difficulty:"hard",
-                question:"¿En qué fase se definen los criterios de aceptación?",
-                options:["Diseño","Ideación y Evaluación","Desarrollo","Gestión de Cambios"],
-                correct:1,explanation:"Los criterios de aceptación se definen en la fase 1: Ideación y Evaluación."},
+            {id:27,category:"Conceptos",type:"trap",difficulty:"extreme",
+            question:"'Validación' responde a la pregunta:",
+            options:["¿El código compila sin errores?","¿Las pruebas unitarias pasan?","¿Construimos el sistema correcto? (Built good system?)","¿El sistema cumple con estándares de código?"],
+            correct:2,
+            explanation:"<span class='key-point'>Validación = '¿Construimos el sistema correcto?' (Built good system?)</span>. Se enfoca en si el sistema cumple las necesidades del usuario, no solo especificaciones técnicas."},
 
-            {id:28,category:"Proceso",type:"conceptual",difficulty:"medium",
-                question:"¿Qué es el informe RMP y cuándo se genera?",
-                options:["Reporte de Métricas del Proyecto, se genera al inicio","Riesgo Mitigado por Pruebas, se genera en la fase de Pruebas E2E","Registro de Modificaciones al Plan, se genera en Diseño","Reporte de Mantenimiento Preventivo, se genera post-producción"],
-                correct:1,explanation:"RMP = Riesgo Mitigado por Pruebas. Se genera durante la fase de Pruebas E2E al ejecutar pruebas de integración."},
+            // ===== CVT DETALLADO =====
+            {id:28,category:"CVT",type:"scenario",difficulty:"extreme",
+            scenario:"Estás completando el CVT para una aplicación distribuida (ASO-API) nueva. El control <strong>DyD-004</strong> solicita evidencia.",
+            question:"¿Qué evidencia específica requiere DyD-004?",
+            options:["Código en repositorio Bitbucket/GitHub","Análisis estático SAST con Chimera","Pruebas de Seguridad Aplicativa (solo para distribuido) + correcciones de vulnerabilidades altas/críticas","Hacking Ético con dictamen"],
+            correct:2,
+            explanation:"<span class='key-point'>DyD-004</span> es Pruebas de Seguridad Aplicativa, que <span class='key-point'>solo aplica para sistemas distribuidos</span> (ASO-API, Web, Mobile). Requiere estrategia, plan y correcciones de vulnerabilidades altas/críticas."},
 
-            {id:29,category:"Proceso",type:"conceptual",difficulty:"expert",
-                question:"¿Cuál es el orden correcto de actividades en la fase de Pruebas E2E?",
-                options:["Ejecución → Despliegue → Ambientación → RMP","Ambientación → Despliegue → Ejecución → Vo.Bo.","Despliegue en Calidad → Ambientación → Ejecución → RMP → Defectos → Vo.Bo. SO","Vo.Bo. → Despliegue → Ejecución → RMP"],
-                correct:2,explanation:"Orden: Despliegue en Calidad → Ambientación y datos (C204) → Ejecución → RMP → Resolución defectos → Vo.Bo. del SO."},
+            {id:29,category:"CVT",type:"trap",difficulty:"extreme",
+            question:"El control PRO-02 (Ready for Operation) se requiere:",
+            options:["Para todos los cambios en producción","Solo para aplicaciones nuevas o cambios de infraestructura relevantes","Solo para sistemas DORA/SOX","Solo cuando hay cambios de base de datos"],
+            correct:1,
+            explanation:"<span class='key-point'>PRO-02 (RFO)</span> solo aplica para <span class='key-point'>aplicaciones nuevas o cambios de infraestructura relevantes</span>. No todos los cambios lo requieren."},
 
-            // ========== TRAZABILIDAD ==========
-            {id:30,category:"Trazabilidad",type:"conceptual",difficulty:"hard",
-                question:"¿Cuál es la cadena completa de trazabilidad según la Norma?",
-                options:["Código → Pruebas → Bug → Fix","Requerimiento → Pruebas → Resultados → CRQ","Jira → C204 → SonarQube → Producción","Diseño → Desarrollo → Testing → Deploy"],
-                correct:1,explanation:"Trazabilidad completa: Requerimiento (Jira) → Pruebas diseñadas/ejecutadas (C204) → Resultados (C204+T950) → CRQ (identificador de cambio)."},
+            {id:30,category:"CVT",type:"numerical",difficulty:"expert",
+            question:"¿Cuántos controles tiene el CVT en total?",
+            options:["10 controles","12 controles","16 controles","20 controles"],
+            correct:2,
+            explanation:"El CVT tiene exactamente <span class='key-point'>16 controles</span>: DyD-001 a DyD-009, PRO-01 a PRO-03, SEG-01 a SEG-02, FRA-01, DMA-01."},
 
-            {id:31,category:"Trazabilidad",type:"conceptual",difficulty:"hard",
-                question:"¿Qué es el documento C204?",
-                options:["El checklist de validación técnica","El plan de pruebas estratégico","El formato estándar de matriz de casos de prueba en México","El informe de riesgo mitigado"],
-                correct:2,explanation:"El C204 es el formato estándar de matriz de casos de prueba en México. Contiene: fechas, maquetas, ligas de Jira, casos de prueba, defectos y evidencias."},
+            // ===== GOLDEN RULES =====
+            {id:31,category:"Golden Rules",type:"trap",difficulty:"extreme",
+            question:"La Regla de Oro #1 establece:",
+            options:["Automatizar todas las pruebas","Las pruebas son responsabilidad del equipo de QA","La calidad se prueba, no se construye","El Tester prueba, el Developer desarrolla, el Arquitecto diseña"],
+            correct:3,
+            explanation:"<span class='key-point'>Golden Rule #1: El Tester prueba, el Developer desarrolla, el Arquitecto diseña</span>. Define la separación de responsabilidades."},
 
-            {id:32,category:"Trazabilidad",type:"conceptual",difficulty:"medium",
-                question:"¿Dónde se almacena el CVT (Checklist de Validación Técnica)?",
-                options:["En Jira","En el repositorio de código","En el Centro Único de Conocimiento (CUC)","En SharePoint del equipo"],
-                correct:2,explanation:"El CVT se almacena en el Centro Único de Conocimiento (CUC)."},
+            {id:32,category:"Golden Rules",type:"trap",difficulty:"extreme",
+            question:"¿Cuál es la Regla de Oro sobre pruebas automatizadas?",
+            options:["La automatización es opcional si hay pruebas manuales suficientes","Toda prueba funcional debe ser automatizable y estar en un repositorio de pruebas","Solo las pruebas de regresión deben automatizarse","La automatización solo aplica para sistemas críticos"],
+            correct:1,
+            explanation:"Golden Rule: <span class='key-point'>Toda prueba funcional debe ser automatizable y estar en un repositorio de pruebas</span>. No es opcional."},
 
-            // ========== TIPOS DE PRUEBAS - DETALLE ==========
-            {id:33,category:"Tipos de Pruebas",type:"tricky",difficulty:"expert",
-                question:"¿Cuál de los siguientes tipos de prueba NO bloquea el despliegue si falla?",
-                options:["Pruebas Unitarias","Análisis Estático","Pruebas de Aceptación","Verificación Postproducción"],
-                correct:3,explanation:"La Verificación Postproducción NO bloquea porque ya está en producción. Todos los demás tipos SÍ bloquean."},
+            // ===== MÁS ESCENARIOS COMPLEJOS =====
+            {id:33,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
+            scenario:"Aplicación con <span class='highlight'>3 issues Mayores</span> en Sonar. El equipo argumenta que son <strong>falsos positivos</strong> relacionados con código legacy que no se puede modificar. El PO aprueba continuar.",
+            question:"¿Qué debe ocurrir?",
+            options:["Proceder porque el PO aprobó y son falsos positivos técnicamente justificados","Bloqueo automático hasta que los 3 issues se resuelvan a 0","Escalar al AO para excepción técnica","Documentar como deuda técnica y proceder"],
+            correct:1,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> No importa si son 'falsos positivos' argumentados o si el PO aprueba. <span class='key-point'>El Quality Gate requiere 0 Mayores</span>. El bloqueo es automático. Los falsos positivos deben configurarse en Sonar, no justificarse verbalmente."},
 
-            {id:34,category:"Tipos de Pruebas",type:"tricky",difficulty:"hard",
-                question:"Las pruebas de Rendimiento/Capacidad son obligatorias para:",
-                options:["Todos los desarrollos propios","Sistemas con más de 100 usuarios","Solo sistemas críticos DORA por disponibilidad","Sistemas con bases de datos grandes"],
-                correct:2,explanation:"Rendimiento/Capacidad: Solo obligatorias para sistemas críticos DORA por disponibilidad."},
+            {id:34,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
+            scenario:"Sistema en producción detecta comportamiento anómalo. Hay un <strong>error que afecta transacciones</strong> de clientes. El equipo quiere hacer rollback inmediato.",
+            question:"¿Cuál es el proceso correcto según la Norma?",
+            options:["Rollback inmediato y documentar después","Abrir ticket FDS en Helix, evaluar impacto, ejecutar plan de rollback documentado en CRQ","Notificar al PO y esperar aprobación para rollback","Escalar a Auditoría antes de cualquier acción"],
+            correct:1,
+            explanation:"Proceso correcto: <span class='key-point'>Ticket FDS en Helix</span> (desde septiembre 2025), evaluar impacto, seguir <span class='key-point'>plan de rollback documentado en CRQ</span>. No se hace rollback sin seguir el proceso."},
 
-            {id:35,category:"Tipos de Pruebas",type:"tricky",difficulty:"hard",
-                question:"¿Qué incluyen las pruebas de Seguridad según la Norma?",
-                options:["Solo SAST","Solo Hacking Ético","SAST + Hacking Ético","SAST + DAST + Hacking Ético"],
-                correct:2,explanation:"Las pruebas de Seguridad incluyen: SAST (Análisis Estático de Seguridad) + Hacking Ético."},
+            {id:35,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
+            scenario:"Pruebas E2E completadas con <span class='highlight'>95% de casos exitosos</span>. El 5% restante son errores menores de UI que no afectan funcionalidad core. Deadline es mañana.",
+            question:"¿Se puede proceder al despliegue?",
+            options:["Sí, porque 95% es suficiente y los errores son menores","No, se requiere 100% de casos exitosos sin excepciones","Depende de la clasificación de los errores y aprobación del SO para errores Asumidos","Sí, con documentación de los errores pendientes"],
+            correct:2,
+            explanation:"<span class='key-point'>Depende de la disposición de los errores</span>. Si el SO los clasifica como 'Asumidos' con justificación documentada, se puede proceder. No es automático ni por porcentaje."},
 
-            {id:36,category:"Tipos de Pruebas",type:"conceptual",difficulty:"medium",
-                question:"¿Cuándo aplican las pruebas de Regresión?",
-                options:["Siempre en todos los desarrollos","Solo en primer despliegue","Cuando aplique: versiones menores, parches, mayores con dependencias","Solo para sistemas DORA"],
-                correct:2,explanation:"Pruebas de Regresión: Cuando aplique (versiones menores, parches, mayores con dependencias)."},
+            // ===== DOCUMENTACIÓN Y EVIDENCIAS =====
+            {id:36,category:"Evidencias",type:"trap",difficulty:"expert",
+            question:"¿Dónde se almacena el Plan de Pruebas según la Norma?",
+            options:["En Jira como épica","En el repositorio de código junto al proyecto","En Confluence del equipo","Debe seguir la estructura documental estándar (A800, C100, C200, etc.)"],
+            correct:3,
+            explanation:"El Plan de Pruebas debe seguir la <span class='key-point'>estructura documental estándar</span>: A800, C100, P950, C200, C204, T950, etc. No es un documento libre en cualquier herramienta."},
 
-            {id:37,category:"Tipos de Pruebas",type:"conceptual",difficulty:"hard",
-                question:"¿Quién CERTIFICA las pruebas de aceptación?",
-                options:["El Quality Coach","El desarrollador","El Product Owner","El Service Owner"],
-                correct:2,explanation:"Pruebas de Aceptación: El PO certifica. DEV y QA ejecutan. Requiere aprobación explícita del PO."},
+            {id:37,category:"Evidencias",type:"trap",difficulty:"expert",
+            question:"¿Qué documentos conforman la evidencia de pruebas funcionales ejecutadas?",
+            options:["Solo capturas de pantalla","C204 (casos ejecutados) y/o T950 (evidencias)","Logs del sistema","Aprobación por correo del PO"],
+            correct:1,
+            explanation:"Evidencia de pruebas funcionales: <span class='key-point'>C204</span> (casos ejecutados) y/o <span class='key-point'>T950</span> (evidencias). Son los formatos estándar definidos."},
 
-            // ========== TERCEROS ==========
-            {id:38,category:"Terceros",type:"conceptual",difficulty:"hard",
-                question:"Para componentes de terceros integrados en desarrollos propios, ¿qué se requiere?",
-                options:["Solo pruebas funcionales","SCA, SAST y verificación de integridad","No se requieren pruebas adicionales","Solo revisión de licencias"],
-                correct:1,explanation:"Componentes de terceros requieren: SCA (Análisis de Composición), SAST y Verificación de Firmas de Integridad."},
+            // ===== INTEGRACIONES Y DEPENDENCIAS =====
+            {id:38,category:"Integraciones",type:"scenario",difficulty:"extreme",
+            scenario:"Tu aplicación consume una API de otro equipo. Esa API cambió su contrato sin notificarte. Tus pruebas de integración fallan en ambiente de desarrollo.",
+            question:"¿Qué tipo de prueba debió haber prevenido este problema?",
+            options:["Pruebas unitarias más exhaustivas","Pruebas de contrato (Contract Testing) en el pipeline","Pruebas de regresión más frecuentes","Pruebas de humo antes de cada integración"],
+            correct:1,
+            explanation:"<span class='key-point'>Contract Testing</span> verifica que los contratos de APIs no cambien de forma incompatible. Debería estar en el pipeline para detectar cambios breaking."},
 
-            {id:39,category:"Terceros",type:"conceptual",difficulty:"hard",
-                question:"¿Qué identifica el SCA (Software Composition Analysis)?",
-                options:["Vulnerabilidades en código propio","Errores de sintaxis","Riesgos en código de terceros, versiones obsoletas y licencias","Problemas de rendimiento"],
-                correct:2,explanation:"SCA: identifica riesgos en código de terceros, versiones obsoletas, licencias."},
+            {id:39,category:"Integraciones",type:"trap",difficulty:"expert",
+            question:"Las pruebas de integración verifican:",
+            options:["Que cada módulo funciona aisladamente","Que los componentes funcionan correctamente cuando se conectan entre sí","Solo las conexiones a bases de datos","Solo las llamadas a APIs externas"],
+            correct:1,
+            explanation:"Pruebas de integración: verifican que <span class='key-point'>los componentes funcionan correctamente cuando se conectan entre sí</span>. No solo BDs o APIs, sino todas las interacciones."},
 
-            {id:40,category:"Terceros",type:"conceptual",difficulty:"medium",
-                question:"La verificación de Firmas de Integridad protege contra:",
-                options:["Vulnerabilidades conocidas","Code Tampering (manipulación del código)","Versiones obsoletas","Problemas de licencias"],
-                correct:1,explanation:"Verificación de Firmas de Integridad: asegurar que el componente no ha sido manipulado (Code Tampering)."},
+            // ===== AMBIENTES =====
+            {id:40,category:"Ambientes",type:"trap",difficulty:"extreme",
+            question:"¿En qué ambiente se ejecutan las pruebas del RMP (Release Management Process)?",
+            options:["Desarrollo","QA","Pre-producción/Staging","Producción"],
+            correct:2,
+            explanation:"Las pruebas del <span class='key-point'>RMP se ejecutan en pre-producción/staging</span>, que simula el ambiente productivo. No en desarrollo ni en producción."},
 
-            // ========== ESCENARIOS ADICIONALES ==========
-            {id:41,category:"Escenario",type:"scenario",difficulty:"expert",
-                scenario:"El equipo completó todas las pruebas exitosamente. Sin embargo, durante la Verificación Postproducción se detecta una <strong>no conformidad grave</strong> que afecta transacciones financieras.",
-                question:"¿Cómo debe tratarse esta situación según la Norma?",
-                options:["Se documenta para el siguiente release","Se trata con ALTA PRIORIDAD","Se genera un ticket de baja prioridad","Se notifica al equipo BEx para que lo resuelvan"],
-                correct:1,explanation:"Regla de Oro #14: No conformidades graves en Verificación Postproducción = alta prioridad."},
+            {id:41,category:"Ambientes",type:"scenario",difficulty:"expert",
+            scenario:"El ambiente de pre-producción tiene configuración diferente a producción (menos memoria, diferente versión de BD).",
+            question:"¿Qué riesgo introduce esto según la Norma?",
+            options:["Ninguno si las pruebas funcionales pasan","Las pruebas de rendimiento no serán representativas","Solo afecta pruebas de seguridad","El CVT rechazará el despliegue automáticamente"],
+            correct:1,
+            explanation:"Si pre-producción difiere de producción, las <span class='key-point'>pruebas de rendimiento no serán representativas</span>. Los resultados no reflejarán el comportamiento real en producción."},
 
-            {id:42,category:"Escenario",type:"scenario",difficulty:"hard",
-                scenario:"Tu equipo recibe un componente de software de un proveedor externo que será integrado en tu desarrollo. El proveedor asegura que el software ya fue probado exhaustivamente.",
-                question:"¿Qué pruebas son necesarias según la Norma de BBVA?",
-                options:["Ninguna, si el proveedor certifica calidad","Solo pruebas funcionales de integración","SCA, SAST y verificación de integridad, independientemente de lo que diga el proveedor","Solo si el PO lo solicita"],
-                correct:2,explanation:"Para componentes de terceros, SIEMPRE se requiere: SCA, SAST y verificación de integridad, sin importar certificaciones del proveedor."},
+            // ===== TIPOS DE PRUEBAS ESPECÍFICAS =====
+            {id:42,category:"Tipos Pruebas",type:"trap",difficulty:"extreme",
+            question:"¿Cuál es la diferencia entre pruebas de Humo y pruebas de Sanidad?",
+            options:["Son exactamente lo mismo","Humo verifica funcionalidades críticas; Sanidad verifica que correcciones no rompieron nada","Humo es manual; Sanidad es automatizada","Humo es para nuevos desarrollos; Sanidad para mantenimiento"],
+            correct:1,
+            explanation:"<span class='key-point'>Humo (Smoke)</span>: verifica funcionalidades críticas básicas. <span class='key-point'>Sanidad (Sanity)</span>: verifica que correcciones específicas no introdujeron nuevos problemas. Son complementarias."},
 
-            {id:43,category:"Escenario",type:"scenario",difficulty:"expert",
-                scenario:"Hay conflicto entre una regulación local de México y una directriz global de BBVA. La regulación local es más antigua pero la directriz global es más reciente.",
-                question:"Según el Principio 1 (Prevalencia Legal), ¿cuál se aplica?",
-                options:["La directriz global por ser más reciente","La regulación local si tiene mayor rango legal","Siempre la directriz global de BBVA","La que el Service Owner determine"],
-                correct:1,explanation:"Principio 1: Se aplica la de MAYOR RANGO. Si la regulación local tiene mayor rango legal que una directriz corporativa, prevalece la local."},
+            {id:43,category:"Tipos Pruebas",type:"trap",difficulty:"expert",
+            question:"Las pruebas de Aceptación son ejecutadas y certificadas por:",
+            options:["El equipo de QA","El DEV junto con el QA","El PO (Product Owner)","El usuario final"],
+            correct:2,
+            explanation:"Las pruebas de Aceptación son <span class='key-point'>certificadas por el PO</span>. El PO representa al negocio y valida que el sistema cumple los requerimientos."},
 
-            {id:44,category:"Escenario",type:"scenario",difficulty:"hard",
-                scenario:"Durante el sprint planning, el PO solicita que se omitan las pruebas de accesibilidad para acelerar la entrega. La aplicación tiene UI y está sujeta a Ley de Accesibilidad.",
-                question:"¿Qué debe hacer el equipo?",
-                options:["Aceptar porque el PO tiene la decisión final","Rechazar porque las pruebas de Accesibilidad son OBLIGATORIAS en este caso","Escalar al Service Owner","Ejecutar pruebas parciales"],
-                correct:1,explanation:"Las pruebas de Accesibilidad son obligatorias cuando aplica Ley de Accesibilidad + hay cambio en UI. No se pueden omitir."},
+            // ===== SEGURIDAD =====
+            {id:44,category:"Seguridad",type:"combined",difficulty:"extreme",
+            question:"¿Cuál es la secuencia correcta de pruebas de seguridad en el pipeline?",
+            options:["DAST → SAST → SCA → Hacking Ético","SAST → SCA → DAST → Hacking Ético","Hacking Ético → SAST → DAST → SCA","SCA → DAST → SAST → Hacking Ético"],
+            correct:1,
+            explanation:"Secuencia correcta: <span class='key-point'>SAST</span> (código estático primero) → <span class='key-point'>SCA</span> (componentes) → <span class='key-point'>DAST</span> (aplicación corriendo) → <span class='key-point'>Hacking Ético</span> (manual al final)."},
 
-            // ========== PREGUNTAS TRICKY ADICIONALES ==========
-            {id:45,category:"Conceptos",type:"tricky",difficulty:"expert",
-                question:"La pregunta clave de la fase de VERIFICACIÓN es:",
-                options:["¿Se construyó un buen sistema?","¿El negocio está satisfecho?","¿Se construyó BIEN el sistema?","¿El usuario final lo acepta?"],
-                correct:2,explanation:"Verificación: '¿Se construyó BIEN el sistema?' (equipos técnicos comprueban según requisitos). Validación: '¿Se construyó un BUEN sistema?' (PO comprueba necesidades de negocio)."},
+            {id:45,category:"Seguridad",type:"trap",difficulty:"extreme",
+            question:"El AO debe asegurar que los umbrales de seguridad:",
+            options:["Sean configurados por el equipo de seguridad","Se cumplan y estén correctamente configurados en las herramientas","Sean más estrictos que los de la Norma","Se revisen solo en auditorías"],
+            correct:1,
+            explanation:"El AO debe asegurar que los <span class='key-point'>umbrales se cumplan y estén correctamente configurados</span>. No solo que existan, sino que estén activos y funcionando."},
 
-            {id:46,category:"Conceptos",type:"tricky",difficulty:"hard",
-                question:"¿Qué significa que los bugs 'NO deben postergarse indefinidamente'?",
-                options:["Deben resolverse en el mismo sprint","La deuda técnica debe gestionarse y eventualmente saldarse","Son responsabilidad exclusiva del desarrollador","Se escalan automáticamente después de 2 semanas"],
-                correct:1,explanation:"La deuda técnica NO se acumula indefinidamente. El PO/SO es responsable de saldarla. Regulado por la Norma de Gestión de Deuda Técnica."},
+            // ===== MÁS TRAMPAS DE ROLES =====
+            {id:46,category:"Roles",type:"trap",difficulty:"extreme",
+            question:"¿Quién da el Vo.Bo. (Visto Bueno) para el despliegue a producción?",
+            options:["El PO porque certifica la aceptación","El Change Lead porque es responsable del CVT","El SO (Service Owner)","El AO porque es el arquitecto"],
+            correct:2,
+            explanation:"El <span class='key-point'>SO da el Vo.Bo.</span> para producción. El PO certifica aceptación, el Change Lead verifica CVT, pero la aprobación final es del SO."},
 
-            {id:47,category:"Conceptos",type:"tricky",difficulty:"hard",
-                question:"¿Por qué NO se deben probar solo 'happy paths'?",
-                options:["Porque no son casos de prueba válidos","Porque solo cubren el 50% del código","Porque los defectos se ocultan en caminos alternos y situaciones de error","Porque la Norma lo prohíbe explícitamente"],
-                correct:2,explanation:"Los defectos se ocultan en los comportamientos no ideales. Se DEBEN probar caminos alternos y situaciones de error, no solo escenarios de éxito."},
+            {id:47,category:"Roles",type:"trap",difficulty:"extreme",
+            question:"¿Quién puede autorizar un Error Asumido?",
+            options:["El DEV con justificación técnica","El PO con aprobación del negocio","Solo el SO (Service Owner)","El AO y el SO conjuntamente"],
+            correct:2,
+            explanation:"<span class='key-point'>Solo el SO</span> puede autorizar errores como 'Asumidos'. Ni el DEV, ni el PO, ni el AO tienen esta autoridad."},
 
-            {id:48,category:"Conceptos",type:"tricky",difficulty:"expert",
-                question:"¿Qué proceso se menciona para gestión de incidentes en Entornos Previos (EEPP) desde septiembre 2025?",
-                options:["CVT Process","RMP Process","FDS (Frontline Development Support)","C204 Process"],
-                correct:2,explanation:"FDS (Frontline Development Support): Desde septiembre 2025, nuevo proceso global para gestión de incidentes en EEPP. Herramienta: Helix (tickets INC)."},
+            {id:48,category:"Roles",type:"scenario",difficulty:"extreme",
+            scenario:"El PO quiere clasificar un error como 'Falso Positivo' para acelerar el despliegue. El DEV está de acuerdo en que es un problema del requerimiento, no del código.",
+            question:"¿Es válido este proceso?",
+            options:["Sí, si PO y DEV están de acuerdo","Sí, el PO tiene autoridad sobre requerimientos","No, solo el SO puede autorizar clasificación de Falso Positivo","No, los Falsos Positivos solo aplican para errores de herramientas"],
+            correct:2,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> Independientemente del acuerdo PO-DEV, <span class='key-point'>solo el SO autoriza</span> la clasificación de Falso Positivo. El proceso no es válido sin el SO."},
 
-            {id:49,category:"Herramientas",type:"conceptual",difficulty:"medium",
-                question:"¿Qué herramienta se usa para tickets de incidentes en FDS?",
-                options:["Jira","ServiceNow","Helix (tickets INC)","Remedy"],
-                correct:2,explanation:"FDS usa Helix como herramienta principal (tickets INC)."},
+            // ===== SHIFT-LEFT =====
+            {id:49,category:"Shift-Left",type:"conceptual",difficulty:"expert",
+            question:"El principio Shift-Left implica:",
+            options:["Mover las pruebas al final del ciclo para tener código más estable","Mover las actividades de calidad y seguridad a las fases más TEMPRANAS del ciclo","Priorizar pruebas de izquierda a derecha","Reducir el número de pruebas en cada fase"],
+            correct:1,
+            explanation:"<span class='key-point'>Shift-Left</span>: mover actividades de calidad y seguridad a fases <span class='key-point'>más tempranas</span> del ciclo, donde los defectos son más baratos de corregir."},
 
-            {id:50,category:"Herramientas",type:"conceptual",difficulty:"medium",
-                question:"¿Qué herramienta se usa para enmascarar datos de producción?",
-                options:["SonarQube","ACIS","HAD","Jira"],
-                correct:2,explanation:"HAD es la herramienta para descargar y enmascarar datos de producción."},
+            {id:50,category:"Shift-Left",type:"scenario",difficulty:"extreme",
+            scenario:"Un defecto de seguridad se descubre en producción. El costo de corrección es 100x mayor que si se hubiera encontrado en diseño.",
+            question:"¿Qué principio de la Norma busca evitar esto?",
+            options:["Automatización","Proporcionalidad","Shift-Left","Concurrencia"],
+            correct:2,
+            explanation:"<span class='key-point'>Shift-Left</span> busca encontrar defectos temprano cuando son <span class='key-point'>más baratos de corregir</span>. Un defecto en producción es mucho más costoso que en diseño."},
 
-            // ========== REGLAS DE ORO ==========
-            {id:51,category:"Reglas de Oro",type:"conceptual",difficulty:"hard",
-                question:"Según las Reglas de Oro, ¿qué tipos de software deben probarse antes de producción?",
-                options:["Solo evolutivos y nuevos desarrollos","Solo correctivos críticos","TODO software: evolutivos, correctivos, primera entrega, sin excepción","Solo lo que determine el PO"],
-                correct:2,explanation:"Regla #1: TODO software debe probarse antes de producción, sin excepción (evolutivos, correctivos, primera entrega)."},
+            // ===== DEUDA TÉCNICA =====
+            {id:51,category:"Deuda Técnica",type:"combined",difficulty:"extreme",
+            question:"La Deuda Técnica registrada debe incluir:",
+            options:["Solo el código afectado","Solo el estimado de esfuerzo para corregirla","Descripción, impacto, prioridad y plan de remediación","Solo la fecha de creación"],
+            correct:2,
+            explanation:"La Deuda Técnica debe documentar: <span class='key-point'>descripción, impacto, prioridad y plan de remediación</span>. No es solo registrar que existe."},
 
-            {id:52,category:"Reglas de Oro",type:"conceptual",difficulty:"medium",
-                question:"El principio de Máxima Automatización significa:",
-                options:["Automatizar el 100% de las pruebas","Priorizar pruebas automáticas sobre procedimientos manuales","Solo usar herramientas automáticas de testing","Eliminar completamente las pruebas manuales"],
-                correct:1,explanation:"Principio 6: Priorizar pruebas automáticas y mecanismos automatizados sobre procedimientos manuales."},
+            {id:52,category:"Deuda Técnica",type:"trap",difficulty:"extreme",
+            question:"¿Cuándo se convierte un Error Asumido en Deuda Técnica?",
+            options:["Inmediatamente cuando se clasifica como Asumido","Nunca, son conceptos diferentes","Cuando el SO lo autoriza y se documenta para corrección futura","Solo si afecta sistemas DORA/SOX"],
+            correct:2,
+            explanation:"Un Error Asumido se convierte en Deuda Técnica cuando el <span class='key-point'>SO lo autoriza y se documenta para corrección futura</span>. No es automático."},
 
-            {id:53,category:"Reglas de Oro",type:"tricky",difficulty:"expert",
-                question:"Si el Quality Gate de Sonar reporta 1 issue de tipo 'Security', ¿qué sucede?",
-                options:["Se permite el despliegue con advertencia","El despliegue es BLOQUEADO","Se genera un ticket para revisión posterior","Depende de la criticidad del sistema"],
-                correct:1,explanation:"El umbral es 0% Security Issues. Con 1 issue de Security, el Quality Gate falla y el despliegue es bloqueado."},
+            // ===== MÉTRICAS =====
+            {id:53,category:"Métricas",type:"numerical",difficulty:"extreme",
+            question:"¿Qué métricas de cobertura se consideran en el Quality Gate?",
+            options:["Solo cobertura de líneas","Solo cobertura de ramas","Cobertura de líneas Y cobertura de ramas","Cobertura de líneas, ramas y mutación"],
+            correct:2,
+            explanation:"El Quality Gate considera <span class='key-point'>cobertura de líneas Y cobertura de ramas</span>. Ambas deben cumplir el umbral del 80%."},
 
-            {id:54,category:"Conceptos",type:"tricky",difficulty:"hard",
-                question:"¿Cuál es la diferencia entre Verificación y Validación en el SDLC?",
-                options:["Son sinónimos con diferente nombre","Verificación es para código, Validación para documentación","Verificación: técnicos comprueban construcción; Validación: PO comprueba necesidades del negocio","Verificación es manual, Validación es automática"],
-                correct:2,explanation:"Verificación: equipos técnicos comprueban construcción según requisitos. Validación: PO comprueba que cubre necesidades del negocio."},
+            {id:54,category:"Métricas",type:"trap",difficulty:"expert",
+            question:"Si la cobertura de líneas es 85% pero la cobertura de ramas es 75%:",
+            options:["Cumple el Quality Gate porque líneas supera 80%","No cumple porque ramas está por debajo de 80%","Cumple porque el promedio es 80%","Depende del tipo de aplicación"],
+            correct:1,
+            explanation:"<span class='key-point'>Ambas coberturas</span> deben ser ≥80%. Si ramas es 75%, <span class='key-point'>no cumple</span> aunque líneas sea 85%. No se promedian."},
 
-            {id:55,category:"Conceptos",type:"conceptual",difficulty:"hard",
-                question:"Las regulaciones que impactan la Norma de Testing incluyen:",
-                options:["Solo SOX","Solo DORA","DORA, SOX, EBA/GL/2019/4, entre otras","Solo regulaciones mexicanas"],
-                correct:2,explanation:"La Norma reúne criterios de múltiples regulaciones: DORA, SOX, EBA/GL/2019/4, etc."}
+            // ===== HERRAMIENTAS =====
+            {id:55,category:"Herramientas",type:"trap",difficulty:"expert",
+            question:"¿Qué herramienta genera los reportes consolidados de vulnerabilidades?",
+            options:["SonarQube","Fortify","Chimera","Veracode"],
+            correct:2,
+            explanation:"<span class='key-point'>Chimera</span> genera los reportes consolidados de vulnerabilidades de todas las herramientas (SAST, DAST, SCA)."},
+
+            {id:56,category:"Herramientas",type:"trap",difficulty:"expert",
+            question:"¿Dónde se gestionan las incidencias de producción desde septiembre 2025?",
+            options:["Jira","ServiceNow","Helix (tickets FDS)","Remedy"],
+            correct:2,
+            explanation:"Desde septiembre 2025, las incidencias EEPP se gestionan en <span class='key-point'>Helix mediante tickets FDS</span>."},
+
+            // ===== ESCENARIOS ADICIONALES =====
+            {id:57,category:"Escenario",type:"scenario",difficulty:"extreme",
+            scenario:"Durante las pruebas E2E, descubres que un escenario del CVT no fue probado porque el ambiente no lo permitía. El deadline es hoy.",
+            question:"¿Qué debe ocurrir?",
+            options:["Documentar la excepción y proceder con el despliegue","El despliegue debe DETENERSE hasta que se complete el CVT","Escalar al PO para que apruebe la excepción","Posponer solo ese escenario para post-producción"],
+            correct:1,
+            explanation:"<span class='key-point'>CVT incompleto = despliegue DETENIDO</span>. No hay excepciones por deadline. El Change Lead no puede aprobar un CVT incompleto."},
+
+            {id:58,category:"Escenario",type:"scenario",difficulty:"extreme",
+            scenario:"Prueba de Hacking Ético encuentra vulnerabilidad <strong>ALTA</strong>. El AO dice que es un riesgo aceptable para el negocio y quiere proceder.",
+            question:"¿Puede el AO aceptar este riesgo y proceder?",
+            options:["Sí, el AO tiene autoridad sobre decisiones técnicas","Sí, si lo documenta como deuda técnica","No, las vulnerabilidades Altas/Críticas de Hacking Ético DEBEN corregirse","No, pero puede escalar al CISO para excepción"],
+            correct:2,
+            explanation:"Las vulnerabilidades <span class='key-point'>Altas y Críticas de Hacking Ético DEBEN corregirse</span>. El AO no puede aceptar este riesgo. Es un requisito no negociable del CVT (DyD-005)."},
+
+            {id:59,category:"Escenario",type:"scenario",difficulty:"extreme",
+            scenario:"Sistema legado que NO tiene pruebas automatizadas. Se requiere un cambio urgente. No hay tiempo para crear pruebas automatizadas.",
+            question:"¿Qué aplica según la Norma?",
+            options:["Se puede desplegar con pruebas manuales documentadas si el SO aprueba","Imposible desplegar sin pruebas automatizadas según Golden Rules","Se aplica el principio de Viabilidad: documentar excepción con justificación","Las pruebas automatizadas son opcionales para sistemas legados"],
+            correct:2,
+            explanation:"Se aplica el <span class='key-point'>principio de Viabilidad</span>: si no es técnicamente viable, se debe <span class='key-point'>documentar la excepción con justificación</span>. No se omite sin documentar."},
+
+            // ===== CICLO COMPLETO =====
+            {id:60,category:"Ciclo",type:"sequence",difficulty:"extreme",
+            question:"¿En qué fase del E2E se genera el Plan de Pruebas?",
+            options:["Ideación","Diseño","Desarrollo","Pruebas E2E"],
+            correct:1,
+            explanation:"El Plan de Pruebas se genera en la fase de <span class='key-point'>Diseño</span>. Ideación es para requerimientos, Desarrollo para código, Pruebas E2E para ejecución."},
+
+            {id:61,category:"Ciclo",type:"trap",difficulty:"extreme",
+            question:"¿Cuál es la relación entre C204 y T950?",
+            options:["Son documentos independientes sin relación","C204 contiene los casos; T950 contiene las evidencias de ejecución","C204 es para pruebas funcionales; T950 para no funcionales","C204 reemplazó a T950 en la nueva versión de la Norma"],
+            correct:1,
+            explanation:"<span class='key-point'>C204</span> = casos de prueba. <span class='key-point'>T950</span> = evidencias de ejecución. Son complementarios, no independientes."},
+
+            // ===== REGULACIÓN =====
+            {id:62,category:"Regulación",type:"trap",difficulty:"extreme",
+            question:"¿Por qué los sistemas DORA/SOX tienen requisitos especiales de testing?",
+            options:["Porque son más complejos técnicamente","Por requerimientos regulatorios de auditoría y control de riesgos financieros","Porque manejan más volumen de datos","Por decisión interna de BBVA"],
+            correct:1,
+            explanation:"DORA (Digital Operational Resilience Act) y SOX (Sarbanes-Oxley) son <span class='key-point'>regulaciones externas</span> que imponen requisitos de auditoría y control para sistemas financieros."},
+
+            {id:63,category:"Regulación",type:"trap",difficulty:"expert",
+            question:"La retención de 12 meses para evidencias DORA/SOX es:",
+            options:["Una recomendación de buenas prácticas","Un requisito regulatorio obligatorio","Configurable según el riesgo de cada aplicación","Solo para evidencias de seguridad"],
+            correct:1,
+            explanation:"Los <span class='key-point'>12 meses de retención para DORA/SOX es un requisito regulatorio obligatorio</span>, no una recomendación ni configurable."},
+
+            // ===== PREGUNTAS FINALES DE INTEGRACIÓN =====
+            {id:64,category:"Integración",type:"combined",difficulty:"extreme",
+            question:"Para un despliegue exitoso, ¿qué combinación de aprobaciones es CORRECTA?",
+            options:["PO certifica + DEV aprueba + Change Lead verifica CVT","PO certifica aceptación + SO da Vo.Bo. + Change Lead verifica CVT completo + CRQ aprobado","AO aprueba + SO certifica + PO da Vo.Bo.","Solo el CRQ aprobado es suficiente si las pruebas pasaron"],
+            correct:1,
+            explanation:"Combinación correcta: <span class='key-point'>PO certifica aceptación</span> + <span class='key-point'>SO da Vo.Bo.</span> + <span class='key-point'>Change Lead verifica CVT completo</span> + <span class='key-point'>CRQ aprobado</span>."},
+
+            {id:65,category:"Integración",type:"combined",difficulty:"extreme",
+            question:"Si un sistema tiene los siguientes resultados: Sonar 0/0/0, Cobertura 79%, 100% pruebas pasan, CVT completo:",
+            options:["Puede desplegarse porque Sonar está limpio","No puede desplegarse porque la cobertura es menor a 80%","Puede desplegarse con excepción documentada","Depende de si es sistema DORA o no"],
+            correct:1,
+            explanation:"<span class='key-point'>Cobertura 79% < 80% requerido</span>. No puede desplegarse. No importa que Sonar esté limpio o que las pruebas pasen. Todos los criterios deben cumplirse."},
+
+            {id:66,category:"Integración",type:"scenario",difficulty:"extreme",
+            scenario:"Auditoría solicita evidencias de un sistema que tuvo 15 ejecuciones en los últimos 2 meses. El sistema NO es DORA/SOX.",
+            question:"¿Cuántas ejecuciones tendrán evidencias disponibles?",
+            options:["Las 15 ejecuciones completas","Solo las últimas 10 ejecuciones","Solo los últimos 3 meses de ejecuciones","Depende del tamaño de las evidencias"],
+            correct:1,
+            explanation:"Para sistemas no DORA/SOX: retención de <span class='key-point'>3 meses O 10 ejecuciones, lo que ocurra primero</span>. Con 15 ejecuciones en 2 meses, solo las <span class='key-point'>últimas 10</span> estarán disponibles."},
+
+            {id:67,category:"Integración",type:"trap",difficulty:"extreme",
+            question:"El principio de Proporcionalidad establece:",
+            options:["Los controles deben ser proporcionales al esfuerzo del equipo","Los controles deben ser proporcionales al riesgo y criticidad del sistema","Las pruebas deben ser proporcionalmente distribuidas en el ciclo","El número de pruebas debe ser proporcional al número de desarrolladores"],
+            correct:1,
+            explanation:"<span class='key-point'>Proporcionalidad</span>: los controles deben ser <span class='key-point'>proporcionales al riesgo y criticidad</span> del sistema. Sistemas más críticos = más controles."},
+
+            {id:68,category:"Final",type:"combined",difficulty:"extreme",
+            question:"¿Cuál es la ÚNICA razón válida para NO ejecutar un tipo de prueba requerido?",
+            options:["Falta de tiempo antes del deadline","Falta de recursos en el equipo","No aplicabilidad técnica documentada según el principio de Viabilidad","Aprobación verbal del PO"],
+            correct:2,
+            explanation:"La única razón válida es <span class='key-point'>no aplicabilidad técnica documentada</span> según el principio de Viabilidad. Tiempo, recursos o aprobaciones verbales no son válidos."},
+
+            {id:69,category:"Final",type:"scenario",difficulty:"extreme",
+            scenario:"Desarrollador senior argumenta que su código no necesita pruebas unitarias porque es 'código trivial' de solo 10 líneas que llama a una API externa.",
+            question:"¿Es válido este argumento según la Norma?",
+            options:["Sí, el código trivial puede excluirse de pruebas unitarias","Sí, si el senior lo justifica técnicamente","No, todo código debe tener pruebas unitarias sin excepción basada en complejidad","No, pero puede tener menor cobertura si está justificado"],
+            correct:2,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> No hay excepción por 'código trivial' o experiencia del desarrollador. <span class='key-point'>Todo código debe tener pruebas</span>. La Regla de Oro: código sin pruebas es código incompleto."},
+
+            {id:70,category:"Final",type:"combined",difficulty:"extreme",
+            question:"¿Cuál es el objetivo PRINCIPAL de todo el marco de Testing según la Norma?",
+            options:["Cumplir con auditorías regulatorias","Documentar el proceso de desarrollo","Asegurar la calidad y minimizar el riesgo de defectos en producción","Estandarizar las herramientas de prueba"],
+            correct:2,
+            explanation:"El objetivo principal es <span class='key-point'>asegurar la calidad y minimizar el riesgo de defectos en producción</span>. Las auditorías y documentación son medios, no el fin."}
         ];
 
         let questions = [];
@@ -1096,8 +1116,8 @@
         }
 
         function startExam() {
-            let limit = parseInt(document.getElementById('questionLimit').value) || 55;
-            limit = Math.max(10, Math.min(55, limit));
+            let limit = parseInt(document.getElementById('questionLimit').value) || 70;
+            limit = Math.max(10, Math.min(70, limit));
             questions = shuffleArray([...allQuestions]).slice(0, limit);
             shuffledOptions = {};
             questions.forEach((q, i) => shuffleOptionsForQuestion(q, i));
@@ -1129,17 +1149,12 @@
             });
         }
 
-        function goToQuestion(index) {
-            currentQuestionIndex = index;
-            renderQuestion();
-            renderQuestionNav();
-        }
+        function goToQuestion(index) { currentQuestionIndex = index; renderQuestion(); renderQuestionNav(); }
 
         function updateStats() {
             document.getElementById('correctCount').textContent = correctCount;
             document.getElementById('incorrectCount').textContent = incorrectCount;
-            const answeredCount = Object.keys(userAnswers).length;
-            const progress = (answeredCount / questions.length) * 100;
+            const progress = (Object.keys(userAnswers).length / questions.length) * 100;
             document.getElementById('progressBar').style.width = `${progress}%`;
         }
 
@@ -1155,20 +1170,16 @@
             document.getElementById('questionCategory').textContent = question.category;
             
             const typeLabel = document.getElementById('questionType');
-            const typeMap = {scenario:'Escenario',conceptual:'Conceptual',numerical:'Numérica',tricky:'Detalle'};
+            const typeMap = {scenario:'Escenario',trap:'Trampa',numerical:'Numérica',combined:'Combinada',negative:'Negativa',sequence:'Secuencia'};
             typeLabel.textContent = typeMap[question.type] || question.type;
             typeLabel.className = `question-type ${question.type}`;
             
             const diffBadge = document.getElementById('difficultyBadge');
-            diffBadge.textContent = question.difficulty === 'expert' ? 'Experto' : question.difficulty === 'hard' ? 'Difícil' : 'Media';
+            diffBadge.textContent = question.difficulty === 'extreme' ? '🔥 EXTREMO' : question.difficulty === 'expert' ? 'Experto' : 'Difícil';
             diffBadge.className = `difficulty-badge ${question.difficulty}`;
             
             const scenarioBox = document.getElementById('scenarioBox');
-            if (question.scenario) {
-                scenarioBox.innerHTML = `<div class="scenario-box">📋 <strong>Escenario:</strong><br>${question.scenario}</div>`;
-            } else {
-                scenarioBox.innerHTML = '';
-            }
+            scenarioBox.innerHTML = question.scenario ? `<div class="scenario-box">📋 <strong>ESCENARIO:</strong><br><br>${question.scenario}</div>` : '';
             
             document.getElementById('questionText').innerHTML = question.question;
             
@@ -1199,7 +1210,7 @@
             const feedbackContainer = document.getElementById('feedbackContainer');
             if (isAnswered) {
                 let feedbackHTML = isCorrect ? '<div class="feedback-message correct"><span class="feedback-icon">✅</span><span>¡Correcto!</span></div>' : '<div class="feedback-message incorrect"><span class="feedback-icon">❌</span><span>Incorrecto</span></div>';
-                if (question.explanation) feedbackHTML += `<div class="explanation"><strong>📖 Explicación:</strong> ${question.explanation}</div>`;
+                if (question.explanation) feedbackHTML += `<div class="explanation"><strong>📖 Explicación:</strong><br><br>${question.explanation}</div>`;
                 feedbackContainer.innerHTML = feedbackHTML;
             } else feedbackContainer.innerHTML = '';
             
@@ -1234,14 +1245,15 @@
             document.getElementById('examScreen').classList.add('hidden');
             document.getElementById('resultsScreen').classList.remove('hidden');
             document.getElementById('finalScore').textContent = `${score}%`;
-            document.getElementById('finalCorrectCount').textContent = correctCount;
-            document.getElementById('finalIncorrectCount').textContent = incorrectCount;
-            document.getElementById('finalUnansweredCount').textContent = unanswered;
+            document.getElementById('finalCorrect').textContent = correctCount;
+            document.getElementById('finalIncorrect').textContent = incorrectCount;
+            document.getElementById('finalUnanswered').textContent = unanswered;
             let gradeText = '', gradeEmoji = '';
-            if (score >= 90) { gradeText = 'Excelente'; gradeEmoji = '🏆'; }
-            else if (score >= 80) { gradeText = 'Muy Bien'; gradeEmoji = '🎉'; }
-            else if (score >= 75) { gradeText = 'Aprobado'; gradeEmoji = '✅'; }
-            else if (score >= 60) { gradeText = 'Necesita Mejorar'; gradeEmoji = '📚'; }
+            if (score >= 95) { gradeText = 'MAESTRO'; gradeEmoji = '👑'; }
+            else if (score >= 90) { gradeText = 'Excelente'; gradeEmoji = '🏆'; }
+            else if (score >= 85) { gradeText = 'Muy Bien'; gradeEmoji = '🎉'; }
+            else if (score >= 80) { gradeText = 'Aprobado'; gradeEmoji = '✅'; }
+            else if (score >= 70) { gradeText = 'Casi'; gradeEmoji = '📚'; }
             else { gradeText = 'No Aprobado'; gradeEmoji = '❌'; }
             document.getElementById('gradeText').textContent = `${gradeEmoji} ${gradeText}`;
         }
@@ -1251,20 +1263,20 @@
             document.getElementById('reviewScreen').classList.remove('hidden');
             const container = document.getElementById('reviewContainer');
             const letters = ['A', 'B', 'C', 'D', 'E'];
-            const typeMap = {scenario:'Escenario',conceptual:'Conceptual',numerical:'Numérica',tricky:'Detalle'};
+            const typeMap = {scenario:'Escenario',trap:'Trampa',numerical:'Numérica',combined:'Combinada',negative:'Negativa',sequence:'Secuencia'};
             container.innerHTML = questions.map((question, qIndex) => {
                 const shuffled = shuffledOptions[qIndex];
                 const userAnswer = userAnswers[qIndex];
                 const isCorrect = answerResults[qIndex];
                 const isUnanswered = userAnswer === undefined;
-                return `<div class="question-card fade-in" style="animation-delay: ${qIndex * 0.02}s">
+                return `<div class="question-card fade-in" style="animation-delay: ${qIndex * 0.015}s">
                     <div class="question-header">
-                        <span class="question-number">Pregunta ${qIndex + 1}</span>
+                        <span class="question-number">P${qIndex + 1}</span>
                         <span class="question-category">${question.category}</span>
                         <span class="question-type ${question.type}">${typeMap[question.type]||question.type}</span>
                         <span style="margin-left: auto; font-size: 1.5rem;">${isUnanswered ? '⚠️' : (isCorrect ? '✅' : '❌')}</span>
                     </div>
-                    ${question.scenario ? `<div class="scenario-box">📋 <strong>Escenario:</strong><br>${question.scenario}</div>` : ''}
+                    ${question.scenario ? `<div class="scenario-box">📋 <strong>ESCENARIO:</strong><br><br>${question.scenario}</div>` : ''}
                     <p class="question-text">${question.question}</p>
                     <div class="options-list">${shuffled.indices.map((originalIndex, displayIndex) => {
                         const option = question.options[originalIndex];
@@ -1274,7 +1286,7 @@
                         else if (displayIndex === userAnswer && !isCorrect) { className += ' incorrect'; feedback = '<span class="option-feedback incorrect">Tu respuesta</span>'; }
                         return `<div class="${className}"><span class="option-letter">${letters[displayIndex]}</span><span class="option-text">${option}</span>${feedback}</div>`;
                     }).join('')}</div>
-                    ${question.explanation ? `<div class="explanation"><strong>📖 Explicación:</strong> ${question.explanation}</div>` : ''}
+                    ${question.explanation ? `<div class="explanation"><strong>📖 Explicación:</strong><br><br>${question.explanation}</div>` : ''}
                 </div>`;
             }).join('');
         }
@@ -1285,7 +1297,6 @@
             document.getElementById('resultsScreen').classList.add('hidden');
             document.getElementById('reviewScreen').classList.add('hidden');
             document.getElementById('startScreen').classList.remove('hidden');
-            questions = []; currentQuestionIndex = 0; userAnswers = {}; answerResults = {}; correctCount = 0; incorrectCount = 0; shuffledOptions = {};
         }
     </script>
 </body>

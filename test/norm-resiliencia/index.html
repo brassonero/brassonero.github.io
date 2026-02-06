@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examen - Cumplimiento Normativo y Resiliencia BBVA</title>
+    <title>Examen EXTREMO - Cumplimiento Normativo y Resiliencia BBVA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0a0f1a;
-            --bg-secondary: #111827;
-            --bg-tertiary: #1f2937;
-            --bg-card: #151d2e;
-            --accent-blue: #0066cc;
-            --accent-cyan: #06b6d4;
-            --accent-emerald: #10b981;
-            --accent-amber: #f59e0b;
-            --accent-red: #ef4444;
-            --accent-purple: #8b5cf6;
-            --accent-pink: #ec4899;
+            --bg-primary: #050508;
+            --bg-secondary: #0c0c12;
+            --bg-tertiary: #14141e;
+            --bg-card: #0e0e16;
+            --accent-red: #dc2626;
+            --accent-orange: #ea580c;
+            --accent-amber: #d97706;
+            --accent-purple: #7c3aed;
+            --accent-pink: #db2777;
+            --accent-cyan: #0891b2;
+            --accent-emerald: #059669;
             --text-primary: #f9fafb;
             --text-secondary: #9ca3af;
             --text-muted: #6b7280;
-            --border-color: #374151;
-            --glow-cyan: 0 0 30px rgba(6, 182, 212, 0.25);
-            --glow-emerald: 0 0 25px rgba(16, 185, 129, 0.3);
-            --glow-red: 0 0 20px rgba(239, 68, 68, 0.3);
+            --border-color: #1f1f2e;
+            --glow-purple: 0 0 40px rgba(124, 58, 237, 0.3);
+            --glow-red: 0 0 30px rgba(220, 38, 38, 0.25);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,11 +43,9 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: 
-                radial-gradient(ellipse at 10% 90%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse at 90% 10%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
-                linear-gradient(rgba(6, 182, 212, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(6, 182, 212, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+                radial-gradient(ellipse at 15% 85%, rgba(124, 58, 237, 0.1) 0%, transparent 45%),
+                radial-gradient(ellipse at 85% 15%, rgba(220, 38, 38, 0.08) 0%, transparent 45%),
+                radial-gradient(ellipse at 50% 50%, rgba(8, 145, 178, 0.05) 0%, transparent 60%);
             pointer-events: none;
             z-index: 0;
         }
@@ -77,9 +74,9 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald), var(--accent-amber), var(--accent-cyan));
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-red), var(--accent-orange), var(--accent-purple));
             background-size: 300% 100%;
-            animation: gradient-shift 5s ease infinite;
+            animation: gradient-shift 4s ease infinite;
         }
 
         @keyframes gradient-shift {
@@ -96,20 +93,26 @@
         }
 
         .logo-icon {
-            width: 75px; height: 75px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald));
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-red));
             border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.2rem;
-            box-shadow: var(--glow-cyan);
+            font-size: 2.5rem;
+            box-shadow: var(--glow-purple);
+            animation: pulse-glow 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 25px rgba(124, 58, 237, 0.3); }
+            50% { box-shadow: 0 0 50px rgba(124, 58, 237, 0.5); }
         }
 
         .header h1 {
             font-size: 1.9rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-red));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -121,26 +124,53 @@
             margin-top: 0.5rem;
         }
 
-        .badge-container {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .badge {
+        .extreme-badge {
             display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-red));
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: white;
+            margin-top: 1rem;
+            animation: pulse-badge 1.5s ease-in-out infinite;
+            box-shadow: var(--glow-purple);
         }
 
-        .badge-cyan { background: var(--accent-cyan); color: black; }
-        .badge-emerald { background: var(--accent-emerald); color: white; }
-        .badge-amber { background: var(--accent-amber); color: black; }
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .warning-banner {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(220, 38, 38, 0.08));
+            border: 2px solid var(--accent-purple);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .warning-banner h3 {
+            color: var(--accent-purple);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warning-banner ul {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding-left: 1.5rem;
+            line-height: 1.9;
+        }
+
+        .warning-banner li strong {
+            color: var(--accent-red);
+        }
 
         .stats-bar {
             display: grid;
@@ -158,7 +188,6 @@
             transition: all 0.3s ease;
         }
 
-        .stat-card:hover { transform: translateY(-2px); }
         .stat-card.correct-stat { border-color: var(--accent-emerald); }
         .stat-card.incorrect-stat { border-color: var(--accent-red); }
 
@@ -166,14 +195,11 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 2rem;
             font-weight: 600;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
-        .stat-value.correct { color: var(--accent-emerald); background: none; -webkit-text-fill-color: var(--accent-emerald); }
-        .stat-value.incorrect { color: var(--accent-red); background: none; -webkit-text-fill-color: var(--accent-red); }
+        .stat-value.neutral { background: linear-gradient(135deg, var(--accent-purple), var(--accent-red)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-value.correct { color: var(--accent-emerald); }
+        .stat-value.incorrect { color: var(--accent-red); }
 
         .stat-label {
             font-size: 0.8rem;
@@ -193,10 +219,9 @@
 
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald));
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-red));
             border-radius: 10px;
             transition: width 0.5s ease;
-            box-shadow: var(--glow-cyan);
         }
 
         .question-card {
@@ -208,8 +233,7 @@
             transition: all 0.3s ease;
         }
 
-        .question-card:hover { border-color: rgba(6, 182, 212, 0.4); }
-        .question-card.answered-correct { border-color: var(--accent-emerald); box-shadow: var(--glow-emerald); }
+        .question-card.answered-correct { border-color: var(--accent-emerald); box-shadow: 0 0 25px rgba(5, 150, 105, 0.2); }
         .question-card.answered-incorrect { border-color: var(--accent-red); box-shadow: var(--glow-red); }
 
         .question-header {
@@ -221,8 +245,8 @@
         }
 
         .question-number {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald));
-            color: black;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-red));
+            color: white;
             font-family: 'JetBrains Mono', monospace;
             font-weight: 600;
             padding: 0.5rem 1rem;
@@ -240,25 +264,27 @@
 
         .question-type {
             font-size: 0.7rem;
-            padding: 0.25rem 0.5rem;
+            padding: 0.25rem 0.6rem;
             border-radius: 4px;
             font-weight: 600;
             text-transform: uppercase;
         }
         .question-type.scenario { background: var(--accent-pink); color: white; }
-        .question-type.conceptual { background: var(--accent-purple); color: white; }
-        .question-type.technical { background: var(--accent-cyan); color: black; }
-        .question-type.tricky { background: var(--accent-amber); color: black; }
+        .question-type.trap { background: var(--accent-red); color: white; }
+        .question-type.numerical { background: var(--accent-cyan); color: white; }
+        .question-type.combined { background: var(--accent-purple); color: white; }
+        .question-type.negative { background: var(--accent-orange); color: white; }
+        .question-type.roles { background: var(--accent-amber); color: black; }
 
         .difficulty-badge {
             font-size: 0.7rem;
-            padding: 0.25rem 0.5rem;
+            padding: 0.25rem 0.6rem;
             border-radius: 4px;
             font-weight: 600;
         }
+        .difficulty-badge.extreme { background: linear-gradient(135deg, #7c3aed, #dc2626); color: white; animation: pulse-badge 2s ease-in-out infinite; }
         .difficulty-badge.expert { background: #dc2626; color: white; }
-        .difficulty-badge.hard { background: var(--accent-amber); color: black; }
-        .difficulty-badge.medium { background: var(--accent-emerald); color: white; }
+        .difficulty-badge.hard { background: var(--accent-orange); color: white; }
 
         .question-text {
             font-size: 1.05rem;
@@ -268,8 +294,9 @@
         }
 
         .scenario-box {
-            background: rgba(6, 182, 212, 0.1);
-            border: 1px solid rgba(6, 182, 212, 0.3);
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(220, 38, 38, 0.06));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-left: 4px solid var(--accent-purple);
             border-radius: 12px;
             padding: 1.2rem;
             margin-bottom: 1.5rem;
@@ -278,7 +305,9 @@
             line-height: 1.7;
         }
 
-        .scenario-box strong { color: var(--accent-cyan); }
+        .scenario-box strong { color: var(--accent-purple); }
+        .scenario-box .highlight { background: rgba(220, 38, 38, 0.2); padding: 0.1rem 0.3rem; border-radius: 3px; color: var(--accent-red); }
+        .scenario-box .data { background: rgba(8, 145, 178, 0.2); padding: 0.1rem 0.3rem; border-radius: 3px; color: var(--accent-cyan); }
 
         .options-list { display: flex; flex-direction: column; gap: 0.75rem; }
 
@@ -295,15 +324,15 @@
         }
 
         .option:hover:not(.disabled) {
-            border-color: var(--accent-cyan);
-            background: rgba(6, 182, 212, 0.1);
+            border-color: var(--accent-purple);
+            background: rgba(124, 58, 237, 0.1);
             transform: translateX(4px);
         }
 
-        .option.correct { border-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.15); }
-        .option.incorrect { border-color: var(--accent-red); background: rgba(239, 68, 68, 0.15); }
+        .option.correct { border-color: var(--accent-emerald); background: rgba(5, 150, 105, 0.15); }
+        .option.incorrect { border-color: var(--accent-red); background: rgba(220, 38, 38, 0.15); }
         .option.disabled { cursor: not-allowed; opacity: 0.7; }
-        .option.show-correct { border-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.1); }
+        .option.show-correct { border-color: var(--accent-emerald); background: rgba(5, 150, 105, 0.1); }
 
         .option-letter {
             width: 38px; height: 38px;
@@ -319,7 +348,7 @@
             flex-shrink: 0;
         }
 
-        .option:hover:not(.disabled) .option-letter { background: var(--accent-cyan); color: black; }
+        .option:hover:not(.disabled) .option-letter { background: var(--accent-purple); color: white; }
         .option.correct .option-letter { background: var(--accent-emerald); color: white; }
         .option.incorrect .option-letter { background: var(--accent-red); color: white; }
         .option.show-correct .option-letter { background: var(--accent-emerald); color: white; }
@@ -340,23 +369,25 @@
             font-weight: 500;
         }
 
-        .feedback-message.correct { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-emerald); color: var(--accent-emerald); }
-        .feedback-message.incorrect { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--accent-red); color: var(--accent-red); }
+        .feedback-message.correct { background: rgba(5, 150, 105, 0.15); border: 1px solid var(--accent-emerald); color: var(--accent-emerald); }
+        .feedback-message.incorrect { background: rgba(220, 38, 38, 0.15); border: 1px solid var(--accent-red); color: var(--accent-red); }
 
         .feedback-icon { font-size: 1.5rem; }
 
         .explanation {
             margin-top: 1rem;
-            padding: 1rem 1.2rem;
-            background: rgba(6, 182, 212, 0.08);
-            border-left: 3px solid var(--accent-cyan);
+            padding: 1.2rem;
+            background: rgba(124, 58, 237, 0.06);
+            border-left: 3px solid var(--accent-purple);
             border-radius: 0 10px 10px 0;
             font-size: 0.9rem;
             color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
-        .explanation strong { color: var(--accent-cyan); }
+        .explanation strong { color: var(--accent-purple); }
+        .explanation .trap-warning { color: var(--accent-red); font-weight: 600; }
+        .explanation .key-point { color: var(--accent-cyan); }
 
         .navigation {
             display: flex;
@@ -381,10 +412,10 @@
             gap: 0.5rem;
         }
 
-        .btn-primary { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald)); color: black; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-cyan); }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-purple), var(--accent-red)); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-purple); }
         .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
-        .btn-secondary:hover { border-color: var(--accent-cyan); }
+        .btn-secondary:hover { border-color: var(--accent-purple); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         .question-nav {
@@ -415,13 +446,13 @@
             transition: all 0.2s ease;
         }
 
-        .nav-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
-        .nav-btn.current { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald)); border-color: transparent; color: black; }
+        .nav-btn:hover { border-color: var(--accent-purple); color: var(--accent-purple); }
+        .nav-btn.current { background: linear-gradient(135deg, var(--accent-purple), var(--accent-red)); border-color: transparent; color: white; }
         .nav-btn.correct { background: var(--accent-emerald); border-color: transparent; color: white; }
         .nav-btn.incorrect { background: var(--accent-red); border-color: transparent; color: white; }
 
         .results-container { text-align: center; padding: 3rem; }
-        .results-score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
+        .results-score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, var(--accent-purple), var(--accent-red)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
         .results-grade { font-size: 2rem; margin-bottom: 2rem; }
         .results-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 2rem 0; }
         .result-stat { background: var(--bg-tertiary); padding: 1.5rem; border-radius: 14px; }
@@ -431,18 +462,13 @@
         .result-stat-value.unanswered { color: var(--accent-amber); }
 
         .start-screen { text-align: center; padding: 3rem; }
-        .start-screen h2 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+        .start-screen h2 { font-size: 1.8rem; margin-bottom: 1.5rem; color: var(--accent-purple); }
 
         .start-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0; text-align: left; }
         .info-item { background: var(--bg-tertiary); padding: 1.2rem; border-radius: 14px; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--border-color); }
-        .info-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        .info-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-red)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
         .info-text h4 { font-size: 0.85rem; color: var(--text-muted); font-weight: 400; }
         .info-text p { font-size: 1.05rem; color: var(--text-primary); font-weight: 600; }
-
-        .warning-box { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.1)); border: 1px solid var(--accent-amber); border-radius: 14px; padding: 1.2rem; margin: 1.5rem 0; text-align: left; }
-        .warning-box h4 { color: var(--accent-amber); margin-bottom: 0.5rem; font-size: 1rem; }
-        .warning-box p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; }
-        .warning-box ul { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; padding-left: 1.2rem; }
 
         .question-limit { margin: 1.5rem 0; padding: 1.2rem; background: var(--bg-tertiary); border-radius: 14px; border: 1px solid var(--border-color); }
         .question-limit label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); }
@@ -451,7 +477,7 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
 
         @media (max-width: 768px) {
             .container { padding: 1rem; }
@@ -466,10 +492,6 @@
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.5s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } }
-        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } }
-        .option.correct { animation: pulse-green 0.5s ease; }
-        .option.incorrect { animation: pulse-red 0.5s ease; }
     </style>
 </head>
 <body>
@@ -478,86 +500,82 @@
     <div class="container">
         <header class="header">
             <div class="logo-container">
-                <div class="logo-icon">🛡️</div>
+                <div class="logo-icon">⚡</div>
                 <div>
                     <h1>Cumplimiento Normativo y Resiliencia</h1>
-                    <p class="subtitle">Systems Engineering — BBVA México</p>
+                    <p class="subtitle">Systems Engineering BBVA — Nivel EXTREMO</p>
                 </div>
             </div>
-            <div class="badge-container">
-                <span class="badge badge-cyan">ENGINEERING</span>
-                <span class="badge badge-emerald">COMPLIANCE</span>
-                <span class="badge badge-amber">RESILIENCIA</span>
-            </div>
+            <div class="extreme-badge">☠️ DIFICULTAD MÁXIMA ☠️</div>
         </header>
 
         <div id="startScreen" class="question-card start-screen">
-            <h2>🎯 Evaluación de Conocimientos</h2>
+            <h2>🎯 Evaluación de Certificación Extrema</h2>
             <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                Examen basado en el Cheat Sheet de Cumplimiento Normativo y Resiliencia.<br>
-                Cubre regulación, seguridad, SDLC, CVT y las 20 Reglas de Oro.
+                Examen diseñado para evaluar conocimiento profundo del marco normativo.<br>
+                Incluye escenarios complejos, trampas sutiles y preguntas de combinación.
             </p>
+
+            <div class="warning-banner">
+                <h3>⚠️ CARACTERÍSTICAS DEL EXAMEN</h3>
+                <ul>
+                    <li><strong>Escenarios multi-factor:</strong> Debes considerar múltiples normas simultáneamente</li>
+                    <li><strong>Trampas de roles:</strong> 1ª vs 2ª vs 3ª Línea - diferencias sutiles</li>
+                    <li><strong>Preguntas negativas:</strong> "¿Cuál NO es...?" - Lee con extremo cuidado</li>
+                    <li><strong>Métricas exactas:</strong> RTO, RPO, MTTR, MTTD - valores y definiciones</li>
+                    <li><strong>CVT detallado:</strong> 16 controles específicos y sus requisitos</li>
+                    <li><strong>CIDA completo:</strong> Confidencialidad, Integridad, Disponibilidad, Autenticidad</li>
+                </ul>
+            </div>
 
             <div class="start-info">
                 <div class="info-item">
                     <div class="info-icon">📋</div>
                     <div class="info-text">
                         <h4>Total de preguntas</h4>
-                        <p>65 preguntas</p>
+                        <p>75 preguntas</p>
                     </div>
                 </div>
                 <div class="info-item">
                     <div class="info-icon">🎯</div>
                     <div class="info-text">
-                        <h4>Temas</h4>
-                        <p>12 categorías</p>
+                        <h4>Nivel</h4>
+                        <p>EXTREMO</p>
                     </div>
                 </div>
                 <div class="info-item">
-                    <div class="info-icon">⚠️</div>
+                    <div class="info-icon">⏱️</div>
                     <div class="info-text">
-                        <h4>Dificultad</h4>
-                        <p>Media-Alta</p>
+                        <h4>Tiempo sugerido</h4>
+                        <p>100 minutos</p>
                     </div>
                 </div>
                 <div class="info-item">
                     <div class="info-icon">✅</div>
                     <div class="info-text">
                         <h4>Para aprobar</h4>
-                        <p>75% mínimo</p>
+                        <p>80% mínimo</p>
                     </div>
                 </div>
             </div>
 
-            <div class="warning-box">
-                <h4>⚠️ Temas del Examen</h4>
-                <ul>
-                    <li>Marco Regulatorio (CNBV, Banxico, LFPDPPP)</li>
-                    <li>Seguridad de la Información (CIDA, cifrado, accesos)</li>
-                    <li>SDLC y Seguridad en el Desarrollo</li>
-                    <li>CVT - 16 Controles de Validación Técnica</li>
-                    <li>Continuidad y Alta Disponibilidad (RTO, RPO, MTTR)</li>
-                    <li>Las 3 Líneas de Defensa y las 20 Reglas de Oro</li>
-                </ul>
-            </div>
-
             <div class="question-limit">
                 <label>Número de preguntas:</label>
-                <input type="number" id="questionLimit" min="10" max="65" value="65">
-                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-65)</span>
+                <input type="number" id="questionLimit" min="10" max="75" value="75">
+                <span style="color: var(--text-muted); margin-left: 0.5rem;">(10-75)</span>
             </div>
 
             <button class="btn btn-primary" onclick="startExam()" style="margin-top: 1.5rem; padding: 1rem 3rem; font-size: 1.1rem;">
-                🚀 Iniciar Evaluación
+                ⚡ Iniciar Examen Extremo
             </button>
         </div>
 
         <div id="examScreen" class="hidden">
             <div class="stats-bar">
-                <div class="stat-card"><div class="stat-value" id="currentQuestion">1</div><div class="stat-label">Actual</div></div>
+                <div class="stat-card"><div class="stat-value neutral" id="currentQuestion">1</div><div class="stat-label">Actual</div></div>
                 <div class="stat-card correct-stat"><div class="stat-value correct" id="correctCount">0</div><div class="stat-label">Correctas</div></div>
                 <div class="stat-card incorrect-stat"><div class="stat-value incorrect" id="incorrectCount">0</div><div class="stat-label">Incorrectas</div></div>
-                <div class="stat-card"><div class="stat-value" id="totalQuestions">65</div><div class="stat-label">Total</div></div>
+                <div class="stat-card"><div class="stat-value neutral" id="totalQuestions">75</div><div class="stat-label">Total</div></div>
             </div>
             <div class="progress-container"><div class="progress-bar" id="progressBar" style="width: 0%"></div></div>
             <div class="question-nav" id="questionNav"></div>
@@ -582,187 +600,521 @@
 
         <div id="resultsScreen" class="hidden">
             <div class="question-card results-container">
-                <h2 style="margin-bottom: 1rem;">Resultados de la Evaluación</h2>
+                <h2 style="margin-bottom: 1rem;">Resultados del Examen Extremo</h2>
                 <div class="results-score" id="finalScore">0%</div>
                 <div class="results-grade" id="gradeText">Calificación</div>
                 <div class="results-stats">
-                    <div class="result-stat"><div class="result-stat-value correct" id="finalCorrectCount">0</div><div class="stat-label">Correctas</div></div>
-                    <div class="result-stat"><div class="result-stat-value incorrect" id="finalIncorrectCount">0</div><div class="stat-label">Incorrectas</div></div>
-                    <div class="result-stat"><div class="result-stat-value unanswered" id="finalUnansweredCount">0</div><div class="stat-label">Sin responder</div></div>
+                    <div class="result-stat"><div class="result-stat-value correct" id="finalCorrect">0</div><div class="stat-label">Correctas</div></div>
+                    <div class="result-stat"><div class="result-stat-value incorrect" id="finalIncorrect">0</div><div class="stat-label">Incorrectas</div></div>
+                    <div class="result-stat"><div class="result-stat-value unanswered" id="finalUnanswered">0</div><div class="stat-label">Sin responder</div></div>
                 </div>
                 <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <button class="btn btn-secondary" onclick="reviewAnswers()">📋 Revisar Respuestas</button>
-                    <button class="btn btn-primary" onclick="restartExam()">🔄 Nuevo Examen</button>
+                    <button class="btn btn-secondary" onclick="reviewAnswers()">📋 Revisar</button>
+                    <button class="btn btn-primary" onclick="restartExam()">🔄 Reintentar</button>
                 </div>
             </div>
         </div>
 
         <div id="reviewScreen" class="hidden">
             <div class="question-card" style="margin-bottom: 1rem;">
-                <h2 style="margin-bottom: 0.5rem;">Revisión de Respuestas</h2>
-                <p style="color: var(--text-secondary);">Análisis detallado de cada pregunta</p>
+                <h2 style="margin-bottom: 0.5rem;">Revisión Detallada</h2>
+                <p style="color: var(--text-secondary);">Análisis completo con explicaciones</p>
             </div>
             <div id="reviewContainer"></div>
             <div class="navigation">
-                <button class="btn btn-primary" onclick="backToResults()">← Volver a Resultados</button>
+                <button class="btn btn-primary" onclick="backToResults()">← Volver</button>
             </div>
         </div>
     </div>
 
     <script>
         const allQuestions = [
-            // ========== MARCO REGULATORIO ==========
-            {id:1,category:"Marco Regulatorio",type:"conceptual",difficulty:"hard",question:"¿Cuál es la función principal de la CNBV y qué documento emite que es clave para Engineering?",options:["Banco central que emite circulares de pago","Supervisa y regula entidades financieras; emite la Circular Única de Bancos (CUB)","Vigila protección de datos personales; emite la LFPDPPP","Audita sistemas de información; emite normas ISO"],correct:1,explanation:"La CNBV supervisa y regula entidades financieras. La CUB consolida disposiciones sobre riesgo operacional, tecnológico, seguridad y continuidad."},
-            
-            {id:2,category:"Marco Regulatorio",type:"conceptual",difficulty:"medium",question:"¿Qué entidad vigila el cumplimiento de la LFPDPPP (protección de datos personales)?",options:["CNBV","Banxico","Secretaría Anticorrupción (antes INAI)","Auditoría Interna"],correct:2,explanation:"La Secretaría Anticorrupción (antes INAI) vigila el cumplimiento de la LFPDPPP."},
-            
-            {id:3,category:"Marco Regulatorio",type:"conceptual",difficulty:"hard",question:"¿Cuál es la relevancia de Banxico para Engineering?",options:["Emite la Circular Única de Bancos","Regula ciberseguridad e infraestructura tecnológica para resiliencia del sistema financiero","Solo regula política monetaria","Audita sistemas internos del banco"],correct:1,explanation:"Banxico regula ciberseguridad e infraestructura tecnológica para resiliencia del sistema financiero."},
-            
-            // ========== RESILIENCIA DIGITAL ==========
-            {id:4,category:"Resiliencia Digital",type:"conceptual",difficulty:"medium",question:"¿Qué es la Resiliencia Digital según la Norma?",options:["Capacidad de crear software rápidamente","Capacidad para resistir, responder y recuperarnos de cualquier incidente tecnológico","Habilidad para automatizar pruebas","Proceso de migración a la nube"],correct:1,explanation:"Resiliencia Digital: Capacidad para resistir, responder y recuperarnos de cualquier incidente tecnológico. Objetivo: que el banco siga funcionando."},
-            
-            {id:5,category:"Resiliencia Digital",type:"conceptual",difficulty:"hard",question:"¿Qué es el 'Modelo de Gobierno' en el contexto de Engineering?",options:["El organigrama del departamento","La 'constitución' de Engineering: norma fundacional de la que emanan todas las normativas específicas","El proceso de aprobación de cambios","La metodología ágil del equipo"],correct:1,explanation:"El Modelo de Gobierno es la 'constitución' de Engineering. Establece quién toma decisiones, cómo se estructuran equipos, y el origen del cuerpo normativo."},
-            
-            // ========== CUERPO NORMATIVO ==========
-            {id:6,category:"Cuerpo Normativo",type:"tricky",difficulty:"expert",question:"¿Qué dirección es responsable del Modelo de Gobierno de Engineering?",options:["Systems","RCS Engineering","Strategy & Control","Information Security"],correct:2,explanation:"Strategy & Control es responsable del Modelo de Gobierno de Engineering, la 'constitución' que define estructura, roles y decisiones."},
-            
-            {id:7,category:"Cuerpo Normativo",type:"tricky",difficulty:"hard",question:"¿Qué dirección es responsable de las normas de SDLC, Testing e Integridad de Información?",options:["Information Security","Infrastructure & IT Ops","Systems","RCS Third Party"],correct:2,explanation:"Systems es responsable de SDLC, Seguridad en SDLC, Adquisición/Desarrollo/Mantenimiento, Testing e Integridad de Información."},
-            
-            {id:8,category:"Cuerpo Normativo",type:"tricky",difficulty:"hard",question:"¿Qué dirección maneja las normas de Riesgo TIC de Terceros y Ciclo de Vida de Servicios de Terceros?",options:["RCS Engineering","RCS Third Party","Information Security","Systems"],correct:1,explanation:"RCS Third Party maneja evaluación, homologación y supervisión continua de proveedores."},
-            
-            // ========== CLASIFICACIÓN DE INFORMACIÓN ==========
-            {id:9,category:"Seguridad Info",type:"technical",difficulty:"expert",question:"¿Cuáles son los 4 niveles de clasificación de la información?",options:["Crítica, Alta, Media, Baja","Pública, Interna, Confidencial, Secreta","Abierta, Restringida, Privada, Clasificada","Nivel 1, Nivel 2, Nivel 3, Nivel 4"],correct:1,explanation:"Los 4 niveles son: Pública (libre acceso), Interna (solo empleados), Confidencial (acceso por roles), Secreta (máxima protección)."},
-            
-            {id:10,category:"Seguridad Info",type:"technical",difficulty:"hard",question:"Para información clasificada como 'Secreta', ¿cuáles son los controles mínimos?",options:["Solo control de acceso básico","Cifrado, RBAC estricto y logs de acceso","Cifrado E2E, MFA, tokenización, pseudonimización y auditoría total","Protección básica de integridad"],correct:2,explanation:"Información Secreta requiere: Cifrado E2E, MFA, tokenización, pseudonimización y auditoría total."},
-            
-            {id:11,category:"Seguridad Info",type:"technical",difficulty:"medium",question:"¿Qué significa proteger datos 'En Tránsito'?",options:["Datos almacenados en BD","Datos siendo procesados activamente","Datos moviéndose por la red - requiere cifrado TLS obligatorio","Datos en backup"],correct:2,explanation:"Datos En Tránsito = datos moviéndose por la red. Requiere cifrado TLS de extremo a extremo obligatorio."},
-            
-            {id:12,category:"Seguridad Info",type:"technical",difficulty:"medium",question:"¿Qué control se aplica a datos 'En Reposo'?",options:["Cifrado TLS","Encriptación de bases de datos","Controles de acceso RBAC","Tokenización"],correct:1,explanation:"Datos En Reposo (almacenados en BD, discos) requieren encriptación de bases de datos."},
-            
-            // ========== CIDA ==========
-            {id:13,category:"CIDA",type:"technical",difficulty:"expert",question:"¿Qué significan las siglas CIDA en el contexto de clasificación de activos?",options:["Control Interno de Datos y Aplicaciones","Confidencialidad, Integridad, Disponibilidad, Autenticidad","Clasificación Interna de Datos Activos","Centro de Información y Datos Automatizados"],correct:1,explanation:"CIDA = Confidencialidad, Integridad, Disponibilidad, Autenticidad. Son las 4 dimensiones para clasificar activos."},
-            
-            {id:14,category:"CIDA",type:"technical",difficulty:"hard",question:"La dimensión de 'Disponibilidad' en CIDA responde a la pregunta:",options:["¿Qué pasa si la información se fuga?","¿Qué pasa si los datos son alterados?","¿Qué pasa si la aplicación no funciona?","¿Qué pasa si no confiamos en el origen?"],correct:2,explanation:"Disponibilidad: ¿Qué pasa si la aplicación no funciona? Determina nivel de HA y estrategia de recuperación."},
-            
-            {id:15,category:"CIDA",type:"technical",difficulty:"hard",question:"¿Qué dimensión CIDA determina los controles de hashing y firmas digitales?",options:["Confidencialidad","Integridad","Disponibilidad","Autenticidad"],correct:1,explanation:"Integridad: ¿Qué pasa si los datos son alterados? Determina controles de hashing y firmas digitales."},
-            
-            // ========== CRIPTOGRAFÍA ==========
-            {id:16,category:"Criptografía",type:"technical",difficulty:"expert",question:"¿Cuáles son los algoritmos de criptografía APROBADOS por el banco?",options:["MD5 (hash) y DES (cifrado)","SHA-1 (hash) y 3DES (cifrado)","AES-256 (cifrado) y SHA-256 (hash)","RSA-1024 y MD5"],correct:2,explanation:"Algoritmos aprobados: AES-256 (cifrado), SHA-256 (hash). Las claves deben rotarse periódicamente."},
-            
-            {id:17,category:"Criptografía",type:"technical",difficulty:"hard",question:"¿Qué está PROHIBIDO en criptografía según la Norma?",options:["Usar AES-256","Rotar claves periódicamente","Crear implementaciones criptográficas personalizadas y almacenar claves en código","Usar bibliotecas aprobadas"],correct:2,explanation:"PROHIBIDO: Crear implementaciones criptográficas personalizadas. NUNCA almacenar claves en código o archivos de configuración."},
-            
-            // ========== IDENTIDADES Y ACCESO ==========
-            {id:18,category:"Identidades",type:"conceptual",difficulty:"hard",question:"El principio de 'Mínimo Privilegio' significa:",options:["Dar acceso de administrador a todos","Diseñar RBAC granular, denegar todo por defecto, solo permisos mínimos indispensables","Permitir acceso temporal a todos los sistemas","Dar acceso solo a producción"],correct:1,explanation:"Mínimo Privilegio: Diseñar RBAC granular. Denegar todo por defecto. Solo permisos mínimos e indispensables. Integrar MFA."},
-            
-            {id:19,category:"Identidades",type:"conceptual",difficulty:"hard",question:"¿Qué significa 'Segregación de Funciones' en operaciones sensibles?",options:["Separar desarrollo de producción","Implementar 'cuatro ojos' / doble aprobación: quien crea ≠ quien autoriza","Dividir el equipo en subgrupos","Usar diferentes herramientas para cada función"],correct:1,explanation:"Segregación de Funciones: Implementar 'cuatro ojos' / doble aprobación para operaciones sensibles. Quien crea ≠ quien autoriza."},
-            
-            {id:20,category:"Identidades",type:"conceptual",difficulty:"medium",question:"¿Qué debe hacerse cuando un miembro del equipo cambia de función o deja el banco?",options:["Nada, los accesos expiran automáticamente","Notificar y revocar accesos a repositorios, herramientas y sistemas","Solo notificar a RRHH","Esperar a la siguiente auditoría"],correct:1,explanation:"Ciclo de Vida del Empleado: Notificar cuando cambia de función o deja el banco. Revocar accesos a repositorios, herramientas y sistemas."},
-            
-            {id:21,category:"Identidades",type:"technical",difficulty:"medium",question:"El principio de 'Trazabilidad' requiere:",options:["Solo registrar errores","Logs de auditoría inmutables: quién, qué, cuándo, cómo","Registrar solo accesos fallidos","Logs opcionales según criticidad"],correct:1,explanation:"Trazabilidad: Todas las acciones deben quedar registradas. Logs de auditoría inmutables: quién, qué, cuándo, cómo."},
-            
-            // ========== REDES Y HARDENING ==========
-            {id:22,category:"Redes",type:"technical",difficulty:"hard",question:"¿Qué es la 'Segmentación de Red'?",options:["Dividir el código en módulos","Infraestructura dividida en zonas de seguridad (producción, desarrollo, DMZ) con tráfico restringido","Separar bases de datos","Usar diferentes proveedores de internet"],correct:1,explanation:"Segmentación de Red: Infraestructura dividida en zonas de seguridad. Tráfico restringido entre zonas."},
-            
-            {id:23,category:"Redes",type:"technical",difficulty:"medium",question:"El principio de los Firewalls es:",options:["Permitir todo por defecto","Denegar por defecto, solo tráfico explícitamente autorizado","Bloquear solo puertos conocidos","Permitir todo el tráfico interno"],correct:1,explanation:"Firewalls: Denegar por defecto. Solo tráfico explícitamente autorizado."},
-            
-            {id:24,category:"Redes",type:"technical",difficulty:"hard",question:"¿Qué es 'Hardening' y cuál es tu responsabilidad como desarrollador?",options:["Aumentar recursos del servidor","Configuraciones de seguridad estandarizadas; desarrollar para entornos minimalistas y usar Golden Images corporativas","Endurecer las pruebas","Aumentar la cobertura de código"],correct:1,explanation:"Hardening: Configuraciones de seguridad estandarizadas, solo servicios necesarios. Tu responsabilidad: desarrollar para entornos minimalistas, declarar dependencias, usar Golden Images."},
-            
-            // ========== MONITORIZACIÓN Y VULNERABILIDADES ==========
-            {id:25,category:"Monitorización",type:"technical",difficulty:"hard",question:"¿Qué información debe incluir un log de alta calidad?",options:["Solo errores","Solo accesos exitosos","Quién, qué, cuándo, cómo - con suficiente detalle","Solo datos de rendimiento"],correct:2,explanation:"Logs de alta calidad: quién, qué, cuándo, cómo, con suficiente detalle. Eventos clave: login exitosos/fallidos, cambios de configuración, accesos a ficheros, errores críticos."},
-            
-            {id:26,category:"Monitorización",type:"technical",difficulty:"expert",question:"¿Qué está PROHIBIDO incluir en los logs?",options:["Timestamps","IPs de origen","Datos sensibles (contraseñas, datos personales, tokens)","Identificadores de usuario"],correct:2,explanation:"NUNCA registrar datos sensibles en los logs: contraseñas, datos personales, tokens."},
-            
-            {id:27,category:"Vulnerabilidades",type:"technical",difficulty:"expert",question:"Para vulnerabilidades de criticidad CRÍTICA, ¿cuál es la acción requerida?",options:["Incluir en backlog de mantenimiento","Planificar parche dentro del SLA","MÁXIMA PRIORIDAD: Corrección inmediata por encima de nuevas funcionalidades","Descartar si es falso positivo"],correct:2,explanation:"Vulnerabilidades CRÍTICAS: MÁXIMA PRIORIDAD. Corrección inmediata por encima de nuevas funcionalidades."},
-            
-            {id:28,category:"Vulnerabilidades",type:"technical",difficulty:"hard",question:"¿Cuáles son las herramientas del pipeline CI/CD para gestión de vulnerabilidades?",options:["Solo SonarQube","SAST, DAST, SCA y Chimera","Solo pruebas manuales","Jenkins y GitHub Actions"],correct:1,explanation:"Herramientas en pipeline: SAST (Análisis Estático), DAST (Análisis Dinámico), SCA (Análisis de Componentes), Chimera (reportes)."},
-            
-            // ========== INCIDENTES DE SEGURIDAD ==========
-            {id:29,category:"Incidentes",type:"scenario",difficulty:"expert",scenario:"Detectas un comportamiento anómalo en producción: consultas SQL inusuales a las 3AM desde una IP desconocida.",question:"¿Cuál es tu PRIMERA acción según la Norma?",options:["Investigar por tu cuenta antes de reportar","Reportar INMEDIATAMENTE al CSIRT/CERT sin asumir que es un error sin importancia","Esperar a ver si se repite","Notificar a tu Tech Lead al día siguiente"],correct:1,explanation:"Fase de Detección: Reportar INMEDIATAMENTE cualquier comportamiento anómalo al CSIRT/CERT. NO asumir que es un error sin importancia."},
-            
-            {id:30,category:"Incidentes",type:"conceptual",difficulty:"hard",question:"En la fase de 'Contención' de un incidente, ¿cómo ayuda el principio de mínimo privilegio?",options:["No tiene relación","Limita el daño si una cuenta es comprometida","Acelera la investigación","Facilita la comunicación"],correct:1,explanation:"Contención: El mínimo privilegio en tu diseño limita el daño si una cuenta es comprometida."},
-            
-            {id:31,category:"Incidentes",type:"conceptual",difficulty:"medium",question:"¿Qué debes implementar después de un incidente según las 'Lecciones Aprendidas'?",options:["Solo documentar el incidente","Participar en post-mortem e implementar mejoras: timeouts, reintentos, circuit breakers","Cambiar todas las contraseñas","Reinstalar todos los servidores"],correct:1,explanation:"Lecciones Aprendidas: Participar en post-mortem. Implementar mejoras: timeouts, reintentos, circuit breakers."},
-            
-            // ========== SDLC ==========
-            {id:32,category:"SDLC",type:"technical",difficulty:"hard",question:"¿Qué control de seguridad se integra en la fase de ANÁLISIS del SDLC?",options:["SAST","Hacking Ético","Análisis de Riesgo Tecnológico (ART)","DAST"],correct:2,explanation:"Fase de Análisis: Requisitos funcionales y no funcionales + Análisis de Riesgo Tecnológico (ART)."},
-            
-            {id:33,category:"SDLC",type:"technical",difficulty:"hard",question:"¿Qué controles se integran en la fase de DISEÑO?",options:["SAST y SCA","Modelado de Amenazas (Threat Modeling) y Security by Design","CVT y CRQ","DAST y Hacking Ético"],correct:1,explanation:"Fase de Diseño: Modelado de Amenazas (Threat Modeling), Security by Design. Documentar decisiones de diseño."},
-            
-            {id:34,category:"SDLC",type:"technical",difficulty:"medium",question:"¿Qué controles se integran en la fase de CONSTRUCCIÓN?",options:["Hacking Ético","CVT completo","SAST, SCA, Codificación Segura (OWASP Top 10)","Solo pruebas manuales"],correct:2,explanation:"Fase de Construcción: SAST, SCA, Codificación Segura (OWASP Top 10)."},
-            
-            {id:35,category:"SDLC",type:"technical",difficulty:"hard",question:"¿Qué es el 'CVT' en la fase de DESPLIEGUE?",options:["Una herramienta de versionado","El hito final (gate) que debe completarse antes de producción","Un tipo de prueba automatizada","El plan de rollback"],correct:1,explanation:"Fase de Despliegue: CVT como hito final (gate). CRQ aprobado + Plan Instalación + Plan Rollback."},
-            
-            // ========== SHIFT LEFT ==========
-            {id:36,category:"Shift Left",type:"conceptual",difficulty:"medium",question:"¿Qué significa el principio 'Shift Left' en seguridad?",options:["Mover la seguridad al final del ciclo","Mover la seguridad hacia la IZQUIERDA (fases más tempranas) del ciclo de vida","Priorizar pruebas de rendimiento","Delegar seguridad a un equipo aparte"],correct:1,explanation:"Shift Left: Mover la seguridad hacia la izquierda del ciclo de vida. Encontrar y arreglar problemas en las fases más tempranas y baratas."},
-            
-            {id:37,category:"Shift Left",type:"conceptual",difficulty:"hard",question:"Según la Norma, ¿de quién es responsabilidad la seguridad?",options:["Del equipo de InfoSec exclusivamente","Del equipo de QA","Es TU responsabilidad como desarrollador profesional, no de un equipo aparte","Del Release Manager"],correct:2,explanation:"La seguridad es parte de TU responsabilidad como desarrollador profesional, no de un equipo aparte."},
-            
-            // ========== OWASP ==========
-            {id:38,category:"OWASP",type:"technical",difficulty:"hard",question:"¿Qué práctica de codificación segura previene Inyección SQL y XSS?",options:["Usar frameworks modernos","Validación estricta de TODAS las entradas del usuario","Cifrar todas las respuestas","Usar HTTPS"],correct:1,explanation:"Prácticas OWASP: Validación estricta de TODAS las entradas del usuario (previene Inyección SQL y XSS)."},
-            
-            {id:39,category:"OWASP",type:"technical",difficulty:"medium",question:"¿Qué debe evitarse en el manejo de errores según OWASP?",options:["Registrar errores en logs","Mostrar errores al usuario","Revelar información sensible en mensajes de error","Usar try-catch"],correct:2,explanation:"Manejo seguro de errores: No revelar información sensible en mensajes de error."},
-            
-            // ========== TESTING ==========
-            {id:40,category:"Testing",type:"technical",difficulty:"hard",question:"¿De qué tipo de pruebas eres el PRINCIPAL responsable como desarrollador?",options:["Pruebas de rendimiento","Pruebas unitarias - alta cobertura obligatoria","Pruebas de aceptación","Hacking Ético"],correct:1,explanation:"Pruebas Unitarias: Tú eres el principal responsable. Alta cobertura obligatoria."},
-            
-            {id:41,category:"Testing",type:"conceptual",difficulty:"medium",question:"Según la 'Regla de Oro del Testing':",options:["Las pruebas manuales son preferibles","Un código sin pruebas es un código incompleto; la calidad NO es negociable","Las pruebas son opcionales si hay presión de tiempo","Solo se prueban funcionalidades nuevas"],correct:1,explanation:"Regla de Oro: Un código sin pruebas es un código incompleto. La calidad NO es negociable."},
-            
-            {id:42,category:"Testing",type:"technical",difficulty:"hard",question:"¿Dónde deben estar integradas TODAS las pruebas?",options:["En un servidor separado","En el pipeline CI/CD para validación continua con cada cambio","Solo en ambientes de QA","En producción"],correct:1,explanation:"Toda prueba debe estar automatizada e integrada en el pipeline CI/CD para validación continua con cada cambio."},
-            
-            // ========== CONTINUIDAD Y HA ==========
-            {id:43,category:"Continuidad",type:"technical",difficulty:"expert",question:"¿Qué es el RTO (Recovery Time Objective)?",options:["Cantidad máxima de pérdida de datos aceptable","Tiempo máximo aceptable para recuperar el servicio","Tiempo promedio de recuperación","Tiempo para detectar un problema"],correct:1,explanation:"RTO: Tiempo máximo aceptable para recuperar el servicio. Determina la arquitectura que debes implementar."},
-            
-            {id:44,category:"Continuidad",type:"technical",difficulty:"expert",question:"¿Qué es el RPO (Recovery Point Objective)?",options:["Tiempo máximo para recuperar el servicio","Cantidad máxima aceptable de pérdida de datos","Tiempo promedio de detección","Frecuencia de monitoreo"],correct:1,explanation:"RPO: Cantidad máxima aceptable de pérdida de datos. Determina frecuencia de backups y estrategia de replicación."},
-            
-            {id:45,category:"Continuidad",type:"technical",difficulty:"hard",question:"¿Qué es el MTTR y cómo se minimiza?",options:["Mean Time To Recovery; con runbooks detallados, pruebas de DR y automatización","Mean Time To Report; con mejor comunicación","Maximum Time To Restore; no se puede minimizar","Minimum Time To Respond; con más personal"],correct:0,explanation:"MTTR: Mean Time To Recovery (tiempo promedio de recuperación). Se minimiza con runbooks detallados, pruebas de DR y automatización."},
-            
-            {id:46,category:"Continuidad",type:"technical",difficulty:"hard",question:"¿Qué es el MTTD y cómo se reduce?",options:["Mean Time To Deploy","Mean Time To Detect; exponiendo métricas (/health), definiendo umbrales de alerta","Maximum Time To Debug","Minimum Time To Deliver"],correct:1,explanation:"MTTD: Mean Time To Detect (tiempo promedio en detectar un problema). Se reduce con endpoint /health y umbrales de alerta."},
-            
-            // ========== ALTA DISPONIBILIDAD ==========
-            {id:47,category:"Alta Disponibilidad",type:"technical",difficulty:"hard",question:"¿Cuáles son los principios de diseño para Alta Disponibilidad?",options:["Solo usar la nube","Redundancia, Health Checks, Failover Automático, Sin SPOFs, Sesión externalizada","Más servidores = mejor","Solo backups frecuentes"],correct:1,explanation:"Principios de HA: Redundancia (clúster activo-activo), Health Checks (/health), Failover Automático, Sin SPOFs, Sesión externalizada."},
-            
-            {id:48,category:"Alta Disponibilidad",type:"technical",difficulty:"medium",question:"¿Qué significa que una aplicación sea 'STATELESS'?",options:["No tiene base de datos","No guarda estado en la instancia; permite múltiples instancias redundantes","No tiene configuración","No tiene logs"],correct:1,explanation:"Aplicaciones STATELESS no guardan estado en la instancia. Permite múltiples instancias (clúster activo-activo). Sesión en componente externo compartido."},
-            
-            {id:49,category:"Alta Disponibilidad",type:"technical",difficulty:"medium",question:"¿Qué es un SPOF y qué debes hacer con él?",options:["Single Point of Failure; eliminarlo de la arquitectura","Security Point of Focus; monitorearlo","Service Provider of Functions; documentarlo","Standard Process of Failover; implementarlo"],correct:0,explanation:"SPOF: Single Point of Failure. Debes eliminar TODOS los SPOFs de la arquitectura."},
-            
-            // ========== BACKUPS Y DR ==========
-            {id:50,category:"Backups",type:"technical",difficulty:"hard",question:"¿Qué son las copias 'inmutables/air-gapped' y para qué sirven?",options:["Copias en la nube","Última línea de defensa contra ransomware","Copias en el mismo servidor","Backups incrementales"],correct:1,explanation:"Copias inmutables/air-gapped: última línea de defensa contra ransomware."},
-            
-            {id:51,category:"Resiliencia",type:"technical",difficulty:"hard",question:"En pruebas de Chaos Engineering, ¿qué mejoras debes implementar después?",options:["Solo documentar los fallos","Timeouts, reintentos, circuit breakers","Más servidores","Cambiar de proveedor"],correct:1,explanation:"Después de Chaos Engineering: Implementar mejoras como timeouts, reintentos, circuit breakers."},
-            
-            // ========== CMDB Y OPERACIÓN ==========
-            {id:52,category:"CMDB",type:"technical",difficulty:"medium",question:"¿Qué debes registrar de tu aplicación en la CMDB?",options:["Solo el nombre","La aplicación, sus componentes y todas sus dependencias mapeadas","Solo las APIs","Solo las bases de datos"],correct:1,explanation:"CMDB: Registrar tu aplicación y sus componentes. Mapear dependencias: BDs, APIs que consume, servicios de terceros."},
-            
-            {id:53,category:"Operación",type:"technical",difficulty:"hard",question:"¿Qué debe incluir un Runbook?",options:["Solo el código fuente","Arranque, parada, alertas comunes, diagnóstico básico","Solo la arquitectura","Solo los contactos del equipo"],correct:1,explanation:"Runbooks: Crear y mantener actualizados. Incluir: arranque, parada, alertas comunes, diagnóstico básico."},
-            
-            // ========== OBSOLESCENCIA ==========
-            {id:54,category:"Obsolescencia",type:"conceptual",difficulty:"hard",question:"¿Por qué es peligroso usar software sin soporte?",options:["Es más lento","Es una puerta abierta a atacantes (sin parches de seguridad)","Cuesta más","Es más difícil de configurar"],correct:1,explanation:"Software sin soporte = puerta abierta a atacantes (sin parches de seguridad)."},
-            
-            {id:55,category:"Obsolescencia",type:"conceptual",difficulty:"medium",question:"¿Qué versiones de software debes usar según la Norma?",options:["Las más nuevas (beta)","Versiones con soporte a largo plazo (LTS)","Las que use el equipo","Las más populares"],correct:1,explanation:"SIEMPRE usar versiones con soporte a largo plazo (LTS). NUNCA usar versiones beta o a punto de perder soporte."},
-            
-            // ========== TERCEROS ==========
-            {id:56,category:"Terceros",type:"technical",difficulty:"hard",question:"¿Puedes trabajar con un proveedor que NO ha sido homologado?",options:["Sí, si es urgente","Sí, con aprobación del PO","NO, no puedes trabajar con proveedor no homologado","Sí, temporalmente"],correct:2,explanation:"No puedes trabajar con proveedor no homologado. Debes planificar tiempos para el proceso de homologación (Due Diligence)."},
-            
-            {id:57,category:"Terceros",type:"scenario",difficulty:"hard",scenario:"Un proveedor de servicios cloud que usas notifica que sufrió un incidente de seguridad que podría afectar tus datos.",question:"¿Cuál es tu responsabilidad?",options:["Esperar a que el proveedor lo resuelva","Evaluar impacto en tus apps y activar contingencia si es necesario (deshabilitar integración)","Notificar solo si hay pérdida de datos confirmada","Documentar para la siguiente auditoría"],correct:1,explanation:"Incidente de Tercero: Evaluar impacto en tus apps. Activar contingencia si es necesario (deshabilitar integración)."},
-            
-            // ========== TRES LÍNEAS DE DEFENSA ==========
-            {id:58,category:"3 Líneas",type:"conceptual",difficulty:"expert",question:"En el Modelo de las Tres Líneas, ¿quién es la 1ª Línea de Defensa?",options:["Auditoría Interna","RCS IT","Tú, tu equipo, Tech Leads, POs - dueños del riesgo","Reguladores externos"],correct:2,explanation:"1ª Línea: Tú, tu equipo, Tech Leads, POs. Dueños del riesgo. Conocer y aplicar normativas. Herramienta: CVT."},
-            
-            {id:59,category:"3 Líneas",type:"conceptual",difficulty:"hard",question:"¿Cuál es la responsabilidad de la 2ª Línea (RCS IT)?",options:["Ejecutar el código","Establecer reglas, asesorar, verificar independientemente. Challenge constructivo.","Aprobar cambios en producción","Auditar anualmente"],correct:1,explanation:"2ª Línea (RCS IT): Establecer reglas, asesorar, verificar independientemente. Challenge constructivo."},
-            
-            {id:60,category:"3 Líneas",type:"conceptual",difficulty:"hard",question:"¿Qué es el proceso TOE (Test of Effectiveness)?",options:["Prueba de diseño del control","Verificación de ejecución real: seleccionan muestra y TE PIDEN EVIDENCIA","Prueba de eficiencia del código","Test de rendimiento"],correct:1,explanation:"TOE: Verifica ejecución real. Seleccionan muestra (ej. 15 CRQs). TE PIDEN EVIDENCIA."},
-            
-            // ========== CVT ==========
-            {id:61,category:"CVT",type:"technical",difficulty:"expert",question:"¿Cuántos controles tiene el CVT (Checklist de Validación Técnica)?",options:["10 controles","12 controles","16 controles","20 controles"],correct:2,explanation:"El CVT tiene 16 controles que deben verificarse antes de cada pase a producción."},
-            
-            {id:62,category:"CVT",type:"technical",difficulty:"hard",question:"¿Qué sucede si el CVT está incompleto?",options:["Se despliega con advertencia","El despliegue es DETENIDO hasta subsanación","Se aprueba con excepciones","Se escala al PO"],correct:1,explanation:"CVT incompleto = despliegue DETENIDO hasta subsanación."},
-            
-            {id:63,category:"CVT",type:"technical",difficulty:"hard",question:"¿Dónde se almacena el Expediente Técnico Básico con las evidencias del CVT?",options:["En Jira","En el repositorio de código","En el Centro Único de Conocimiento (CUC)","En SharePoint personal"],correct:2,explanation:"Expediente final se almacena en el Centro Único de Conocimiento (CUC)."},
-            
-            {id:64,category:"CVT",type:"technical",difficulty:"expert",question:"¿Qué control del CVT requiere el documento de autorización para usar datos reales en ambientes previos?",options:["DyD-001","DyD-006","DyD-09","PRO-01"],correct:2,explanation:"DyD-09 (Consentimiento Datos Reales): Documento de autorización para usar datos reales en ambientes previos."},
-            
-            // ========== SEGURIDAD FÍSICA ==========
-            {id:65,category:"Seg. Física",type:"conceptual",difficulty:"medium",question:"¿Cuál es tu responsabilidad respecto a tu portátil corporativo?",options:["Solo no perderlo","Eres directamente responsable; su robo puede ser un incidente grave","Solo mantenerlo actualizado","No tienes responsabilidad especial"],correct:1,explanation:"Proteger tu portátil: eres directamente responsable. Su robo puede ser un incidente grave."}
+            // ===== ESCENARIOS COMPLEJOS MULTI-NORMA =====
+            {id:1,category:"Escenario Multi-Norma",type:"scenario",difficulty:"extreme",
+            scenario:"Un desarrollador detecta tráfico anómalo a las 2AM: <span class='highlight'>consultas masivas</span> a la BD de clientes desde una IP interna que no reconoce. El sistema procesa <span class='data'>datos clasificados como Secretos</span>. El desarrollador cree que puede ser un proceso batch legítimo.",
+            question:"¿Cuál es la acción CORRECTA según múltiples normas aplicables?",
+            options:["Investigar primero para no generar falsas alarmas al CSIRT","Reportar INMEDIATAMENTE al CSIRT/CERT sin asumir que es legítimo","Consultar con el Tech Lead antes de reportar","Revisar los logs para confirmar si es un proceso batch"],
+            correct:1,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> La tentación es 'investigar primero'. Pero la Norma de Incidentes establece: <span class='key-point'>Reportar INMEDIATAMENTE cualquier comportamiento anómalo al CSIRT/CERT. NO asumir que es un error sin importancia</span>. Con datos Secretos, la urgencia es mayor."},
+
+            {id:2,category:"Escenario Multi-Norma",type:"scenario",difficulty:"extreme",
+            scenario:"Aplicación nueva necesita conectarse a una <span class='highlight'>API externa de un proveedor</span> que ofrece servicios de verificación de identidad. El proveedor tiene certificación ISO 27001. El deadline es en 2 semanas.",
+            question:"¿Qué proceso(s) DEBE(N) completarse antes de la integración?",
+            options:["Solo evaluación técnica porque tiene ISO 27001","Clasificación del servicio + Homologación (Due Diligence) completa, independientemente del deadline","Solo firma del contrato con cláusulas de seguridad","Evaluación técnica + contrato, la homologación puede hacerse después"],
+            correct:1,
+            explanation:"La certificación ISO 27001 del proveedor <span class='key-point'>NO exime del proceso de homologación</span>. Se requiere: 1) Clasificación por criticidad y datos, 2) <span class='key-point'>Homologación completa (Due Diligence)</span>. No puedes trabajar con proveedor no homologado."},
+
+            {id:3,category:"Escenario Multi-Norma",type:"scenario",difficulty:"extreme",
+            scenario:"Durante un DR Test (prueba de recuperación de desastre), tu aplicación <span class='highlight'>falla al conectarse</span> a una BD en el sitio de respaldo. El <span class='data'>RTO definido es 4 horas</span> y ya van 3.5 horas intentando.",
+            question:"Según las normas de Continuidad, ¿qué debe ocurrir?",
+            options:["Continuar intentando hasta las 4 horas completas","Escalar inmediatamente, documentar el fallo, y actualizar el runbook con el problema identificado","Declarar el DR Test como fallido y reprogramar","Cambiar el RTO a 6 horas para esta aplicación"],
+            correct:1,
+            explanation:"Con <span class='key-point'>30 minutos restantes del RTO</span>, debes escalar de inmediato. El MTTR se minimiza con <span class='key-point'>runbooks detallados y pruebas de DR</span>. Este fallo debe documentarse y el runbook actualizarse para prevenir futuras ocurrencias."},
+
+            {id:4,category:"Escenario Multi-Norma",type:"scenario",difficulty:"extreme",
+            scenario:"Auditoría de la <span class='highlight'>2ª Línea (RCS IT)</span> solicita evidencia del control <span class='data'>DyD-003</span> para tu aplicación. Tienes el reporte de Chimera pero muestra <span class='highlight'>3 vulnerabilidades Altas</span> que fueron clasificadas como 'falsos positivos' por el equipo.",
+            question:"¿Esta evidencia será aceptada?",
+            options:["Sí, si el equipo documentó técnicamente por qué son falsos positivos","No, las vulnerabilidades Altas deben corregirse siempre","Depende de si el SO autorizó la clasificación como falsos positivos","Solo si fueron descartas en la herramienta Sonar/Chimera"],
+            correct:2,
+            explanation:"Los 'falsos positivos' deben ser <span class='key-point'>autorizados por el SO</span>, no solo documentados por el equipo. Además, deben <span class='key-point'>configurarse/descartarse en la herramienta</span>, no solo justificarse verbalmente. Sin autorización del SO, la evidencia no es válida."},
+
+            {id:5,category:"Escenario Multi-Norma",type:"scenario",difficulty:"extreme",
+            scenario:"Un componente crítico usa <span class='highlight'>Java 8</span>, que perdió soporte LTS. El equipo argumenta que la migración a Java 17 requiere <span class='data'>3 meses de trabajo</span> y hay otras prioridades de negocio.",
+            question:"¿Qué establece la Norma de Obsolescencia?",
+            options:["Se puede mantener Java 8 si hay otras prioridades de negocio","Software sin soporte = puerta abierta a atacantes; debe priorizarse la migración","Se puede usar con una excepción documentada indefinidamente","Solo es problema si hay vulnerabilidades conocidas activas"],
+            correct:1,
+            explanation:"La Norma establece: <span class='key-point'>Software sin soporte = puerta abierta a atacantes (sin parches de seguridad)</span>. SIEMPRE usar versiones LTS. Las 'prioridades de negocio' no justifican el riesgo de seguridad."},
+
+            // ===== TRES LÍNEAS DE DEFENSA - TRAMPAS =====
+            {id:6,category:"3 Líneas",type:"trap",difficulty:"extreme",
+            question:"En el Modelo de las Tres Líneas, ¿cuál es la función ESPECÍFICA de la 2ª Línea (RCS IT)?",
+            options:["Ejecutar controles y aplicar normativas directamente","Auditar todos los procesos de forma independiente","Establecer reglas, asesorar y verificar independientemente con challenge constructivo","Aprobar todos los cambios a producción"],
+            correct:2,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> La 1ª Línea ejecuta, la 3ª audita. La <span class='key-point'>2ª Línea (RCS IT) establece reglas, asesora y verifica independientemente</span>. Su rol es de 'challenge constructivo', no de ejecución ni auditoría."},
+
+            {id:7,category:"3 Líneas",type:"trap",difficulty:"extreme",
+            question:"¿Quién es el 'dueño del riesgo' según el Modelo de Tres Líneas?",
+            options:["RCS IT porque establece las reglas","Auditoría Interna porque tiene visión global","Tú, tu equipo, Tech Leads y POs (1ª Línea)","El CISO porque es responsable de seguridad"],
+            correct:2,
+            explanation:"La <span class='key-point'>1ª Línea (tú, tu equipo, Tech Leads, POs) son los dueños del riesgo</span>. Conocen y aplican normativas. RCS IT asesora, Auditoría verifica, pero el ownership es de la 1ª Línea."},
+
+            {id:8,category:"3 Líneas",type:"trap",difficulty:"extreme",
+            question:"El proceso TOE (Test of Effectiveness) de RCS IT implica:",
+            options:["Verificar que el diseño del control es correcto","Seleccionar una muestra (ej. 15 CRQs) y solicitar EVIDENCIA real de ejecución","Aprobar el diseño de nuevos controles","Capacitar a los equipos sobre los controles"],
+            correct:1,
+            explanation:"TOE ≠ TOD. <span class='key-point'>TOD verifica diseño, TOE verifica ejecución real</span>. En TOE, RCS IT selecciona muestra (ej. 15 CRQs) y <span class='key-point'>TE PIDEN EVIDENCIA</span>. Si falta = Deficiencia con plan de acción."},
+
+            {id:9,category:"3 Líneas",type:"roles",difficulty:"extreme",
+            question:"Si RCS IT encuentra que falta evidencia en un control durante el TOE, ¿qué ocurre?",
+            options:["Se registra como observación menor","Se registra como Deficiencia (Gap) con plan de acción, responsable y fechas compromiso","Se escala a Auditoría Interna automáticamente","Se da un plazo de gracia para conseguir la evidencia"],
+            correct:1,
+            explanation:"Evidencia faltante/incorrecta = <span class='key-point'>Deficiencia (Gap)</span> que requiere plan de acción, responsable y fechas compromiso. RCS IT da seguimiento hasta el cierre. No hay 'observaciones menores'."},
+
+            // ===== CIDA AVANZADO =====
+            {id:10,category:"CIDA",type:"combined",difficulty:"extreme",
+            question:"Si la dimensión de 'Disponibilidad' de tu aplicación tiene impacto CRÍTICO, ¿qué controles se derivan?",
+            options:["Solo backups más frecuentes","Cifrado E2E y MFA","Alto nivel de HA (redundancia) y estrategia de recuperación robusta","Solo monitoreo mejorado"],
+            correct:2,
+            explanation:"Disponibilidad crítica implica: <span class='key-point'>Alto nivel de HA</span> (clúster activo-activo, sin SPOFs) y <span class='key-point'>estrategia de recuperación robusta</span> (RTO/RPO agresivos). El cifrado es para Confidencialidad."},
+
+            {id:11,category:"CIDA",type:"trap",difficulty:"extreme",
+            question:"La dimensión 'Autenticidad' en CIDA determina:",
+            options:["Nivel de cifrado requerido","Controles de hashing y firmas digitales","Controles de autenticación y no repudio","Frecuencia de backups"],
+            correct:2,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> Autenticidad ≠ Integridad. <span class='key-point'>Autenticidad determina controles de autenticación y no repudio</span> (¿confiamos en el origen?). Integridad usa hashing y firmas para detectar alteraciones."},
+
+            {id:12,category:"CIDA",type:"numerical",difficulty:"extreme",
+            question:"¿Cuántas dimensiones tiene CIDA y cuáles son?",
+            options:["3: Confidencialidad, Integridad, Disponibilidad","4: Confidencialidad, Integridad, Disponibilidad, Autenticidad","5: CIDA más Trazabilidad","4: Clasificación, Integridad, Disponibilidad, Acceso"],
+            correct:1,
+            explanation:"CIDA tiene <span class='key-point'>4 dimensiones</span>: <span class='key-point'>C</span>onfidencialidad, <span class='key-point'>I</span>ntegridad, <span class='key-point'>D</span>isponibilidad, <span class='key-point'>A</span>utenticidad. No es la tríada CIA tradicional."},
+
+            // ===== CLASIFICACIÓN DE INFORMACIÓN =====
+            {id:13,category:"Clasificación",type:"trap",difficulty:"extreme",
+            question:"Para información clasificada como 'Confidencial', ¿cuáles son los controles mínimos?",
+            options:["Solo control de acceso básico","Cifrado, RBAC estricto, logs de acceso","Cifrado E2E, MFA, tokenización, pseudonimización, auditoría total","Protección básica de integridad"],
+            correct:1,
+            explanation:"<span class='trap-warning'>TRAMPA:</span> Confidencial ≠ Secreta. <span class='key-point'>Confidencial requiere: Cifrado, RBAC estricto, logs de acceso</span>. Los controles más extremos (MFA, tokenización, auditoría total) son para <span class='key-point'>Secreta</span>."},
+
+            {id:14,category:"Clasificación",type:"trap",difficulty:"extreme",
+            question:"¿Cuál es el nivel de clasificación para 'datos de clientes, credenciales y claves criptográficas'?",
+            options:["Confidencial","Secreta","Interna con controles adicionales","Depende del volumen de datos"],
+            correct:1,
+            explanation:"Datos de clientes, credenciales y claves criptográficas son <span class='key-point'>Secreta</span> (máxima protección). Requieren: Cifrado E2E, MFA, tokenización, pseudonimización, auditoría total."},
+
+            // ===== CRIPTOGRAFÍA AVANZADA =====
+            {id:15,category:"Criptografía",type:"numerical",difficulty:"extreme",
+            question:"¿Cuáles son los ÚNICOS algoritmos de criptografía aprobados según la Norma?",
+            options:["RSA-2048 (cifrado) y MD5 (hash)","AES-128 (cifrado) y SHA-1 (hash)","AES-256 (cifrado) y SHA-256 (hash)","3DES (cifrado) y SHA-512 (hash)"],
+            correct:2,
+            explanation:"Algoritmos aprobados: <span class='key-point'>AES-256</span> (cifrado) y <span class='key-point'>SHA-256</span> (hash). MD5 y SHA-1 están obsoletos. AES-128 no está aprobado. Las claves deben rotarse periódicamente."},
+
+            {id:16,category:"Criptografía",type:"negative",difficulty:"extreme",
+            question:"¿Cuál de las siguientes prácticas está PERMITIDA según la Norma de Criptografía?",
+            options:["Almacenar claves en variables de entorno del código","Crear implementaciones criptográficas personalizadas para casos especiales","Usar el sistema de gestión de claves centralizado del banco","Almacenar claves cifradas en archivos de configuración"],
+            correct:2,
+            explanation:"Solo está permitido <span class='key-point'>usar el sistema de gestión de claves centralizado</span> y bibliotecas aprobadas. NUNCA: implementaciones personalizadas, claves en código, claves en configuración (aunque estén cifradas)."},
+
+            // ===== MÉTRICAS DE CONTINUIDAD =====
+            {id:17,category:"Métricas",type:"trap",difficulty:"extreme",
+            question:"¿Qué métrica determina la FRECUENCIA de backups?",
+            options:["RTO (Recovery Time Objective)","RPO (Recovery Point Objective)","MTTR (Mean Time To Recovery)","MTTD (Mean Time To Detect)"],
+            correct:1,
+            explanation:"<span class='trap-warning'>TRAMPA común:</span> RTO es TIEMPO de recuperación. <span class='key-point'>RPO (cantidad máxima de pérdida de datos) determina frecuencia de backups</span>. Si RPO=1 hora, backups cada hora máximo."},
+
+            {id:18,category:"Métricas",type:"trap",difficulty:"extreme",
+            question:"¿Qué métrica se reduce con runbooks detallados, pruebas de DR y automatización?",
+            options:["RTO","RPO","MTTR","MTTD"],
+            correct:2,
+            explanation:"<span class='key-point'>MTTR (Mean Time To Recovery)</span> se minimiza con runbooks detallados, pruebas de DR y automatización. RTO es el objetivo, MTTR es el promedio real."},
+
+            {id:19,category:"Métricas",type:"trap",difficulty:"extreme",
+            question:"¿Qué métrica se reduce exponiendo endpoint /health y definiendo umbrales de alerta?",
+            options:["RTO","RPO","MTTR","MTTD"],
+            correct:3,
+            explanation:"<span class='key-point'>MTTD (Mean Time To Detect)</span> se reduce con monitoreo proactivo: endpoint /health, métricas de salud, umbrales de alerta. Es el tiempo en DETECTAR, no en recuperar."},
+
+            {id:20,category:"Métricas",type:"combined",difficulty:"extreme",
+            question:"Si una aplicación tiene RTO=2h y RPO=30min, ¿qué implica para el diseño?",
+            options:["Backups cada 2 horas, recuperación rápida","Backups cada 30 minutos máximo, arquitectura que permita recuperar en 2 horas","Backups diarios con restauración en 30 minutos","Solo depende del RTO, el RPO es secundario"],
+            correct:1,
+            explanation:"RPO=30min implica <span class='key-point'>backups máximo cada 30 minutos</span>. RTO=2h implica arquitectura (HA, runbooks, DR) que permita <span class='key-point'>recuperar el servicio en máximo 2 horas</span>. Ambos son independientes pero complementarios."},
+
+            // ===== ALTA DISPONIBILIDAD =====
+            {id:21,category:"Alta Disponibilidad",type:"combined",difficulty:"extreme",
+            question:"¿Cuál es la combinación CORRECTA de principios de Alta Disponibilidad?",
+            options:["Solo redundancia y backups frecuentes","Redundancia, Health Checks (/health), Failover Automático, Eliminar SPOFs, Sesión externalizada","Solo clúster activo-pasivo y monitoreo","Redundancia y documentación de procedimientos"],
+            correct:1,
+            explanation:"Principios completos de HA: <span class='key-point'>Redundancia</span> (activo-activo), <span class='key-point'>Health Checks</span> (/health), <span class='key-point'>Failover Automático</span>, <span class='key-point'>Sin SPOFs</span>, <span class='key-point'>Sesión externalizada</span>, aplicaciones STATELESS."},
+
+            {id:22,category:"Alta Disponibilidad",type:"trap",difficulty:"extreme",
+            question:"¿Por qué las aplicaciones deben ser STATELESS para Alta Disponibilidad?",
+            options:["Porque consumen menos memoria","Porque permite múltiples instancias redundantes sin conflicto de estado","Porque es más fácil de programar","Porque los balanceadores lo requieren"],
+            correct:1,
+            explanation:"STATELESS permite <span class='key-point'>múltiples instancias (clúster activo-activo)</span> donde cualquier instancia puede atender cualquier request. La sesión se externaliza a un componente compartido."},
+
+            {id:23,category:"Alta Disponibilidad",type:"trap",difficulty:"extreme",
+            question:"¿Qué son las copias 'air-gapped' y cuál es su propósito principal?",
+            options:["Copias en la nube separadas del data center","Copias físicamente desconectadas, última línea de defensa contra ransomware","Copias incrementales automáticas","Copias en tiempo real a sitio remoto"],
+            correct:1,
+            explanation:"Copias air-gapped están <span class='key-point'>físicamente desconectadas</span> de la red. Son la <span class='key-point'>última línea de defensa contra ransomware</span> porque el malware no puede cifrarlas."},
+
+            // ===== CVT DETALLADO =====
+            {id:24,category:"CVT",type:"numerical",difficulty:"extreme",
+            question:"¿Cuántos controles tiene el CVT?",
+            options:["12 controles","14 controles","16 controles","18 controles"],
+            correct:2,
+            explanation:"El CVT tiene exactamente <span class='key-point'>16 controles</span>: DyD-001 a DyD-009, PRO-01 a PRO-03, SEG-01 a SEG-02, FRA-01, DMA-01."},
+
+            {id:25,category:"CVT",type:"trap",difficulty:"extreme",
+            question:"El control PRO-02 (Ready for Operation) se requiere para:",
+            options:["Todos los cambios a producción","Solo aplicaciones nuevas o cambios de infraestructura relevantes","Solo sistemas DORA/SOX","Solo cuando hay cambios en la base de datos"],
+            correct:1,
+            explanation:"<span class='key-point'>PRO-02 (RFO)</span> NO es para todos los cambios. Solo para <span class='key-point'>aplicaciones nuevas o cambios de infraestructura relevantes</span>. Requiere Boletín RFO + ID RFO de Continuum."},
+
+            {id:26,category:"CVT",type:"trap",difficulty:"extreme",
+            question:"¿Qué control del CVT requiere el documento de autorización para usar datos reales en ambientes previos?",
+            options:["DyD-001 (Definición Funcional y Técnica)","DyD-006 (Pruebas Funcionales Previas)","DyD-09 (Consentimiento Datos Reales)","PRO-03 (Gestión de Respaldos)"],
+            correct:2,
+            explanation:"<span class='key-point'>DyD-09</span> es el control de Consentimiento para Datos Reales. Requiere documento de autorización explícito para usar datos de producción en ambientes previos."},
+
+            {id:27,category:"CVT",type:"scenario",difficulty:"extreme",
+            scenario:"Aplicación distribuida nueva (ASO-API). Completando el CVT, el control <span class='data'>DyD-004</span> está marcado como 'No Aplica' por el equipo.",
+            question:"¿Es correcto marcar DyD-004 como 'No Aplica'?",
+            options:["Sí, DyD-004 es opcional para nuevas aplicaciones","No, DyD-004 (Pruebas de Seguridad Aplicativa) es obligatorio para sistemas distribuidos","Sí, si el control DyD-005 (Hacking Ético) está completo","Depende de la clasificación CIDA de la aplicación"],
+            correct:1,
+            explanation:"<span class='key-point'>DyD-004 aplica específicamente para sistemas distribuidos</span> (ASO-API, Web, Mobile). Para una ASO-API nueva, <span class='key-point'>NO puede marcarse como 'No Aplica'</span>. Es obligatorio."},
+
+            {id:28,category:"CVT",type:"trap",difficulty:"extreme",
+            question:"¿Quién es responsable de verificar que el CVT esté completo?",
+            options:["El PO del proyecto","El SO del servicio","El Change Lead de la instalación","El AO de la aplicación"],
+            correct:2,
+            explanation:"El <span class='key-point'>Change Lead de la instalación</span> es responsable de la completitud del CVT. Es su 'gate final' antes de producción. El CVT incompleto = despliegue DETENIDO."},
+
+            {id:29,category:"CVT",type:"trap",difficulty:"extreme",
+            question:"¿Dónde se almacena el Expediente Técnico Básico con todas las evidencias?",
+            options:["En Confluence del equipo","En el repositorio del proyecto","En el Centro Único de Conocimiento (CUC)","En ServiceNow junto al CRQ"],
+            correct:2,
+            explanation:"El Expediente Técnico Básico se almacena en el <span class='key-point'>Centro Único de Conocimiento (CUC)</span>, no en herramientas de equipo ni repositorios de código."},
+
+            // ===== SDLC Y SEGURIDAD =====
+            {id:30,category:"SDLC",type:"combined",difficulty:"extreme",
+            question:"¿Qué controles de seguridad se integran en la fase de DISEÑO del SDLC?",
+            options:["SAST y SCA","Modelado de Amenazas (Threat Modeling) y Security by Design","CVT y CRQ","DAST y Hacking Ético"],
+            correct:1,
+            explanation:"Fase de Diseño: <span class='key-point'>Modelado de Amenazas (Threat Modeling)</span> y <span class='key-point'>Security by Design</span>. SAST/SCA son de Construcción. DAST/Hacking Ético de Pruebas."},
+
+            {id:31,category:"SDLC",type:"combined",difficulty:"extreme",
+            question:"¿Qué controles se integran en la fase de CONSTRUCCIÓN?",
+            options:["ART (Análisis de Riesgo Tecnológico)","CVT completo","SAST, SCA, Codificación Segura (OWASP Top 10)","DAST y pruebas de penetración"],
+            correct:2,
+            explanation:"Fase de Construcción: <span class='key-point'>SAST</span> (análisis estático), <span class='key-point'>SCA</span> (análisis de componentes), <span class='key-point'>Codificación Segura OWASP Top 10</span>."},
+
+            {id:32,category:"SDLC",type:"trap",difficulty:"extreme",
+            question:"El principio 'Shift Left' implica:",
+            options:["Priorizar las pruebas de la izquierda del pipeline","Mover actividades de calidad y seguridad a fases TEMPRANAS del ciclo","Que el equipo de izquierda (desarrollo) haga las pruebas","Reducir pruebas en fases tardías"],
+            correct:1,
+            explanation:"<span class='key-point'>Shift Left</span>: mover seguridad y calidad a fases <span class='key-point'>más tempranas</span> donde los defectos son más baratos de corregir. No es sobre 'izquierda del pipeline'."},
+
+            // ===== OWASP Y CODIFICACIÓN SEGURA =====
+            {id:33,category:"OWASP",type:"trap",difficulty:"extreme",
+            question:"¿Qué práctica previene TANTO Inyección SQL COMO XSS?",
+            options:["Usar HTTPS en todas las conexiones","Validación estricta de TODAS las entradas del usuario","Cifrar los datos en la base de datos","Usar frameworks modernos automáticamente"],
+            correct:1,
+            explanation:"<span class='key-point'>Validación estricta de TODAS las entradas del usuario</span> previene tanto SQL Injection como XSS. HTTPS protege en tránsito, no contra inyección."},
+
+            {id:34,category:"OWASP",type:"trap",difficulty:"extreme",
+            question:"En el manejo seguro de errores, ¿qué está PROHIBIDO?",
+            options:["Registrar errores en logs","Mostrar mensajes de error genéricos al usuario","Revelar información sensible (stack traces, rutas, versiones) en mensajes de error","Usar códigos de error numéricos"],
+            correct:2,
+            explanation:"<span class='key-point'>PROHIBIDO revelar información sensible</span> en errores: stack traces, rutas de archivos, versiones de software, queries SQL. Los atacantes usan esta información."},
+
+            // ===== MONITORIZACIÓN Y LOGS =====
+            {id:35,category:"Logs",type:"combined",difficulty:"extreme",
+            question:"Un log de alta calidad debe incluir:",
+            options:["Solo errores críticos para reducir volumen","Quién, qué, cuándo, cómo - con suficiente detalle para investigación","Toda la información disponible incluyendo datos sensibles","Solo métricas de rendimiento"],
+            correct:1,
+            explanation:"Logs de calidad: <span class='key-point'>quién, qué, cuándo, cómo</span>. Eventos clave: logins (exitosos/fallidos), cambios de configuración, accesos a ficheros, errores críticos. <span class='key-point'>NUNCA datos sensibles</span>."},
+
+            {id:36,category:"Logs",type:"negative",difficulty:"extreme",
+            question:"¿Cuál de los siguientes datos NUNCA debe incluirse en logs?",
+            options:["Timestamps de eventos","IPs de origen de conexiones","Contraseñas, tokens, datos personales de clientes","Identificadores de sesión (ofuscados)"],
+            correct:2,
+            explanation:"<span class='key-point'>NUNCA en logs</span>: contraseñas, tokens de autenticación, datos personales de clientes, números de tarjeta, etc. Los IPs y timestamps SÍ deben registrarse."},
+
+            {id:37,category:"Logs",type:"trap",difficulty:"extreme",
+            question:"¿A dónde deben enviarse los logs de seguridad?",
+            options:["A archivos locales del servidor","Al SIEM corporativo usando formato estándar","A la base de datos de la aplicación","A un bucket de almacenamiento en la nube"],
+            correct:1,
+            explanation:"Los logs deben enviarse al <span class='key-point'>SIEM corporativo usando formato estándar</span>. No a archivos locales (no centralizados) ni a la BD de la app (mezclado con datos de negocio)."},
+
+            // ===== GESTIÓN DE VULNERABILIDADES =====
+            {id:38,category:"Vulnerabilidades",type:"combined",difficulty:"extreme",
+            question:"Para una vulnerabilidad de criticidad CRÍTICA, ¿cuál es la acción requerida?",
+            options:["Incluir en el backlog del próximo sprint","MÁXIMA PRIORIDAD: Corrección inmediata por encima de nuevas funcionalidades","Planificar parche dentro del SLA de 30 días","Evaluar si realmente es crítica"],
+            correct:1,
+            explanation:"Vulnerabilidades CRÍTICAS: <span class='key-point'>MÁXIMA PRIORIDAD. Corrección inmediata por encima de nuevas funcionalidades</span>. No hay SLA, es AHORA."},
+
+            {id:39,category:"Vulnerabilidades",type:"trap",difficulty:"extreme",
+            question:"¿Qué herramientas componen el análisis de vulnerabilidades en el pipeline CI/CD?",
+            options:["Solo SonarQube","SAST, DAST, SCA y Chimera para reportes consolidados","Solo análisis manual de código","SAST y pruebas unitarias"],
+            correct:1,
+            explanation:"Pipeline de seguridad: <span class='key-point'>SAST</span> (estático), <span class='key-point'>DAST</span> (dinámico), <span class='key-point'>SCA</span> (componentes), <span class='key-point'>Chimera</span> (reportes consolidados)."},
+
+            // ===== INCIDENTES DE SEGURIDAD =====
+            {id:40,category:"Incidentes",type:"scenario",difficulty:"extreme",
+            scenario:"Recibes notificación de que una <span class='highlight'>cuenta de servicio</span> de tu aplicación está siendo usada para acceder a recursos que normalmente no accede. El acceso es técnicamente legítimo (la cuenta tiene permisos).",
+            question:"¿Cuál es la acción correcta?",
+            options:["Monitorear por 24 horas antes de actuar","Reportar inmediatamente al CSIRT aunque el acceso sea técnicamente válido","No hacer nada porque la cuenta tiene los permisos necesarios","Revocar los permisos de la cuenta preventivamente"],
+            correct:1,
+            explanation:"Comportamiento anómalo debe reportarse <span class='key-point'>INMEDIATAMENTE al CSIRT</span> aunque sea 'técnicamente válido'. El mínimo privilegio y acceso inusual son señales de posible compromiso."},
+
+            {id:41,category:"Incidentes",type:"combined",difficulty:"extreme",
+            question:"En la fase de 'Lecciones Aprendidas' post-incidente, ¿qué mejoras se implementan típicamente?",
+            options:["Solo documentar el incidente","Timeouts, reintentos, circuit breakers y actualizaciones a runbooks","Cambiar contraseñas de todas las cuentas","Solo revisar los logs"],
+            correct:1,
+            explanation:"Lecciones Aprendidas: implementar mejoras como <span class='key-point'>timeouts, reintentos, circuit breakers</span>. Actualizar runbooks con lo aprendido. Es mejora continua, no solo documentación."},
+
+            // ===== REDES Y HARDENING =====
+            {id:42,category:"Redes",type:"trap",difficulty:"extreme",
+            question:"El principio de 'Segmentación de Red' implica que como desarrollador debes:",
+            options:["Asumir acceso libre entre todos los componentes","NO asumir acceso libre; declarar flujos necesarios y solicitar aperturas de firewall justificadas","Configurar tus propias reglas de firewall","Solo preocuparte por la red de desarrollo"],
+            correct:1,
+            explanation:"Segmentación: <span class='key-point'>NO asumir acceso libre</span>. Debes <span class='key-point'>declarar flujos de comunicación necesarios</span> y solicitar aperturas de firewall justificadas. El acceso debe ser explícito."},
+
+            {id:43,category:"Redes",type:"trap",difficulty:"extreme",
+            question:"'Hardening' significa:",
+            options:["Aumentar los recursos del servidor","Configuraciones de seguridad estandarizadas con solo servicios estrictamente necesarios","Usar servidores más potentes","Aumentar el nivel de logging"],
+            correct:1,
+            explanation:"Hardening: <span class='key-point'>Configuraciones de seguridad estandarizadas</span>, <span class='key-point'>solo servicios estrictamente necesarios</span>. Tu responsabilidad: desarrollar para entornos minimalistas, usar Golden Images corporativas."},
+
+            // ===== GESTIÓN DE TERCEROS =====
+            {id:44,category:"Terceros",type:"trap",difficulty:"extreme",
+            question:"¿Puedes integrar con un proveedor que está en proceso de homologación pero aún no completó?",
+            options:["Sí, si hay urgencia de negocio","Sí, con aprobación del PO","NO, no puedes trabajar con proveedor no homologado","Sí, en ambiente de desarrollo mientras se completa"],
+            correct:2,
+            explanation:"<span class='key-point'>NO puedes trabajar con proveedor no homologado</span>, independientemente de urgencias o aprobaciones internas. Debes planificar tiempos para el proceso de Due Diligence."},
+
+            {id:45,category:"Terceros",type:"scenario",difficulty:"extreme",
+            scenario:"Un proveedor cloud crítico para tu aplicación notifica un <span class='highlight'>incidente de seguridad</span> que podría haber expuesto datos. No hay confirmación de que tus datos fueron afectados.",
+            question:"¿Cuál es tu responsabilidad?",
+            options:["Esperar confirmación del proveedor antes de actuar","Evaluar impacto en tus apps y activar contingencia si es necesario (deshabilitar integración)","Solo documentar la notificación","Notificar a tu PO y esperar instrucciones"],
+            correct:1,
+            explanation:"Ante incidente de tercero: <span class='key-point'>Evaluar impacto en tus apps</span> de inmediato. <span class='key-point'>Activar contingencia si es necesario</span> (incluye deshabilitar integración). No esperar confirmación."},
+
+            // ===== 20 REGLAS DE ORO =====
+            {id:46,category:"Reglas de Oro",type:"trap",difficulty:"extreme",
+            question:"La Regla de Oro #1 establece que la seguridad es:",
+            options:["Responsabilidad del equipo de InfoSec","Responsabilidad del equipo de QA","TU responsabilidad como desarrollador, no de un equipo aparte","Responsabilidad compartida entre todos por igual"],
+            correct:2,
+            explanation:"Regla #1: <span class='key-point'>La seguridad es TU responsabilidad</span>, no de un equipo aparte. Como desarrollador profesional, la seguridad es parte integral de tu trabajo."},
+
+            {id:47,category:"Reglas de Oro",type:"trap",difficulty:"extreme",
+            question:"La Regla de Oro sobre RBAC establece:",
+            options:["Permitir acceso amplio y restringir según necesidad","Diseñar RBAC granular, denegar por defecto, solo permisos mínimos indispensables","Copiar perfiles de acceso de usuarios similares","Dar acceso temporal amplio y reducir después"],
+            correct:1,
+            explanation:"Regla sobre RBAC: <span class='key-point'>Diseñar granular, denegar por defecto, solo permisos mínimos indispensables</span>. Nunca 'permitir amplio y restringir'."},
+
+            {id:48,category:"Reglas de Oro",type:"trap",difficulty:"extreme",
+            question:"La Regla de Oro sobre claves y secretos establece:",
+            options:["Cifrar las claves antes de ponerlas en el código","NUNCA almacenar claves, contraseñas o secretos en el código","Usar variables de entorno en lugar de hardcoded","Rotar las claves frecuentemente si están en código"],
+            correct:1,
+            explanation:"Regla: <span class='key-point'>NUNCA almacenar claves, contraseñas o secretos en el código</span>. Ni cifradas, ni en variables de entorno del código, ni en configuración. Usar gestión de claves centralizada."},
+
+            {id:49,category:"Reglas de Oro",type:"numerical",difficulty:"extreme",
+            question:"¿Cuántas Reglas de Oro del Desarrollador se definen en la Norma?",
+            options:["10 reglas","15 reglas","20 reglas","25 reglas"],
+            correct:2,
+            explanation:"Se definen exactamente <span class='key-point'>20 Reglas de Oro</span> del Desarrollador en BBVA. Cubren desde seguridad hasta operación, CVT y formación."},
+
+            // ===== PREGUNTAS NEGATIVAS =====
+            {id:50,category:"Negativas",type:"negative",difficulty:"extreme",
+            question:"¿Cuál de los siguientes NO es uno de los 4 niveles de clasificación de información?",
+            options:["Pública","Interna","Restringida","Secreta"],
+            correct:2,
+            explanation:"Los 4 niveles son: <span class='key-point'>Pública, Interna, Confidencial, Secreta</span>. '<span class='trap-warning'>Restringida</span>' NO existe como nivel de clasificación en la Norma."},
+
+            {id:51,category:"Negativas",type:"negative",difficulty:"extreme",
+            question:"¿Cuál de las siguientes NO es una dirección responsable de normas en Engineering?",
+            options:["Strategy & Control","RCS Third Party","Quality Assurance","Physical Security"],
+            correct:2,
+            explanation:"Las direcciones son: Strategy & Control, RCS Engineering, RCS Third Party, Information Security, Infrastructure & IT Ops, Physical Security, Systems. '<span class='trap-warning'>Quality Assurance</span>' NO es una dirección normativa."},
+
+            {id:52,category:"Negativas",type:"negative",difficulty:"extreme",
+            question:"¿Cuál de los siguientes NO es un estado de protección de datos?",
+            options:["En Tránsito","En Reposo","En Proceso","En Uso"],
+            correct:2,
+            explanation:"Los 3 estados son: <span class='key-point'>En Tránsito, En Reposo, En Uso</span>. '<span class='trap-warning'>En Proceso</span>' no existe; 'En Uso' es cuando los datos están siendo procesados activamente."},
+
+            // ===== REGULADORES =====
+            {id:53,category:"Reguladores",type:"trap",difficulty:"extreme",
+            question:"¿Qué entidad emite la Circular Única de Bancos (CUB)?",
+            options:["Banxico","CNBV","Secretaría Anticorrupción","CONDUSEF"],
+            correct:1,
+            explanation:"La <span class='key-point'>CNBV (Comisión Nacional Bancaria y de Valores)</span> emite la CUB. Banxico regula sistemas de pago y ciberseguridad del sistema financiero."},
+
+            {id:54,category:"Reguladores",type:"trap",difficulty:"extreme",
+            question:"¿Qué ley vigila la Secretaría Anticorrupción (antes INAI)?",
+            options:["Ley de Instituciones de Crédito","Ley de Protección al Ahorro Bancario","LFPDPPP (Ley Federal de Protección de Datos Personales)","Ley General de Transparencia"],
+            correct:2,
+            explanation:"La Secretaría Anticorrupción vigila la <span class='key-point'>LFPDPPP (Ley Federal de Protección de Datos Personales en Posesión de Particulares)</span>."},
+
+            // ===== MODELO DE GOBIERNO =====
+            {id:55,category:"Gobierno",type:"trap",difficulty:"extreme",
+            question:"El 'Modelo de Gobierno de Engineering' es:",
+            options:["El organigrama del área de Engineering","La 'constitución' de Engineering: norma fundacional de la que emanan todas las normativas específicas","El proceso de aprobación de cambios","La metodología de desarrollo"],
+            correct:1,
+            explanation:"El Modelo de Gobierno es la <span class='key-point'>'constitución' de Engineering</span>. Establece quién toma decisiones, cómo se estructuran equipos, y el origen del cuerpo normativo. De él emanan todas las demás normas."},
+
+            {id:56,category:"Gobierno",type:"trap",difficulty:"extreme",
+            question:"¿Qué dirección es responsable del Modelo de Gobierno de Engineering?",
+            options:["Systems","RCS Engineering","Strategy & Control","Information Security"],
+            correct:2,
+            explanation:"<span class='key-point'>Strategy & Control</span> es responsable del Modelo de Gobierno. Define estructura, roles, decisiones y origen del cuerpo normativo."},
+
+            // ===== OPERACIÓN TI =====
+            {id:57,category:"Operación",type:"combined",difficulty:"extreme",
+            question:"Un Runbook debe incluir:",
+            options:["Solo el procedimiento de arranque","Arranque, parada, alertas comunes, diagnóstico básico","Solo contactos del equipo","Solo la arquitectura del sistema"],
+            correct:1,
+            explanation:"Runbook completo: <span class='key-point'>arranque, parada, alertas comunes, diagnóstico básico</span>. Debe mantenerse actualizado. Reduce MTTR."},
+
+            {id:58,category:"Operación",type:"trap",difficulty:"extreme",
+            question:"¿Qué significa que tu aplicación debe ser 'automatizable' para Operación TI?",
+            options:["Que use CI/CD","Que tenga APIs para tareas admin, estándares de configuración, despliegues automatizados","Que no requiera intervención humana nunca","Que use contenedores"],
+            correct:1,
+            explanation:"Aplicación automatizable: <span class='key-point'>APIs para tareas admin</span>, estándares de configuración, despliegues automatizados. Permite operación eficiente sin intervención manual constante."},
+
+            // ===== CMDB =====
+            {id:59,category:"CMDB",type:"combined",difficulty:"extreme",
+            question:"Al registrar tu aplicación en CMDB, ¿qué DEBES mapear?",
+            options:["Solo el nombre y responsable","Solo las APIs que expone","La aplicación, sus componentes y todas sus dependencias (BDs, APIs que consume, servicios de terceros)","Solo los servidores donde corre"],
+            correct:2,
+            explanation:"CMDB debe incluir: <span class='key-point'>aplicación, componentes, TODAS las dependencias</span> (BDs, APIs que consume, servicios de terceros). Es necesario para análisis de impacto."},
+
+            {id:60,category:"CMDB",type:"trap",difficulty:"extreme",
+            question:"¿Para qué se usa la CMDB antes de hacer cambios?",
+            options:["Para ver quién es el dueño del sistema","Para análisis de impacto e identificar sistemas afectados","Para obtener aprobación del cambio","Para programar el mantenimiento"],
+            correct:1,
+            explanation:"Antes de cambios: consultar CMDB para <span class='key-point'>análisis de impacto</span> e <span class='key-point'>identificar sistemas afectados</span>. Las dependencias mapeadas son críticas para esto."},
+
+            // ===== SEGURIDAD FÍSICA =====
+            {id:61,category:"Seg. Física",type:"combined",difficulty:"extreme",
+            question:"¿Cuáles son tus responsabilidades de seguridad física según la Norma?",
+            options:["Solo portar identificación","Portar ID visible, escritorio limpio, bloquear pantalla SIEMPRE, proteger tu portátil","Solo no dejar documentos en la impresora","Solo no compartir tu contraseña"],
+            correct:1,
+            explanation:"Responsabilidades físicas: <span class='key-point'>ID visible, escritorio limpio, bloquear pantalla SIEMPRE al ausentarte, proteger portátil</span> (su robo es incidente grave)."},
+
+            {id:62,category:"Seg. Física",type:"trap",difficulty:"extreme",
+            question:"Tu portátil corporativo es robado. ¿Qué nivel de gravedad tiene este evento?",
+            options:["Incidente menor si no tenía datos sensibles","Potencialmente un incidente grave que debe reportarse inmediatamente","Solo es grave si tenía código fuente","Depende de si estaba cifrado"],
+            correct:1,
+            explanation:"El robo de portátil <span class='key-point'>puede ser un incidente grave</span>. Eres directamente responsable. Debe reportarse inmediatamente independientemente del contenido."},
+
+            // ===== IMPACTOS DEL INCUMPLIMIENTO =====
+            {id:63,category:"Impactos",type:"combined",difficulty:"extreme",
+            question:"¿Cuáles son los impactos REGULATORIOS del incumplimiento normativo?",
+            options:["Solo errores de código","Solo retrabajos","Sanciones regulatorias, pérdida de confianza del cliente, pérdidas patrimoniales, riesgo reputacional","Solo improductividad"],
+            correct:2,
+            explanation:"Impactos regulatorios: <span class='key-point'>Sanciones regulatorias, pérdida de confianza del cliente, pérdidas patrimoniales, riesgo reputacional</span>. Van más allá de problemas técnicos."},
+
+            {id:64,category:"Impactos",type:"combined",difficulty:"extreme",
+            question:"¿Cuáles son los impactos TÉCNICOS del incumplimiento normativo?",
+            options:["Sanciones económicas","Errores de diseño/implementación, deficiente calidad del software, vulnerabilidades de seguridad, retrabajos","Solo problemas de rendimiento","Solo incompatibilidad de versiones"],
+            correct:1,
+            explanation:"Impactos técnicos: <span class='key-point'>Errores de diseño/implementación, deficiente calidad, vulnerabilidades, retrabajos</span>. El cumplimiento previene estos problemas."},
+
+            // ===== ESCENARIOS FINALES COMPLEJOS =====
+            {id:65,category:"Escenario Final",type:"scenario",difficulty:"extreme",
+            scenario:"Sistema financiero con clasificación CIDA: <span class='data'>Confidencialidad=Alta</span>, <span class='data'>Disponibilidad=Crítica</span>. Usa componentes de un proveedor externo. Próximo a despliegue.",
+            question:"¿Qué combinación de controles es OBLIGATORIA?",
+            options:["Solo pruebas funcionales y aprobación del PO","Cifrado de datos + HA + pruebas de terceros (SCA/SAST/integridad) + CVT completo","Solo certificación ISO del proveedor","Solo pruebas de rendimiento por la criticidad"],
+            correct:1,
+            explanation:"Confidencialidad Alta = <span class='key-point'>cifrado</span>. Disponibilidad Crítica = <span class='key-point'>HA</span>. Terceros = <span class='key-point'>SCA+SAST+integridad</span>. Despliegue = <span class='key-point'>CVT completo</span>. Todo es obligatorio."},
+
+            {id:66,category:"Escenario Final",type:"scenario",difficulty:"extreme",
+            scenario:"Auditoría de <span class='highlight'>3ª Línea</span> revisa tu aplicación. Solicitan evidencia de <span class='data'>15 CRQs</span> del último año. Tu sistema no es DORA/SOX. El último CRQ fue hace <span class='data'>4 meses</span>.",
+            question:"¿Tendrás evidencias de los 15 CRQs?",
+            options:["Sí, todas las evidencias por 12 meses","No necesariamente, solo 3 meses o 10 ejecuciones para sistemas no DORA/SOX","Sí, si fueron almacenadas en el CUC","Depende del tamaño de las evidencias"],
+            correct:1,
+            explanation:"Sistemas no DORA/SOX: retención de <span class='key-point'>3 meses o 10 ejecuciones, lo que ocurra primero</span>. Con 4 meses y 15 CRQs, probablemente <span class='key-point'>no tendrás todas las evidencias</span>."},
+
+            {id:67,category:"Escenario Final",type:"scenario",difficulty:"extreme",
+            scenario:"Durante Chaos Engineering, tu aplicación <span class='highlight'>falló al perder conexión</span> con una API de terceros. No tenía timeout configurado y se quedó esperando indefinidamente.",
+            question:"¿Qué mejoras debes implementar según las Lecciones Aprendidas?",
+            options:["Solo documentar el fallo","Timeouts, reintentos con backoff, circuit breakers","Solo aumentar el timeout","Solo monitorear más de cerca"],
+            correct:1,
+            explanation:"Mejoras de resiliencia: <span class='key-point'>Timeouts</span> (no esperar indefinidamente), <span class='key-point'>reintentos con backoff</span>, <span class='key-point'>circuit breakers</span> (cortar llamadas a servicios que fallan)."},
+
+            {id:68,category:"Escenario Final",type:"scenario",difficulty:"extreme",
+            scenario:"Eres requerido en un 'war room' por un incidente de seguridad. El CSIRT solicita análisis técnico, buscar causa raíz, y colaborar en solución de emergencia.",
+            question:"¿En qué fase del proceso de incidentes estás participando?",
+            options:["Detección","Respuesta","Contención","Lecciones Aprendidas"],
+            correct:1,
+            explanation:"El 'war room' es fase de <span class='key-point'>Respuesta</span>. Detección es reportar. Contención es aislar. La fase de Respuesta incluye análisis, causa raíz y solución de emergencia."},
+
+            // ===== PREGUNTAS DE INTEGRACIÓN FINAL =====
+            {id:69,category:"Integración",type:"combined",difficulty:"extreme",
+            question:"Para una aplicación STATELESS con HA, ¿cuál es la arquitectura correcta?",
+            options:["Un servidor con backups frecuentes","Clúster activo-pasivo con failover manual","Clúster activo-activo con sesión externalizada, health checks, sin SPOFs","Múltiples servidores sin balanceador"],
+            correct:2,
+            explanation:"Arquitectura HA correcta: <span class='key-point'>activo-activo</span> (no pasivo), <span class='key-point'>sesión externalizada</span>, <span class='key-point'>health checks</span>, <span class='key-point'>sin SPOFs</span>. El balanceador usa /health para failover automático."},
+
+            {id:70,category:"Integración",type:"combined",difficulty:"extreme",
+            question:"El principio de 'Mínimo Privilegio' combinado con 'Segregación de Funciones' implica:",
+            options:["Dar menos permisos y separar equipos","RBAC granular + denegar por defecto + doble aprobación para operaciones sensibles","Solo usar MFA para todos","Revisar permisos mensualmente"],
+            correct:1,
+            explanation:"Combinación: <span class='key-point'>RBAC granular + denegar por defecto</span> (mínimo privilegio) + <span class='key-point'>doble aprobación / cuatro ojos</span> para operaciones sensibles (segregación). Quien crea ≠ quien autoriza."},
+
+            {id:71,category:"Integración",type:"combined",difficulty:"extreme",
+            question:"¿Cuál es la relación entre el CVT y el CRQ?",
+            options:["Son documentos independientes","El CVT debe completarse ANTES de aprobar el CRQ para producción","El CRQ incluye el CVT","El CVT reemplaza al CRQ"],
+            correct:1,
+            explanation:"El <span class='key-point'>CVT es prerequisito del CRQ</span>. CVT completo → CRQ puede aprobarse. CVT incompleto = despliegue DETENIDO = CRQ no puede ejecutarse."},
+
+            {id:72,category:"Integración",type:"trap",difficulty:"extreme",
+            question:"¿Qué tienen en común las normas de Information Security, Testing y SDLC?",
+            options:["Todas son opcionales","Todas aplican solo a sistemas DORA/SOX","Todas tienen controles que deben evidenciarse y pueden ser auditados por las 3 líneas","Todas son responsabilidad de un solo equipo"],
+            correct:2,
+            explanation:"Todas las normas <span class='key-point'>tienen controles que deben evidenciarse</span>. La 1ª Línea ejecuta y documenta, la 2ª verifica, la 3ª audita. El cumplimiento no es opcional."},
+
+            {id:73,category:"Integración",type:"trap",difficulty:"extreme",
+            question:"El cumplimiento normativo NO es:",
+            options:["Responsabilidad de todos los desarrolladores","Base de la calidad, seguridad y resiliencia","Burocracia innecesaria que ralentiza el desarrollo","Protección para el banco y los clientes"],
+            correct:2,
+            explanation:"<span class='key-point'>El cumplimiento normativo NO es burocracia</span>. Es la base de la calidad, seguridad y resiliencia de los sistemas que operan el dinero de los clientes."},
+
+            {id:74,category:"Integración",type:"combined",difficulty:"extreme",
+            question:"¿Cuántas direcciones tienen normas específicas bajo el Modelo de Gobierno de Engineering?",
+            options:["5 direcciones","6 direcciones","7 direcciones","8 direcciones"],
+            correct:2,
+            explanation:"<span class='key-point'>7 direcciones</span>: Strategy & Control, RCS Engineering, RCS Third Party, Information Security, Infrastructure & IT Ops, Physical Security, Systems."},
+
+            {id:75,category:"Final",type:"combined",difficulty:"extreme",
+            question:"¿Cuál es el propósito ÚLTIMO de todo el marco normativo de Engineering según el documento?",
+            options:["Cumplir con reguladores externos","Evitar sanciones y auditorías","Fortalecer la capacidad de resistir, responder y recuperarse ante incidentes tecnológicos (Resiliencia Digital)","Documentar todos los procesos"],
+            correct:2,
+            explanation:"El propósito último es la <span class='key-point'>Resiliencia Digital</span>: fortalecer la capacidad de <span class='key-point'>resistir, responder y recuperarse</span> ante ciberataques, fallos de software y cualquier incidente tecnológico. Que el banco siga funcionando."}
         ];
 
         let questions = [];
@@ -790,8 +1142,8 @@
         }
 
         function startExam() {
-            let limit = parseInt(document.getElementById('questionLimit').value) || 65;
-            limit = Math.max(10, Math.min(65, limit));
+            let limit = parseInt(document.getElementById('questionLimit').value) || 75;
+            limit = Math.max(10, Math.min(75, limit));
             questions = shuffleArray([...allQuestions]).slice(0, limit);
             shuffledOptions = {};
             questions.forEach((q, i) => shuffleOptionsForQuestion(q, i));
@@ -828,8 +1180,7 @@
         function updateStats() {
             document.getElementById('correctCount').textContent = correctCount;
             document.getElementById('incorrectCount').textContent = incorrectCount;
-            const answeredCount = Object.keys(userAnswers).length;
-            const progress = (answeredCount / questions.length) * 100;
+            const progress = (Object.keys(userAnswers).length / questions.length) * 100;
             document.getElementById('progressBar').style.width = `${progress}%`;
         }
 
@@ -845,16 +1196,16 @@
             document.getElementById('questionCategory').textContent = question.category;
             
             const typeLabel = document.getElementById('questionType');
-            const typeMap = {scenario:'Escenario',conceptual:'Conceptual',technical:'Técnica',tricky:'Detalle'};
+            const typeMap = {scenario:'Escenario',trap:'Trampa',numerical:'Numérica',combined:'Combinada',negative:'Negativa',roles:'Roles'};
             typeLabel.textContent = typeMap[question.type] || question.type;
             typeLabel.className = `question-type ${question.type}`;
             
             const diffBadge = document.getElementById('difficultyBadge');
-            diffBadge.textContent = question.difficulty === 'expert' ? 'Experto' : question.difficulty === 'hard' ? 'Difícil' : 'Media';
+            diffBadge.textContent = question.difficulty === 'extreme' ? '⚡ EXTREMO' : question.difficulty === 'expert' ? 'Experto' : 'Difícil';
             diffBadge.className = `difficulty-badge ${question.difficulty}`;
             
             const scenarioBox = document.getElementById('scenarioBox');
-            scenarioBox.innerHTML = question.scenario ? `<div class="scenario-box">📋 <strong>Escenario:</strong><br>${question.scenario}</div>` : '';
+            scenarioBox.innerHTML = question.scenario ? `<div class="scenario-box">📋 <strong>ESCENARIO:</strong><br><br>${question.scenario}</div>` : '';
             
             document.getElementById('questionText').innerHTML = question.question;
             
@@ -885,7 +1236,7 @@
             const feedbackContainer = document.getElementById('feedbackContainer');
             if (isAnswered) {
                 let feedbackHTML = isCorrect ? '<div class="feedback-message correct"><span class="feedback-icon">✅</span><span>¡Correcto!</span></div>' : '<div class="feedback-message incorrect"><span class="feedback-icon">❌</span><span>Incorrecto</span></div>';
-                if (question.explanation) feedbackHTML += `<div class="explanation"><strong>📖 Explicación:</strong> ${question.explanation}</div>`;
+                if (question.explanation) feedbackHTML += `<div class="explanation"><strong>📖 Explicación:</strong><br><br>${question.explanation}</div>`;
                 feedbackContainer.innerHTML = feedbackHTML;
             } else feedbackContainer.innerHTML = '';
             
@@ -920,14 +1271,15 @@
             document.getElementById('examScreen').classList.add('hidden');
             document.getElementById('resultsScreen').classList.remove('hidden');
             document.getElementById('finalScore').textContent = `${score}%`;
-            document.getElementById('finalCorrectCount').textContent = correctCount;
-            document.getElementById('finalIncorrectCount').textContent = incorrectCount;
-            document.getElementById('finalUnansweredCount').textContent = unanswered;
+            document.getElementById('finalCorrect').textContent = correctCount;
+            document.getElementById('finalIncorrect').textContent = incorrectCount;
+            document.getElementById('finalUnanswered').textContent = unanswered;
             let gradeText = '', gradeEmoji = '';
-            if (score >= 90) { gradeText = 'Excelente'; gradeEmoji = '🏆'; }
-            else if (score >= 80) { gradeText = 'Muy Bien'; gradeEmoji = '🎉'; }
-            else if (score >= 75) { gradeText = 'Aprobado'; gradeEmoji = '✅'; }
-            else if (score >= 60) { gradeText = 'Necesita Mejorar'; gradeEmoji = '📚'; }
+            if (score >= 95) { gradeText = 'LEGENDARIO'; gradeEmoji = '👑'; }
+            else if (score >= 90) { gradeText = 'Excelente'; gradeEmoji = '🏆'; }
+            else if (score >= 85) { gradeText = 'Muy Bien'; gradeEmoji = '🎉'; }
+            else if (score >= 80) { gradeText = 'Aprobado'; gradeEmoji = '✅'; }
+            else if (score >= 70) { gradeText = 'Casi'; gradeEmoji = '📚'; }
             else { gradeText = 'No Aprobado'; gradeEmoji = '❌'; }
             document.getElementById('gradeText').textContent = `${gradeEmoji} ${gradeText}`;
         }
@@ -937,20 +1289,20 @@
             document.getElementById('reviewScreen').classList.remove('hidden');
             const container = document.getElementById('reviewContainer');
             const letters = ['A', 'B', 'C', 'D', 'E'];
-            const typeMap = {scenario:'Escenario',conceptual:'Conceptual',technical:'Técnica',tricky:'Detalle'};
+            const typeMap = {scenario:'Escenario',trap:'Trampa',numerical:'Numérica',combined:'Combinada',negative:'Negativa',roles:'Roles'};
             container.innerHTML = questions.map((question, qIndex) => {
                 const shuffled = shuffledOptions[qIndex];
                 const userAnswer = userAnswers[qIndex];
                 const isCorrect = answerResults[qIndex];
                 const isUnanswered = userAnswer === undefined;
-                return `<div class="question-card fade-in" style="animation-delay: ${qIndex * 0.02}s">
+                return `<div class="question-card fade-in" style="animation-delay: ${qIndex * 0.012}s">
                     <div class="question-header">
-                        <span class="question-number">Pregunta ${qIndex + 1}</span>
+                        <span class="question-number">P${qIndex + 1}</span>
                         <span class="question-category">${question.category}</span>
                         <span class="question-type ${question.type}">${typeMap[question.type]||question.type}</span>
                         <span style="margin-left: auto; font-size: 1.5rem;">${isUnanswered ? '⚠️' : (isCorrect ? '✅' : '❌')}</span>
                     </div>
-                    ${question.scenario ? `<div class="scenario-box">📋 <strong>Escenario:</strong><br>${question.scenario}</div>` : ''}
+                    ${question.scenario ? `<div class="scenario-box">📋 <strong>ESCENARIO:</strong><br><br>${question.scenario}</div>` : ''}
                     <p class="question-text">${question.question}</p>
                     <div class="options-list">${shuffled.indices.map((originalIndex, displayIndex) => {
                         const option = question.options[originalIndex];
@@ -960,7 +1312,7 @@
                         else if (displayIndex === userAnswer && !isCorrect) { className += ' incorrect'; feedback = '<span class="option-feedback incorrect">Tu respuesta</span>'; }
                         return `<div class="${className}"><span class="option-letter">${letters[displayIndex]}</span><span class="option-text">${option}</span>${feedback}</div>`;
                     }).join('')}</div>
-                    ${question.explanation ? `<div class="explanation"><strong>📖 Explicación:</strong> ${question.explanation}</div>` : ''}
+                    ${question.explanation ? `<div class="explanation"><strong>📖 Explicación:</strong><br><br>${question.explanation}</div>` : ''}
                 </div>`;
             }).join('');
         }
@@ -971,7 +1323,6 @@
             document.getElementById('resultsScreen').classList.add('hidden');
             document.getElementById('reviewScreen').classList.add('hidden');
             document.getElementById('startScreen').classList.remove('hidden');
-            questions = []; currentQuestionIndex = 0; userAnswers = {}; answerResults = {}; correctCount = 0; incorrectCount = 0; shuffledOptions = {};
         }
     </script>
 </body>
