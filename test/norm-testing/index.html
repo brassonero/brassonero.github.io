@@ -691,7 +691,7 @@
             // ===== PREGUNTAS TRAMPA DE ROLES =====
             {id:10,category:"Roles Trampa",type:"trap",difficulty:"extreme",
             question:"¿Quién EJECUTA las pruebas de Hacking Ético?",
-            options:["El equipo DEV como parte de sus responsabilidades","El PO porque certifica la aceptación","El AO (Application Owner)","Un equipo externo de seguridad independiente"],
+            options:["El equipo DEV","El PO","El AO","Un equipo externo de seguridad independiente"],
             correct:2,
             explanation:"<span class='trap-warning'>TRAMPA COMÚN:</span> El <span class='key-point'>AO (Application Owner)</span> ejecuta Hacking Ético. NO el DEV (ejecuta todos los tipos de pruebas excepto Hacking Ético), NO equipos externos necesariamente."},
 
@@ -927,7 +927,7 @@
             // ===== MÁS TRAMPAS DE ROLES =====
             {id:46,category:"Roles",type:"trap",difficulty:"extreme",
             question:"¿Quién da el Vo.Bo. (Visto Bueno) para el despliegue a producción?",
-            options:["El PO porque certifica la aceptación","El Change Lead porque es responsable del CVT","El SO (Service Owner)","El AO porque es el arquitecto"],
+            options:["El PO","El Change Lead","El SO","El AO"],
             correct:2,
             explanation:"El <span class='key-point'>SO da el Vo.Bo.</span> para producción. El PO certifica aceptación, el Change Lead verifica CVT, pero la aprobación final es del SO."},
 
@@ -974,7 +974,7 @@
             // ===== MÉTRICAS =====
             {id:53,category:"Métricas",type:"numerical",difficulty:"extreme",
             question:"¿Qué métricas de cobertura se consideran en el Quality Gate?",
-            options:["Solo cobertura de líneas","Solo cobertura de ramas","Cobertura de líneas Y cobertura de ramas","Cobertura de líneas, ramas y mutación"],
+            options:["Solo cobertura de líneas","Solo cobertura de ramas","Cobertura de líneas y cobertura de ramas","Cobertura de líneas, ramas y mutación"],
             correct:2,
             explanation:"El Quality Gate considera <span class='key-point'>cobertura de líneas Y cobertura de ramas</span>. Ambas deben cumplir el umbral del 80%."},
 
@@ -1008,7 +1008,7 @@
             {id:58,category:"Escenario",type:"scenario",difficulty:"extreme",
             scenario:"Prueba de Hacking Ético encuentra vulnerabilidad <strong>ALTA</strong>. El AO dice que es un riesgo aceptable para el negocio y quiere proceder.",
             question:"¿Puede el AO aceptar este riesgo y proceder?",
-            options:["Sí, el AO tiene autoridad sobre decisiones técnicas","Sí, si lo documenta como deuda técnica","No, las vulnerabilidades Altas/Críticas de Hacking Ético DEBEN corregirse","No, pero puede escalar al CISO para excepción"],
+            options:["Sí, el AO tiene autoridad sobre decisiones técnicas","Sí, si lo documenta como deuda técnica","No, las vulnerabilidades Altas/Críticas de Hacking Ético deben corregirse","No, pero puede escalar al CISO para excepción"],
             correct:2,
             explanation:"Las vulnerabilidades <span class='key-point'>Altas y Críticas de Hacking Ético DEBEN corregirse</span>. El AO no puede aceptar este riesgo. Es un requisito no negociable del CVT (DyD-005)."},
 
