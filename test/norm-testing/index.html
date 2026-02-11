@@ -631,7 +631,7 @@
             {id:1,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
             scenario:"Sistema <strong>DORA crítico</strong> con cambio de emergencia. El Quality Gate de Sonar muestra: <span class='highlight'>0 Críticos, 1 Mayor, 0 Seguridad</span>. Cobertura: <span class='highlight'>82%</span>. El PO presiona por desplegar hoy porque hay un problema en producción. El SO ya dio Vo.Bo. verbal.",
             question:"¿Qué debe ocurrir según la Norma?",
-            options:["Proceder con el despliegue porque es emergencia y el SO aprobó verbalmente","El despliegue debe BLOQUEARSE automáticamente por el issue Mayor aunque sea emergencia","Proceder porque la cobertura supera el 80% requerido","Escalar al AO para que autorice la excepción DORA"],
+            options:["Proceder con el despliegue porque es emergencia y el SO aprobó verbalmente","El despliegue debe bloquearse automáticamente por el issue Mayor aunque sea emergencia","Proceder porque la cobertura supera el 80% requerido","Escalar al AO para que autorice la excepción DORA"],
             correct:1,
             explanation:"<span class='trap-warning'>TRAMPA:</span> Aunque es emergencia y hay aprobación verbal del SO, el Quality Gate requiere <span class='key-point'>0% Critical, 0% Major, 0% Security</span>. El 1 Mayor bloquea automáticamente. La cobertura (82%) SÍ cumple, pero eso no anula el bloqueo por issues."},
 
@@ -652,7 +652,7 @@
             {id:4,category:"Escenario Complejo",type:"scenario",difficulty:"extreme",
             scenario:"Componente de terceros (librería open source) necesita actualizarse por vulnerabilidad crítica. El proveedor dice que ya pasó sus propias pruebas de seguridad certificadas.",
             question:"¿Qué pruebas son OBLIGATORIAS según la Norma, independientemente de las certificaciones del proveedor?",
-            options:["Ninguna adicional si el proveedor tiene certificación ISO 27001","Solo SCA para verificar obsolescencia","SCA (obsolescencia/licencias) + SAST (vulnerabilidades) + Verificación de integridad (tampering)","Solo SAST porque es una vulnerabilidad de seguridad"],
+            options:["Ninguna adicional si el proveedor tiene certificación ISO 27001","Solo SCA para verificar obsolescencia","SCA + SAST + Verificación de integridad","Solo SAST porque es una vulnerabilidad de seguridad"],
             correct:2,
             explanation:"Para componentes de terceros siempre se requieren: <span class='key-point'>SCA</span> (obsolescencia y licencias), <span class='key-point'>SAST</span> (vulnerabilidades), y <span class='key-point'>verificación de integridad</span> (tampering). Las certificaciones del proveedor NO eximen de estas pruebas."},
 
@@ -697,7 +697,7 @@
 
             {id:11,category:"Roles Trampa",type:"trap",difficulty:"extreme",
             question:"¿Quién es responsable de la Deuda Técnica en un proyecto de MANTENIMIENTO?",
-            options:["El PO (Product Owner) siempre es responsable de la deuda técnica","El SO (Service Owner) en mantenimiento","El DEV porque genera el código","El AO porque es el arquitecto"],
+            options:["El PO siempre es responsable de la deuda técnica","El SO en mantenimiento","El DEV porque genera el código","El AO porque es el arquitecto"],
             correct:1,
             explanation:"<span class='trap-warning'>TRAMPA:</span> La responsabilidad de Deuda Técnica CAMBIA según el contexto: <span class='key-point'>PO para desarrollos nuevos</span>, <span class='key-point'>SO para mantenimiento</span>. La pregunta específica 'mantenimiento', por lo tanto es el SO."},
 
@@ -715,7 +715,7 @@
 
             {id:14,category:"Roles Trampa",type:"trap",difficulty:"extreme",
             question:"¿Quién genera el Plan Estratégico de Pruebas?",
-            options:["El DEV con apoyo del QA","El PO porque define los requerimientos","El AO (Application Owner)","El Release Manager"],
+            options:["El DEV con apoyo del QA","El PO","El AO","El Release Manager"],
             correct:2,
             explanation:"El <span class='key-point'>AO (Application Owner)</span> genera el Plan Estratégico de Pruebas. NO confundir con el Plan de Pruebas operativo que involucra al DEV."},
 
@@ -773,7 +773,7 @@
             // ===== PRINCIPIOS AVANZADOS =====
             {id:23,category:"Principios",type:"trap",difficulty:"extreme",
             question:"El principio de 'Concurrencia' establece que:",
-            options:["Todas las pruebas deben ejecutarse en paralelo","Cuando hay conflicto entre normativas, se aplica la más permisiva","Cuando hay conflicto entre normativas, se aplica la MÁS RESTRICTIVA","Las pruebas concurrentes tienen prioridad"],
+            options:["Todas las pruebas deben ejecutarse en paralelo","Cuando hay conflicto entre normativas, se aplica la más permisiva","Cuando hay conflicto entre normativas, se aplica la más restrictiva","Las pruebas concurrentes tienen prioridad"],
             correct:2,
             explanation:"<span class='trap-warning'>TRAMPA:</span> Concurrencia NO es sobre paralelismo. Significa que cuando hay <span class='key-point'>conflicto entre normativas, se aplica la MÁS RESTRICTIVA</span>."},
 
@@ -792,13 +792,13 @@
             // ===== VERIFICACIÓN VS VALIDACIÓN =====
             {id:26,category:"Conceptos",type:"trap",difficulty:"extreme",
             question:"'Verificación' responde a la pregunta:",
-            options:["¿Construimos el sistema correcto?","¿Construimos correctamente el sistema? (Built right?)","¿El usuario está satisfecho?","¿El sistema es seguro?"],
+            options:["¿Construimos el sistema correcto?","¿Construimos correctamente el sistema?","¿El usuario está satisfecho?","¿El sistema es seguro?"],
             correct:1,
             explanation:"<span class='key-point'>Verificación = '¿Construimos correctamente el sistema?' (Built right?)</span>. Validación = '¿Construimos el sistema correcto?' (Built good system?). Son conceptos diferentes."},
 
             {id:27,category:"Conceptos",type:"trap",difficulty:"extreme",
             question:"'Validación' responde a la pregunta:",
-            options:["¿El código compila sin errores?","¿Las pruebas unitarias pasan?","¿Construimos el sistema correcto? (Built good system?)","¿El sistema cumple con estándares de código?"],
+            options:["¿El código compila sin errores?","¿Las pruebas unitarias pasan?","¿Construimos el sistema correcto?","¿El sistema cumple con estándares de código?"],
             correct:2,
             explanation:"<span class='key-point'>Validación = '¿Construimos el sistema correcto?' (Built good system?)</span>. Se enfoca en si el sistema cumple las necesidades del usuario, no solo especificaciones técnicas."},
 
@@ -806,7 +806,7 @@
             {id:28,category:"CVT",type:"scenario",difficulty:"extreme",
             scenario:"Estás completando el CVT para una aplicación distribuida (ASO-API) nueva. El control <strong>DyD-004</strong> solicita evidencia.",
             question:"¿Qué evidencia específica requiere DyD-004?",
-            options:["Código en repositorio Bitbucket/GitHub","Análisis estático SAST con Chimera","Pruebas de Seguridad Aplicativa (solo para distribuido) + correcciones de vulnerabilidades altas/críticas","Hacking Ético con dictamen"],
+            options:["Código en repositorio Bitbucket/GitHub","Análisis estático SAST con Chimera","Pruebas de seguridad aplicativa más correcciones de vulnerabilidades altas/críticas","Hacking Ético con dictamen"],
             correct:2,
             explanation:"<span class='key-point'>DyD-004</span> es Pruebas de Seguridad Aplicativa, que <span class='key-point'>solo aplica para sistemas distribuidos</span> (ASO-API, Web, Mobile). Requiere estrategia, plan y correcciones de vulnerabilidades altas/críticas."},
 
@@ -866,7 +866,7 @@
 
             {id:37,category:"Evidencias",type:"trap",difficulty:"expert",
             question:"¿Qué documentos conforman la evidencia de pruebas funcionales ejecutadas?",
-            options:["Solo capturas de pantalla","C204 (casos ejecutados) y/o T950 (evidencias)","Logs del sistema","Aprobación por correo del PO"],
+            options:["Solo capturas de pantalla","C204 y/o T950","Logs del sistema","Aprobación por correo del PO"],
             correct:1,
             explanation:"Evidencia de pruebas funcionales: <span class='key-point'>C204</span> (casos ejecutados) y/o <span class='key-point'>T950</span> (evidencias). Son los formatos estándar definidos."},
 
@@ -874,7 +874,7 @@
             {id:38,category:"Integraciones",type:"scenario",difficulty:"extreme",
             scenario:"Tu aplicación consume una API de otro equipo. Esa API cambió su contrato sin notificarte. Tus pruebas de integración fallan en ambiente de desarrollo.",
             question:"¿Qué tipo de prueba debió haber prevenido este problema?",
-            options:["Pruebas unitarias más exhaustivas","Pruebas de contrato (Contract Testing) en el pipeline","Pruebas de regresión más frecuentes","Pruebas de humo antes de cada integración"],
+            options:["Pruebas unitarias más exhaustivas","Pruebas de contrato en el pipeline","Pruebas de regresión más frecuentes","Pruebas de humo antes de cada integración"],
             correct:1,
             explanation:"<span class='key-point'>Contract Testing</span> verifica que los contratos de APIs no cambien de forma incompatible. Debería estar en el pipeline para detectar cambios breaking."},
 
@@ -907,7 +907,7 @@
 
             {id:43,category:"Tipos Pruebas",type:"trap",difficulty:"expert",
             question:"Las pruebas de Aceptación son ejecutadas y certificadas por:",
-            options:["El equipo de QA","El DEV junto con el QA","El PO (Product Owner)","El usuario final"],
+            options:["El equipo de QA","El DEV junto con el QA","El PO","El usuario final"],
             correct:2,
             explanation:"Las pruebas de Aceptación son <span class='key-point'>certificadas por el PO</span>. El PO representa al negocio y valida que el sistema cumple los requerimientos."},
 
@@ -933,7 +933,7 @@
 
             {id:47,category:"Roles",type:"trap",difficulty:"extreme",
             question:"¿Quién puede autorizar un Error Asumido?",
-            options:["El DEV con justificación técnica","El PO con aprobación del negocio","Solo el SO (Service Owner)","El AO y el SO conjuntamente"],
+            options:["El DEV","El PO","El SO","El AO y el SO"],
             correct:2,
             explanation:"<span class='key-point'>Solo el SO</span> puede autorizar errores como 'Asumidos'. Ni el DEV, ni el PO, ni el AO tienen esta autoridad."},
 
@@ -947,7 +947,7 @@
             // ===== SHIFT-LEFT =====
             {id:49,category:"Shift-Left",type:"conceptual",difficulty:"expert",
             question:"El principio Shift-Left implica:",
-            options:["Mover las pruebas al final del ciclo para tener código más estable","Mover las actividades de calidad y seguridad a las fases más TEMPRANAS del ciclo","Priorizar pruebas de izquierda a derecha","Reducir el número de pruebas en cada fase"],
+            options:["Mover las pruebas al final del ciclo para tener código más estable","Actividades de calidad y seguridad a las fases más tempranas del ciclo","Priorizar pruebas de izquierda a derecha","Reducir el número de pruebas en cada fase"],
             correct:1,
             explanation:"<span class='key-point'>Shift-Left</span>: mover actividades de calidad y seguridad a fases <span class='key-point'>más tempranas</span> del ciclo, donde los defectos son más baratos de corregir."},
 
@@ -1001,7 +1001,7 @@
             {id:57,category:"Escenario",type:"scenario",difficulty:"extreme",
             scenario:"Durante las pruebas E2E, descubres que un escenario del CVT no fue probado porque el ambiente no lo permitía. El deadline es hoy.",
             question:"¿Qué debe ocurrir?",
-            options:["Documentar la excepción y proceder con el despliegue","El despliegue debe DETENERSE hasta que se complete el CVT","Escalar al PO para que apruebe la excepción","Posponer solo ese escenario para post-producción"],
+            options:["Documentar la excepción y proceder con el despliegue","El despliegue debe detenerse hasta que se complete el CVT","Escalar al PO para que apruebe la excepción","Posponer solo ese escenario para post-producción"],
             correct:1,
             explanation:"<span class='key-point'>CVT incompleto = despliegue DETENIDO</span>. No hay excepciones por deadline. El Change Lead no puede aprobar un CVT incompleto."},
 
@@ -1073,7 +1073,7 @@
 
             {id:68,category:"Final",type:"combined",difficulty:"extreme",
             question:"¿Cuál es la ÚNICA razón válida para NO ejecutar un tipo de prueba requerido?",
-            options:["Falta de tiempo antes del deadline","Falta de recursos en el equipo","No aplicabilidad técnica documentada según el principio de Viabilidad","Aprobación verbal del PO"],
+            options:["Falta de tiempo antes del deadline","Falta de recursos en el equipo","No aplicabilidad técnica","Aprobación verbal del PO"],
             correct:2,
             explanation:"La única razón válida es <span class='key-point'>no aplicabilidad técnica documentada</span> según el principio de Viabilidad. Tiempo, recursos o aprobaciones verbales no son válidos."},
 
