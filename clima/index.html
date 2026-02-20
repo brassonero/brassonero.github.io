@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌍 Pokémon Weather Map</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #3B4CCA;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: #CC0000;
+    padding: 0;
+    border-bottom: 6px solid #880000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .pokeball-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, white 50%, #CC0000 50%);
+    border: 4px solid #1a1a1a;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .pokeball-logo::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 4px;
+    background: #1a1a1a;
+    transform: translateY(-50%);
+  }
+
+  .pokeball-logo::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #1a1a1a;
+    z-index: 1;
+  }
+
+  .header-text h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.85rem;
+    color: #FFDE00;
+    text-shadow: 3px 3px 0px #B8860B, -1px -1px 0 #000, 1px -1px 0 #000;
+    letter-spacing: 1px;
+    line-height: 1.4;
+  }
+
+  .header-text p {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.85);
+    margin-top: 4px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  .header-decor {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 2;
+  }
+
+  .decor-circle {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,0,0,0.3);
+  }
+
+  #map { flex: 1; z-index: 1; }
+
+  .pokemon-icon { background: none; border: none; }
+
+  .pokemon-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7));
+  }
+
+  .pokemon-marker:hover { transform: scale(1.25) translateY(-6px); }
+
+  .pokemon-marker img {
+    width: 56px; height: 56px;
+    object-fit: contain;
+  }
+
+  .leaflet-popup-content-wrapper {
+    background: #1a1a2e;
+    border: 4px solid #FFDE00;
+    border-radius: 4px;
+    box-shadow: 4px 4px 0px #B8860B, 0 8px 30px rgba(0,0,0,0.6);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .leaflet-popup-content { margin: 0 !important; }
+  .leaflet-popup-tip-container { display: none; }
+
+  .popup-header {
+    background: #CC0000;
+    padding: 8px 14px;
+    border-bottom: 3px solid #880000;
+  }
+
+  .popup-header h3 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    color: #FFDE00;
+    text-shadow: 1px 1px 0 #000;
+  }
+
+  .popup-inner {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    min-width: 220px;
+  }
+
+  .popup-sprite {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid #333;
+    border-radius: 4px;
+    padding: 4px;
+    flex-shrink: 0;
+  }
+
+  .popup-inner img {
+    width: 72px; height: 72px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .popup-info { color: white; flex: 1; }
+
+  .popup-info .temp {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.2rem;
+    color: #FFDE00;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  .popup-info .condition {
+    font-size: 0.7rem;
+    color: #ccc;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .popup-info .pokemon-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: #78C850;
+    margin-top: 6px;
+    line-height: 1.6;
+  }
+
+  .type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 6px;
+    border: 2px solid rgba(0,0,0,0.3);
+  }
+
+  #loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: #CC0000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    gap: 24px;
+  }
+
+  .loading-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1rem;
+    color: #FFDE00;
+    text-shadow: 3px 3px 0 #880000;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .pokeball-spin {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, white 50%, #CC0000 50%);
+    border: 6px solid #1a1a1a;
+    position: relative;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .pokeball-spin::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 6px;
+    background: #1a1a1a;
+    transform: translateY(-50%);
+  }
+
+  .pokeball-spin::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: white;
+    border: 5px solid #1a1a1a;
+    z-index: 1;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-sub {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: rgba(255,255,255,0.7);
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .legend {
+    background: #1a1a2e;
+    border: 4px solid #FFDE00;
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 0.6rem;
+    line-height: 2;
+    box-shadow: 4px 4px 0px #B8860B;
+    max-width: 240px;
+  }
+
+  .legend h4 {
+    font-family: 'Press Start 2P', monospace;
+    color: #FFDE00;
+    margin-bottom: 8px;
+    font-size: 0.55rem;
+    text-shadow: 1px 1px 0 #000;
+    border-bottom: 2px solid #333;
+    padding-bottom: 6px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ddd;
+    font-size: 0.58rem;
+  }
+
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    flex-shrink: 0;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .header-text h1 { font-size: 0.55rem; }
+    .header-text p { font-size: 0.4rem; }
+    .pokeball-logo { width: 32px; height: 32px; }
+    .header-decor { display: none; }
+
+    .legend {
+      max-width: 160px;
+      font-size: 0.5rem;
+      padding: 6px 10px;
+    }
+    .legend h4 { font-size: 0.45rem; }
+    .legend-item { font-size: 0.45rem; }
+
+    .pokemon-marker img { width: 38px; height: 38px; }
+
+    .popup-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 160px;
+    }
+    .popup-inner img { width: 50px; height: 50px; }
+    .popup-info .temp { font-size: 0.9rem; }
+    .popup-info .pokemon-name { font-size: 0.4rem; }
+    .type-badge { font-size: 0.38rem; }
+
+    .loading-title {
+      font-size: 0.6rem;
+      padding: 0 20px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .header-text h1 { font-size: 0.42rem; }
+    .legend { display: none; }
+  }
+</style>
+</head>
+
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="pokeball-logo"></div>
+      <div class="header-text">
+        <h1>Pokémon Weather Map</h1>
+        <p>Clima real · Wild Pokémon appeared!</p>
+      </div>
+      <div class="header-decor">
+        <div class="decor-circle" style="background:#78C850"></div>
+        <div class="decor-circle" style="background:#FFDE00"></div>
+        <div class="decor-circle" style="background:#F08030"></div>
+      </div>
+    </div>
+  </header>
+  <div id="loading-overlay">
+    <div class="pokeball-spin"></div>
+    <div class="loading-title">Pokémon Weather Map</div>
+    <div class="loading-sub">Buscando Pokémon salvajes...</div>
+  </div>
+  <div id="map"></div>
+  <script>
+    const API_KEY = 'ac39d7ef1d6feed80b00409860f6dcbc';
+
+    const CITIES = [
+      { name: 'Ciudad de México', lat: 19.43, lon: -99.13 },
+      { name: 'São Paulo', lat: -23.55, lon: -46.63 },
+      { name: 'Buenos Aires', lat: -34.61, lon: -58.38 },
+      { name: 'Nueva York', lat: 40.71, lon: -74.01 },
+      { name: 'Londres', lat: 51.51, lon: -0.13 },
+      { name: 'Tokio', lat: 35.68, lon: 139.69 },
+      { name: 'Sídney', lat: -33.87, lon: 151.21 },
+      { name: 'Moscú', lat: 55.75, lon: 37.62 },
+      { name: 'El Cairo', lat: 30.04, lon: 31.24 },
+      { name: 'Lagos', lat: 6.52, lon: 3.38 },
+      { name: 'Mumbai', lat: 19.08, lon: 72.88 },
+      { name: 'Los Ángeles', lat: 34.05, lon: -118.24 },
+      { name: 'París', lat: 48.85, lon: 2.35 },
+      { name: 'Bogotá', lat: 4.71, lon: -74.07 },
+      { name: 'Seúl', lat: 37.57, lon: 126.98 },
+      { name: 'Ensenada', lat: 31.87, lon: -116.60 },
+      { name: 'Guadalajara', lat: 20.66, lon: -103.35 },
+      { name: 'Santiago', lat: -33.45, lon: -70.67 },
+      { name: 'Lima', lat: -12.05, lon: -77.04 },
+      { name: 'Caracas', lat: 10.48, lon: -66.88 },
+      { name: 'Toronto', lat: 43.65, lon: -79.38 },
+      { name: 'Chicago', lat: 41.88, lon: -87.63 },
+      { name: 'Madrid', lat: 40.42, lon: -3.70 },
+      { name: 'Berlín', lat: 52.52, lon: 13.40 },
+      { name: 'Estambul', lat: 41.01, lon: 28.95 },
+      { name: 'Dubái', lat: 25.20, lon: 55.27 },
+      { name: 'Bangkok', lat: 13.75, lon: 100.52 },
+      { name: 'Shanghái', lat: 31.23, lon: 121.47 },
+      { name: 'Nairobi', lat: -1.29, lon: 36.82 },
+      { name: 'Ciudad del Cabo', lat: -33.93, lon: 18.42 },
+    ];
+
+    // 3-4 Pokémon por tipo, aleatorio cada carga
+    const TYPE_ROSTERS = {
+      fire: {
+        color: '#EE8130', emoji: '🔥', pokemon: [
+          { id: 4, name: 'Charmander' },
+          { id: 37, name: 'Vulpix' },
+          { id: 58, name: 'Growlithe' },
+          { id: 77, name: 'Ponyta' },
+        ]
+      },
+      water: {
+        color: '#6390F0', emoji: '🌧', pokemon: [
+          { id: 7, name: 'Squirtle' },
+          { id: 54, name: 'Psyduck' },
+          { id: 79, name: 'Slowpoke' },
+          { id: 116, name: 'Horsea' },
+        ]
+      },
+      electric: {
+        color: '#F7D02C', emoji: '⚡', pokemon: [
+          { id: 25, name: 'Pikachu' },
+          { id: 100, name: 'Voltorb' },
+          { id: 125, name: 'Electabuzz' },
+          { id: 135, name: 'Jolteon' },
+        ]
+      },
+      ice: {
+        color: '#96D9D6', emoji: '❄️', pokemon: [
+          { id: 87, name: 'Dewgong' },
+          { id: 124, name: 'Jynx' },
+          { id: 131, name: 'Lapras' },
+          { id: 362, name: 'Glalie' },
+        ]
+      },
+      ghost: {
+        color: '#735797', emoji: '🌫', pokemon: [
+          { id: 92, name: 'Gastly' },
+          { id: 93, name: 'Haunter' },
+          { id: 355, name: 'Duskull' },
+          { id: 354, name: 'Banette' },
+        ]
+      },
+      flying: {
+        color: '#A98FF3', emoji: '☁️', pokemon: [
+          { id: 16, name: 'Pidgey' },
+          { id: 41, name: 'Zubat' },
+          { id: 142, name: 'Aerodactyl' },
+          { id: 278, name: 'Wingull' },
+        ]
+      },
+      poison: {
+        color: '#A33EA1', emoji: '😶‍🌫️', pokemon: [
+          { id: 41, name: 'Zubat' },
+          { id: 88, name: 'Grimer' },
+          { id: 109, name: 'Koffing' },
+          { id: 23, name: 'Ekans' },
+        ]
+      },
+      ground: {
+        color: '#E2BF65', emoji: '💨', pokemon: [
+          { id: 27, name: 'Sandshrew' },
+          { id: 50, name: 'Diglett' },
+          { id: 104, name: 'Cubone' },
+          { id: 328, name: 'Trapinch' },
+        ]
+      },
+    };
+
+    const WEATHER_TO_TYPE = {
+      Thunderstorm: 'electric',
+      Drizzle: 'water',
+      Rain: 'water',
+      Snow: 'ice',
+      Mist: 'ghost',
+      Smoke: 'poison',
+      Haze: 'poison',
+      Dust: 'ground',
+      Fog: 'ghost',
+      Sand: 'ground',
+      Ash: 'poison',
+      Squall: 'water',
+      Tornado: 'ghost',
+      Clear: 'fire',
+      Clouds: 'flying',
+    };
+
+    function getPokemon(condition) {
+      const typeName = WEATHER_TO_TYPE[condition] || 'normal';
+      const roster = TYPE_ROSTERS[typeName];
+      const pick = roster.pokemon[Math.floor(Math.random() * roster.pokemon.length)];
+      return { ...pick, type: typeName, color: roster.color, emoji: roster.emoji };
+    }
+
+    function getSpriteUrl(id) {
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+    }
+
+    async function fetchWeather(city) {
+      const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${API_KEY}&units=metric&lang=es`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    function createMarkerIcon(pokemon) {
+      const html = `<div class="pokemon-marker"><img src="${getSpriteUrl(pokemon.id)}" alt="${pokemon.name}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png'"/></div>`;
+      return L.divIcon({ html, className: 'pokemon-icon', iconSize: [52, 60], iconAnchor: [26, 55], popupAnchor: [0, -55] });
+    }
+
+    function createPopup(city, weather, pokemon) {
+      const temp = Math.round(weather.main.temp);
+      const feels = Math.round(weather.main.feels_like);
+      return `
+    <div class="popup-inner">
+      <img src="${getSpriteUrl(pokemon.id)}" alt="${pokemon.name}"/>
+      <div class="popup-info">
+        <h3>${city.name} ${pokemon.emoji}</h3>
+        <div class="temp">${temp}°C</div>
+        <div class="condition">${weather.weather[0].description} · ${weather.main.humidity}% hum.</div>
+        <div class="condition">Sensación: ${feels}°C</div>
+        <div class="pokemon-name">✨ ¡Apareció un ${pokemon.name} salvaje!</div>
+        <span class="type-badge" style="background:${pokemon.color}22;color:${pokemon.color};border:1px solid ${pokemon.color}44">Tipo ${pokemon.type}</span>
+      </div>
+    </div>`;
+    }
+
+    async function init() {
+      const map = L.map('map', {
+        center: [20, 0],
+        zoom: 2,
+        minZoom: 2,
+        maxZoom: 17,
+        maxBounds: [[-90, -180], [90, 180]],
+        maxBoundsViscosity: 1.0,
+      });
+
+      L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenTopoMap contributors', maxZoom: 17
+      }).addTo(map);
+
+      const legend = L.control({ position: 'bottomright' });
+      legend.onAdd = () => {
+        const div = L.DomUtil.create('div', 'legend');
+        div.innerHTML = `<h4>🗺️ Tipos por clima</h4>
+      ${Object.entries(WEATHER_TO_TYPE).filter((v, i, a) => a.findIndex(x => x[1] === v[1]) === i).map(([cond, type]) => {
+          const r = TYPE_ROSTERS[type];
+          return `<div class="legend-item"><div class="legend-dot" style="background:${r.color}"></div>${r.emoji} ${cond} → Tipo ${type}</div>`;
+        }).join('')}`;
+        return div;
+      };
+      legend.addTo(map);
+
+      const results = await Promise.allSettled(
+        CITIES.map(city => fetchWeather(city).then(w => ({ city, weather: w })))
+      );
+
+      results.forEach(r => {
+        if (r.status !== 'fulfilled') return;
+        const { city, weather } = r.value;
+        const pokemon = getPokemon(weather.weather[0].main);
+        L.marker([city.lat, city.lon], { icon: createMarkerIcon(pokemon) })
+          .addTo(map)
+          .bindPopup(createPopup(city, weather, pokemon), { maxWidth: 300 });
+      });
+
+      document.getElementById('loading-overlay').style.display = 'none';
+    }
+
+    init().catch(err => {
+      document.getElementById('loading-overlay').innerHTML =
+        `<p style="color:#e63946">❌ Error: ${err.message}</p><p style="color:#aaa;font-size:0.8rem">Verificá tu API key</p>`;
+    });
+  </script>
+</body>
+
+</html>
