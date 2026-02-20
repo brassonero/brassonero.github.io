@@ -3,351 +3,435 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🌍 Pokémon Weather Map</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #3B4CCA;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  header {
-    background: #CC0000;
-    padding: 0;
-    border-bottom: 6px solid #880000;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .header-inner {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 10px 20px;
-    position: relative;
-    z-index: 2;
-  }
-
-  .pokeball-logo {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, white 50%, #CC0000 50%);
-    border: 4px solid #1a1a1a;
-    position: relative;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  }
-
-  .pokeball-logo::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 0; right: 0;
-    height: 4px;
-    background: #1a1a1a;
-    transform: translateY(-50%);
-  }
-
-  .pokeball-logo::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: white;
-    border: 3px solid #1a1a1a;
-    z-index: 1;
-  }
-
-  .header-text h1 {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.85rem;
-    color: #FFDE00;
-    text-shadow: 3px 3px 0px #B8860B, -1px -1px 0 #000, 1px -1px 0 #000;
-    letter-spacing: 1px;
-    line-height: 1.4;
-  }
-
-  .header-text p {
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.85);
-    margin-top: 4px;
-    font-family: 'Press Start 2P', monospace;
-  }
-
-  .header-decor {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    gap: 8px;
-    z-index: 2;
-  }
-
-  .decor-circle {
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    border: 2px solid rgba(0,0,0,0.3);
-  }
-
-  #map { flex: 1; z-index: 1; }
-
-  .pokemon-icon { background: none; border: none; }
-
-  .pokemon-marker {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.15s ease;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7));
-  }
-
-  .pokemon-marker:hover { transform: scale(1.25) translateY(-6px); }
-
-  .pokemon-marker img {
-    width: 56px; height: 56px;
-    object-fit: contain;
-  }
-
-  .leaflet-popup-content-wrapper {
-    background: #1a1a2e;
-    border: 4px solid #FFDE00;
-    border-radius: 4px;
-    box-shadow: 4px 4px 0px #B8860B, 0 8px 30px rgba(0,0,0,0.6);
-    padding: 0;
-    overflow: hidden;
-  }
-
-  .leaflet-popup-content { margin: 0 !important; }
-  .leaflet-popup-tip-container { display: none; }
-
-  .popup-header {
-    background: #CC0000;
-    padding: 8px 14px;
-    border-bottom: 3px solid #880000;
-  }
-
-  .popup-header h3 {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.6rem;
-    color: #FFDE00;
-    text-shadow: 1px 1px 0 #000;
-  }
-
-  .popup-inner {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    padding: 12px 14px;
-    min-width: 220px;
-  }
-
-  .popup-sprite {
-    background: rgba(255,255,255,0.05);
-    border: 2px solid #333;
-    border-radius: 4px;
-    padding: 4px;
-    flex-shrink: 0;
-  }
-
-  .popup-inner img {
-    width: 72px; height: 72px;
-    object-fit: contain;
-    display: block;
-  }
-
-  .popup-info { color: white; flex: 1; }
-
-  .popup-info .temp {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 1.2rem;
-    color: #FFDE00;
-    text-shadow: 2px 2px 0 #000;
-  }
-
-  .popup-info .condition {
-    font-size: 0.7rem;
-    color: #ccc;
-    margin-top: 4px;
-    line-height: 1.5;
-  }
-
-  .popup-info .pokemon-name {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.5rem;
-    color: #78C850;
-    margin-top: 6px;
-    line-height: 1.6;
-  }
-
-  .type-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 3px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.45rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    margin-top: 6px;
-    border: 2px solid rgba(0,0,0,0.3);
-  }
-
-  #loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: #CC0000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    gap: 24px;
-  }
-
-  .loading-title {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 1rem;
-    color: #FFDE00;
-    text-shadow: 3px 3px 0 #880000;
-    text-align: center;
-    line-height: 1.8;
-  }
-
-  .pokeball-spin {
-    width: 70px; height: 70px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, white 50%, #CC0000 50%);
-    border: 6px solid #1a1a1a;
-    position: relative;
-    animation: spin 0.8s linear infinite;
-  }
-
-  .pokeball-spin::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 0; right: 0;
-    height: 6px;
-    background: #1a1a1a;
-    transform: translateY(-50%);
-  }
-
-  .pokeball-spin::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: white;
-    border: 5px solid #1a1a1a;
-    z-index: 1;
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  .loading-sub {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.5rem;
-    color: rgba(255,255,255,0.7);
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  .legend {
-    background: #1a1a2e;
-    border: 4px solid #FFDE00;
-    border-radius: 4px;
-    padding: 10px 14px;
-    font-size: 0.6rem;
-    line-height: 2;
-    box-shadow: 4px 4px 0px #B8860B;
-    max-width: 240px;
-  }
-
-  .legend h4 {
-    font-family: 'Press Start 2P', monospace;
-    color: #FFDE00;
-    margin-bottom: 8px;
-    font-size: 0.55rem;
-    text-shadow: 1px 1px 0 #000;
-    border-bottom: 2px solid #333;
-    padding-bottom: 6px;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #ddd;
-    font-size: 0.58rem;
-  }
-
-  .legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.3);
-    flex-shrink: 0;
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 600px) {
-    .header-text h1 { font-size: 0.55rem; }
-    .header-text p { font-size: 0.4rem; }
-    .pokeball-logo { width: 32px; height: 32px; }
-    .header-decor { display: none; }
-
-    .legend {
-      max-width: 160px;
-      font-size: 0.5rem;
-      padding: 6px 10px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .legend h4 { font-size: 0.45rem; }
-    .legend-item { font-size: 0.45rem; }
 
-    .pokemon-marker img { width: 38px; height: 38px; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #3B4CCA;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #CC0000;
+      padding: 0;
+      border-bottom: 6px solid #880000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pokeball-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, white 50%, #CC0000 50%);
+      border: 4px solid #1a1a1a;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .pokeball-logo::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #1a1a1a;
+      transform: translateY(-50%);
+    }
+
+    .pokeball-logo::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #1a1a1a;
+      z-index: 1;
+    }
+
+    .header-text h1 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.85rem;
+      color: #FFDE00;
+      text-shadow: 3px 3px 0px #B8860B, -1px -1px 0 #000, 1px -1px 0 #000;
+      letter-spacing: 1px;
+      line-height: 1.4;
+    }
+
+    .header-text p {
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 4px;
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    .header-decor {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 2;
+    }
+
+    .decor-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 0, 0, 0.3);
+    }
+
+    #map {
+      flex: 1;
+      z-index: 1;
+    }
+
+    .pokemon-icon {
+      background: none;
+      border: none;
+    }
+
+    .pokemon-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
+    }
+
+    .pokemon-marker:hover {
+      transform: scale(1.25) translateY(-6px);
+    }
+
+    .pokemon-marker img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: #1a1a2e;
+      border: 4px solid #FFDE00;
+      border-radius: 4px;
+      box-shadow: 4px 4px 0px #B8860B, 0 8px 30px rgba(0, 0, 0, 0.6);
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .leaflet-popup-content {
+      margin: 0 !important;
+    }
+
+    .leaflet-popup-tip-container {
+      display: none;
+    }
+
+    .popup-header {
+      background: #CC0000;
+      padding: 8px 14px;
+      border-bottom: 3px solid #880000;
+    }
+
+    .popup-header h3 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.6rem;
+      color: #FFDE00;
+      text-shadow: 1px 1px 0 #000;
+    }
 
     .popup-inner {
-      flex-direction: column;
-      align-items: flex-start;
-      min-width: 160px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      min-width: 220px;
     }
-    .popup-inner img { width: 50px; height: 50px; }
-    .popup-info .temp { font-size: 0.9rem; }
-    .popup-info .pokemon-name { font-size: 0.4rem; }
-    .type-badge { font-size: 0.38rem; }
+
+    .popup-sprite {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #333;
+      border-radius: 4px;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    .popup-inner img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .popup-info {
+      color: white;
+      flex: 1;
+    }
+
+    .popup-info .temp {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 1.2rem;
+      color: #FFDE00;
+      text-shadow: 2px 2px 0 #000;
+    }
+
+    .popup-info .condition {
+      font-size: 0.7rem;
+      color: #ccc;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .popup-info .pokemon-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.5rem;
+      color: #78C850;
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.45rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 6px;
+      border: 2px solid rgba(0, 0, 0, 0.3);
+    }
+
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: #CC0000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      gap: 24px;
+    }
 
     .loading-title {
-      font-size: 0.6rem;
-      padding: 0 20px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 1rem;
+      color: #FFDE00;
+      text-shadow: 3px 3px 0 #880000;
+      text-align: center;
+      line-height: 1.8;
     }
-  }
 
-  @media (max-width: 380px) {
-    .header-text h1 { font-size: 0.42rem; }
-    .legend { display: none; }
-  }
-</style>
+    .pokeball-spin {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, white 50%, #CC0000 50%);
+      border: 6px solid #1a1a1a;
+      position: relative;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .pokeball-spin::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: #1a1a1a;
+      transform: translateY(-50%);
+    }
+
+    .pokeball-spin::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      border: 5px solid #1a1a1a;
+      z-index: 1;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-sub {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.5rem;
+      color: rgba(255, 255, 255, 0.7);
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .legend {
+      background: #1a1a2e;
+      border: 4px solid #FFDE00;
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-size: 0.6rem;
+      line-height: 2;
+      box-shadow: 4px 4px 0px #B8860B;
+      max-width: 240px;
+    }
+
+    .legend h4 {
+      font-family: 'Press Start 2P', monospace;
+      color: #FFDE00;
+      margin-bottom: 8px;
+      font-size: 0.55rem;
+      text-shadow: 1px 1px 0 #000;
+      border-bottom: 2px solid #333;
+      padding-bottom: 6px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ddd;
+      font-size: 0.58rem;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .header-text h1 {
+        font-size: 0.55rem;
+      }
+
+      .header-text p {
+        font-size: 0.4rem;
+      }
+
+      .pokeball-logo {
+        width: 32px;
+        height: 32px;
+      }
+
+      .header-decor {
+        display: none;
+      }
+
+      .legend {
+        max-width: 160px;
+        font-size: 0.5rem;
+        padding: 6px 10px;
+      }
+
+      .legend h4 {
+        font-size: 0.45rem;
+      }
+
+      .legend-item {
+        font-size: 0.45rem;
+      }
+
+      .pokemon-marker img {
+        width: 38px;
+        height: 38px;
+      }
+
+      .popup-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        min-width: 160px;
+      }
+
+      .popup-inner img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .popup-info .temp {
+        font-size: 0.9rem;
+      }
+
+      .popup-info .pokemon-name {
+        font-size: 0.4rem;
+      }
+
+      .type-badge {
+        font-size: 0.38rem;
+      }
+
+      .loading-title {
+        font-size: 0.6rem;
+        padding: 0 20px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .header-text h1 {
+        font-size: 0.42rem;
+      }
+
+      .legend {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -542,8 +626,8 @@
         maxBoundsViscosity: 1.0,
       });
 
-      L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenTopoMap contributors', maxZoom: 17
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '© Esri', maxZoom: 19
       }).addTo(map);
 
       const legend = L.control({ position: 'bottomright' });
