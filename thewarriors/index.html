@@ -24,7 +24,9 @@
   }
 
   html, body {
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
     background: #000;
     overflow: hidden;
     -webkit-text-size-adjust: 100%;
@@ -39,7 +41,9 @@
 
   .poster {
     position: relative;
-    width: 100vw; height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
     background: var(--dark);
     overflow: hidden;
     cursor: crosshair;
@@ -64,8 +68,6 @@
     100% { opacity: 1; }
   }
 
-
-
   /* ========== PERSPECTIVE GRID ========== */
   .grid-container {
     position: absolute;
@@ -83,7 +85,6 @@
   }
 
   .grid-svg { width: 100%; height: 100%; }
-
   .grid-svg line { filter: drop-shadow(0 0 2px rgba(200,60,30,0.3)); }
 
   /* ========== WIREFRAME GLOBE ========== */
@@ -298,7 +299,6 @@
       0 0 80px rgba(255,85,51,0.2);
   }
 
-  /* Glitch effect */
   .cn-char.glitch {
     animation: charGlitch 0.15s steps(2) both;
   }
@@ -457,7 +457,7 @@
     background-size: 128px;
   }
 
-  /* ========== CRT VIGNETTE (stronger) ========== */
+  /* ========== CRT VIGNETTE ========== */
   .vignette {
     position: absolute;
     inset: 0;
@@ -597,24 +597,28 @@
   /* Landscape phones */
   @media (max-height: 500px) and (orientation: landscape) {
     .header { top: 0.5%; }
-    .header-text { font-size: clamp(12px, 2.5vh, 22px); padding: 2px 6px; }
-    .globe-container { width: clamp(28px, 8vh, 50px); height: clamp(28px, 8vh, 50px); top: 0.5%; }
+    .header-text { font-size: clamp(12px, 2.5dvh, 22px); padding: 2px 6px; }
+    .globe-container {
+      width: clamp(28px, 8dvh, 50px);
+      height: clamp(28px, 8dvh, 50px);
+      top: 0.5%;
+    }
     .year-markers { display: none; }
     .grid-container { top: 8%; height: 40%; }
     .decade-label { display: none; }
     .scanline { top: 40%; }
     .waveform-row { top: 50%; }
-    .waveform-year { font-size: clamp(10px, 2.5vh, 16px); }
+    .waveform-year { font-size: clamp(10px, 2.5dvh, 16px); }
     .waveform-canvas { height: 18px; }
     .dots-row { top: 55%; }
     .dot { width: 6px; height: 6px; }
     .main-type { top: 57%; }
-    .cn-char { font-size: clamp(28px, 10vh, 60px); }
-    .or-text { font-size: clamp(10px, 3vh, 18px); transform: translateY(-8px); }
+    .cn-char { font-size: clamp(28px, 10dvh, 60px); }
+    .or-text { font-size: clamp(10px, 3dvh, 18px); transform: translateY(-8px); }
     .cn-line-2 { margin-top: -2px; }
     .subtitle { bottom: 2%; }
-    .subtitle .cn-sub { font-size: clamp(10px, 3vh, 16px); }
-    .subtitle .en-sub { font-size: clamp(7px, 1.8vh, 10px); margin-top: 4px; }
+    .subtitle .cn-sub { font-size: clamp(10px, 3dvh, 16px); }
+    .subtitle .en-sub { font-size: clamp(7px, 1.8dvh, 10px); margin-top: 4px; }
     .side-left, .side-right { display: none; }
   }
 
@@ -690,7 +694,6 @@
         </radialGradient>
       </defs>
 
-      <!-- Subtle center glow -->
       <rect x="0" y="0" width="460" height="360" fill="url(#gridGlow)"/>
 
       <g clip-path="url(#gridClip)">
@@ -751,7 +754,6 @@
         <polygon points="0,-12 12,0 0,12 -12,0" fill="none" stroke="var(--red)" stroke-width="0.6" opacity="0.5"/>
         <line x1="0" y1="-18" x2="0" y2="18" stroke="var(--red)" stroke-width="0.4" opacity="0.4"/>
         <line x1="-18" y1="0" x2="18" y2="0" stroke="var(--red)" stroke-width="0.4" opacity="0.4"/>
-        <!-- Pulsing center dot -->
         <circle cx="0" cy="0" r="2" fill="var(--red)" opacity="0.8">
           <animate attributeName="r" values="1.5;3;1.5" dur="2s" repeatCount="indefinite"/>
           <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
@@ -900,7 +902,6 @@
     }
     ctx.stroke();
 
-    // Mirror line (dimmer)
     ctx.strokeStyle = 'rgba(45,170,90,0.2)';
     ctx.shadowBlur = 0;
     ctx.beginPath();
@@ -931,7 +932,6 @@
   }
   setTimeout(triggerGlitch, 3000);
 
-  // Click/tap to glitch all
   function glitchAll() {
     chars.forEach((el, i) => {
       setTimeout(() => {
