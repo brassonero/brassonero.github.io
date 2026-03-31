@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="ℏ">
     <title>brassonero</title>
-    <!-- Favicon -->
     <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon">
     <style>
@@ -19,23 +18,18 @@
         @keyframes psychedelicFlow {
             0% {
                 background-position: 0% 0%;
-                filter: hue-rotate(0deg) brightness(1) saturate(1.2);
             }
             25% {
                 background-position: 100% 50%;
-                filter: hue-rotate(45deg) brightness(1.1) saturate(1.5);
             }
             50% {
                 background-position: 100% 100%;
-                filter: hue-rotate(90deg) brightness(1.05) saturate(1.3);
             }
             75% {
                 background-position: 0% 50%;
-                filter: hue-rotate(45deg) brightness(1.1) saturate(1.4);
             }
             100% {
                 background-position: 0% 0%;
-                filter: hue-rotate(0deg) brightness(1) saturate(1.2);
             }
         }
 
@@ -63,14 +57,19 @@
         @keyframes shimmer {
             0% {
                 opacity: 0;
-                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                transform: translate(-30%, -40%) scale(0.8);
             }
-            50% {
-                opacity: 0.7;
+            40% {
+                opacity: 0.6;
+                transform: translate(0%, -10%) scale(1.1);
+            }
+            70% {
+                opacity: 0.4;
+                transform: translate(20%, 10%) scale(1);
             }
             100% {
                 opacity: 0;
-                transform: translateX(100%) translateY(100%) rotate(45deg);
+                transform: translate(30%, 40%) scale(0.8);
             }
         }
 
@@ -91,6 +90,40 @@
             50% {
                 transform: rotate(180deg) scale(1.2);
                 opacity: 0.08;
+            }
+        }
+
+        @keyframes grainDrift {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-2%, -3%); }
+            20% { transform: translate(3%, 1%); }
+            30% { transform: translate(-1%, 3%); }
+            40% { transform: translate(2%, -2%); }
+            50% { transform: translate(-3%, 1%); }
+            60% { transform: translate(1%, -1%); }
+            70% { transform: translate(-2%, 2%); }
+            80% { transform: translate(3%, -3%); }
+            90% { transform: translate(-1%, -2%); }
+        }
+
+        @keyframes revealText {
+            0% {
+                opacity: 0;
+                letter-spacing: 0.5em;
+                filter: blur(12px);
+            }
+            50% {
+                opacity: 0.8;
+                letter-spacing: 0.15em;
+                filter: blur(0px);
+            }
+            85% {
+                opacity: 0.5;
+                filter: blur(0px);
+            }
+            100% {
+                opacity: 0;
+                filter: blur(6px);
             }
         }
 
@@ -129,23 +162,78 @@
             overflow: hidden;
             position: relative;
             -webkit-tap-highlight-color: transparent;
-            transition: filter 2s ease;
+            transition: filter 0.8s ease;
         }
 
         body.playing {
             animation-duration: 15s, 4s;
         }
 
+        /* Film grain overlay */
+        .grain {
+            position: fixed;
+            inset: -60%;
+            width: 220%;
+            height: 220%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.035;
+            mix-blend-mode: overlay;
+            animation: grainDrift 0.8s steps(1) infinite;
+            -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 72%);
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 72%);
+        }
+
+        body.playing .grain {
+            opacity: 0.05;
+        }
+
+        /* Particle canvas */
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 4;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        body.playing #particleCanvas {
+            opacity: 1;
+        }
+
+        /* Audio-reactive ring */
+        .reactive-ring {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0);
+            pointer-events: none;
+            z-index: 3;
+            transition: all 0.15s ease-out;
+        }
+
         .geometric-overlay {
             position: absolute;
             inset: -20%;
             pointer-events: none;
-            opacity: 0.05;
+            opacity: 0.06;
             mix-blend-mode: overlay;
             animation: geometricPulse 10s ease-in-out infinite;
             background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.03) 10px, rgba(255, 255, 255, 0.03) 20px),
-                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.03) 10px, rgba(255, 255, 255, 0.03) 20px);
+                radial-gradient(circle 2px at 25% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 100%),
+                radial-gradient(circle 3px at 75% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 100%),
+                radial-gradient(circle 2px at 50% 60%, rgba(255, 255, 255, 0.07) 0%, transparent 100%),
+                radial-gradient(circle 4px at 15% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 100%),
+                radial-gradient(circle 2px at 85% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 100%),
+                radial-gradient(circle 3px at 40% 90%, rgba(255, 255, 255, 0.04) 0%, transparent 100%),
+                radial-gradient(circle 2px at 60% 35%, rgba(255, 255, 255, 0.07) 0%, transparent 100%);
         }
 
         body::before {
@@ -163,11 +251,14 @@
         body::after {
             content: '';
             position: absolute;
-            inset: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-            animation: shimmer 6s ease-in-out infinite;
+            inset: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.18), transparent 60%);
+            animation: shimmer 8s ease-in-out infinite;
             pointer-events: none;
             mix-blend-mode: overlay;
+            border-radius: 50%;
         }
 
         .orbs-container {
@@ -176,6 +267,7 @@
             pointer-events: none;
             filter: blur(40px);
             opacity: 0.5;
+            transition: filter 1s ease, opacity 1s ease;
         }
 
         body.playing .orbs-container {
@@ -187,6 +279,7 @@
             position: absolute;
             mix-blend-mode: screen;
             animation: morphOrb 8s ease-in-out infinite;
+            transition: transform 0.3s ease-out;
         }
 
         .orb1 {
@@ -222,10 +315,10 @@
             bottom: max(env(safe-area-inset-bottom), 20px);
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 50px;
             padding: clamp(12px, 3vw, 15px) clamp(20px, 5vw, 30px);
             display: flex;
@@ -235,21 +328,21 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
             box-shadow: 
-                0 8px 32px rgba(138, 43, 226, 0.2),
-                0 0 80px rgba(255, 20, 147, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                0 8px 32px rgba(138, 43, 226, 0.15),
+                0 0 80px rgba(255, 20, 147, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
             touch-action: manipulation;
             min-width: 120px;
             justify-content: center;
         }
 
         .audio-control:hover {
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.1);
             transform: translateX(-50%) translateY(-3px) scale(1.05);
             box-shadow: 
-                0 12px 48px rgba(138, 43, 226, 0.3),
-                0 0 120px rgba(255, 20, 147, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                0 12px 48px rgba(138, 43, 226, 0.25),
+                0 0 120px rgba(255, 20, 147, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .audio-control:active {
@@ -310,7 +403,7 @@
 
         .visualizer {
             display: flex;
-            gap: 4px;
+            gap: 3px;
             height: 24px;
             align-items: center;
             opacity: 0;
@@ -327,39 +420,21 @@
         }
 
         .bar {
-            width: 3px;
-            background: linear-gradient(to top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.9));
+            width: 2.5px;
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 3px;
-            transition: height 0.15s ease;
-            box-shadow: 0 0 5px currentColor;
+            transition: height 0.08s ease-out;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+            will-change: height;
         }
 
-        .bar1 { height: 8px; }
-        .bar2 { height: 12px; }
-        .bar3 { height: 6px; }
-        .bar4 { height: 14px; }
-        .bar5 { height: 10px; }
-
-        body.playing .bar {
-            animation: dance 0.6s ease-in-out infinite;
-        }
-
-        body.playing .bar1 { animation-delay: 0s; }
-        body.playing .bar2 { animation-delay: 0.08s; }
-        body.playing .bar3 { animation-delay: 0.16s; }
-        body.playing .bar4 { animation-delay: 0.24s; }
-        body.playing .bar5 { animation-delay: 0.32s; }
-
-        @keyframes dance {
-            0%, 100% { 
-                height: 8px;
-                background: linear-gradient(to top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.9));
-            }
-            50% { 
-                height: 24px;
-                background: linear-gradient(to top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.9));
-            }
-        }
+        .bar1 { height: 4px; }
+        .bar2 { height: 6px; }
+        .bar3 { height: 4px; }
+        .bar4 { height: 8px; }
+        .bar5 { height: 5px; }
+        .bar6 { height: 3px; }
+        .bar7 { height: 7px; }
 
         .cursor-glow {
             position: fixed;
@@ -380,28 +455,18 @@
             top: max(env(safe-area-inset-top), 20px);
             left: 50%;
             transform: translateX(-50%);
-            font-size: clamp(10px, 2.5vw, 12px);
+            font-size: clamp(11px, 2.5vw, 13px);
             text-transform: uppercase;
-            letter-spacing: clamp(2px, 0.3vw, 3px);
+            letter-spacing: 0.3em;
             opacity: 0;
-            animation: fadeInOut 8s ease-in-out 2s;
+            animation: revealText 10s ease-in-out 1.5s;
             pointer-events: none;
             text-shadow: 
-                0 0 20px rgba(255, 20, 147, 0.5),
+                0 0 30px rgba(255, 20, 147, 0.4),
                 0 2px 10px rgba(0, 0, 0, 0.3);
             padding: 0 20px;
             text-align: center;
-        }
-
-        @keyframes fadeInOut {
-            0%, 100% { 
-                opacity: 0;
-                transform: translateX(-50%) translateY(-10px);
-            }
-            50% { 
-                opacity: 0.7;
-                transform: translateX(-50%) translateY(0);
-            }
+            font-weight: 300;
         }
 
         .kaleidoscope {
@@ -445,6 +510,22 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Frequency ring canvas */
+        #freqCanvas {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        body.playing #freqCanvas {
+            opacity: 0.6;
+        }
+
         @media (max-width: 768px) {
             body {
                 cursor: default;
@@ -462,6 +543,14 @@
             .kaleidoscope {
                 display: none;
             }
+
+            #freqCanvas {
+                opacity: 0;
+            }
+
+            body.playing #freqCanvas {
+                opacity: 0.4;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -475,19 +564,24 @@
             .orb,
             .kaleidoscope::before,
             .kaleidoscope::after,
-            .geometric-overlay {
+            .geometric-overlay,
+            .grain {
                 animation: none;
             }
         }
     </style>
 </head>
 <body>
+    <canvas class="grain" id="grainCanvas"></canvas>
+    <canvas id="particleCanvas"></canvas>
+    <canvas id="freqCanvas" width="500" height="500"></canvas>
+
     <div class="geometric-overlay"></div>
     
-    <div class="orbs-container">
-        <div class="orb orb1"></div>
-        <div class="orb orb2"></div>
-        <div class="orb orb3"></div>
+    <div class="orbs-container" id="orbsContainer">
+        <div class="orb orb1" id="orb1"></div>
+        <div class="orb orb2" id="orb2"></div>
+        <div class="orb orb3" id="orb3"></div>
     </div>
 
     <div class="kaleidoscope"></div>
@@ -512,6 +606,8 @@
             <div class="bar bar3"></div>
             <div class="bar bar4"></div>
             <div class="bar bar5"></div>
+            <div class="bar bar6"></div>
+            <div class="bar bar7"></div>
         </div>
     </div>
 
@@ -524,19 +620,290 @@
         const audio = document.getElementById('backgroundAudio');
         const audioControl = document.querySelector('.audio-control');
         const audioText = document.querySelector('.audio-text');
-        const playIcon = document.querySelector('.play-icon');
-        const pauseIcon = document.querySelector('.pause-icon');
-        const visualizer = document.querySelector('.visualizer');
         const cursorGlow = document.querySelector('.cursor-glow');
+        const bars = document.querySelectorAll('.bar');
+        const particleCanvas = document.getElementById('particleCanvas');
+        const pCtx = particleCanvas.getContext('2d');
+        const freqCanvas = document.getElementById('freqCanvas');
+        const fCtx = freqCanvas.getContext('2d');
+        const grainCanvas = document.getElementById('grainCanvas');
+        const gCtx = grainCanvas.getContext('2d');
+
         let isPlaying = false;
         let hasPlayed = false;
+        let audioContext = null;
+        let analyser = null;
+        let dataArray = null;
+        let source = null;
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                         window.matchMedia("(max-width: 768px)").matches;
 
+        // ── Film grain ──
+        function initGrain() {
+            grainCanvas.width = 1024;
+            grainCanvas.height = 1024;
+            generateGrain();
+        }
 
+        function generateGrain() {
+            const imageData = gCtx.createImageData(1024, 1024);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const v = Math.random() * 255;
+                data[i] = v;
+                data[i + 1] = v;
+                data[i + 2] = v;
+                data[i + 3] = 255;
+            }
+            gCtx.putImageData(imageData, 0, 0);
+        }
+
+        // Regenerate grain periodically for texture variety
+        setInterval(generateGrain, 100);
+        initGrain();
+
+        // ── Particle system ──
+        const particles = [];
+        const PARTICLE_COUNT = isMobile ? 60 : 140;
+
+        function resizeParticleCanvas() {
+            particleCanvas.width = window.innerWidth * (isMobile ? 1 : window.devicePixelRatio);
+            particleCanvas.height = window.innerHeight * (isMobile ? 1 : window.devicePixelRatio);
+            particleCanvas.style.width = window.innerWidth + 'px';
+            particleCanvas.style.height = window.innerHeight + 'px';
+        }
+        resizeParticleCanvas();
+
+        const particleColors = [
+            [255, 20, 147],
+            [0, 255, 255],
+            [138, 43, 226],
+            [254, 168, 55],
+            [0, 250, 154],
+            [255, 215, 0],
+        ];
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+            particles.push({
+                x: Math.random() * particleCanvas.width,
+                y: Math.random() * particleCanvas.height,
+                baseRadius: Math.random() * 1.5 + 0.5,
+                radius: 0,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                color: color,
+                phase: Math.random() * Math.PI * 2,
+                freqBand: Math.floor(Math.random() * 4), // which frequency band drives this particle
+            });
+        }
+
+        // ── Frequency ring canvas sizing ──
+        function resizeFreqCanvas() {
+            const size = Math.min(window.innerWidth, window.innerHeight) * (isMobile ? 0.6 : 0.55);
+            freqCanvas.width = size * (isMobile ? 1 : window.devicePixelRatio);
+            freqCanvas.height = size * (isMobile ? 1 : window.devicePixelRatio);
+            freqCanvas.style.width = size + 'px';
+            freqCanvas.style.height = size + 'px';
+        }
+        resizeFreqCanvas();
+
+        // ── Web Audio API setup ──
+        function initAudioContext() {
+            if (audioContext) return;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            analyser.smoothingTimeConstant = 0.8;
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+        }
+
+        // ── Audio-reactive helpers ──
+        function getFrequencyBands() {
+            if (!analyser || !isPlaying) return { bass: 0, mid: 0, high: 0, average: 0 };
+            analyser.getByteFrequencyData(dataArray);
+            const len = dataArray.length;
+            let bass = 0, mid = 0, high = 0, sum = 0;
+            for (let i = 0; i < len; i++) {
+                sum += dataArray[i];
+                if (i < len * 0.15) bass += dataArray[i];
+                else if (i < len * 0.5) mid += dataArray[i];
+                else high += dataArray[i];
+            }
+            const bassCount = Math.floor(len * 0.15) || 1;
+            const midCount = Math.floor(len * 0.35) || 1;
+            const highCount = len - Math.floor(len * 0.5) || 1;
+            return {
+                bass: bass / bassCount / 255,
+                mid: mid / midCount / 255,
+                high: high / highCount / 255,
+                average: sum / len / 255,
+            };
+        }
+
+        // ── Draw frequency ring ──
+        function drawFreqRing(bands) {
+            const w = freqCanvas.width;
+            const h = freqCanvas.height;
+            fCtx.clearRect(0, 0, w, h);
+            if (!isPlaying || !analyser) return;
+
+            analyser.getByteFrequencyData(dataArray);
+            const cx = w / 2;
+            const cy = h / 2;
+            const baseRadius = Math.min(cx, cy) * 0.35;
+            const len = dataArray.length;
+
+            // Outer glow ring
+            fCtx.save();
+            fCtx.globalAlpha = 0.15 + bands.bass * 0.3;
+            fCtx.beginPath();
+            fCtx.arc(cx, cy, baseRadius + bands.bass * 40, 0, Math.PI * 2);
+            fCtx.strokeStyle = `rgba(255, 20, 147, ${0.2 + bands.bass * 0.5})`;
+            fCtx.lineWidth = 2 + bands.bass * 4;
+            fCtx.shadowColor = 'rgba(255, 20, 147, 0.6)';
+            fCtx.shadowBlur = 20 + bands.bass * 30;
+            fCtx.stroke();
+            fCtx.restore();
+
+            // Frequency bars in a circle
+            const barCount = Math.min(len, 64);
+            for (let i = 0; i < barCount; i++) {
+                const angle = (i / barCount) * Math.PI * 2 - Math.PI / 2;
+                const val = dataArray[i] / 255;
+                const barLen = val * baseRadius * 0.6;
+
+                const x1 = cx + Math.cos(angle) * baseRadius;
+                const y1 = cy + Math.sin(angle) * baseRadius;
+                const x2 = cx + Math.cos(angle) * (baseRadius + barLen);
+                const y2 = cy + Math.sin(angle) * (baseRadius + barLen);
+
+                const hue = (i / barCount) * 60 + 300; // magenta → cyan range
+                fCtx.beginPath();
+                fCtx.moveTo(x1, y1);
+                fCtx.lineTo(x2, y2);
+                fCtx.strokeStyle = `hsla(${hue}, 100%, 70%, ${0.3 + val * 0.6})`;
+                fCtx.lineWidth = 1.5;
+                fCtx.lineCap = 'round';
+                fCtx.stroke();
+            }
+
+            // Inner breathing circle
+            fCtx.save();
+            fCtx.globalAlpha = 0.06 + bands.average * 0.12;
+            fCtx.beginPath();
+            fCtx.arc(cx, cy, baseRadius * (0.6 + bands.mid * 0.3), 0, Math.PI * 2);
+            fCtx.fillStyle = `rgba(138, 43, 226, 0.3)`;
+            fCtx.shadowColor = 'rgba(138, 43, 226, 0.4)';
+            fCtx.shadowBlur = 30;
+            fCtx.fill();
+            fCtx.restore();
+        }
+
+        // ── Draw particles ──
+        function drawParticles(bands, time) {
+            const w = particleCanvas.width;
+            const h = particleCanvas.height;
+            pCtx.clearRect(0, 0, w, h);
+
+            const energy = isPlaying ? bands.average : 0;
+            const bassEnergy = isPlaying ? bands.bass : 0;
+
+            for (const p of particles) {
+                // Movement
+                const drift = isPlaying ? 0.5 + energy * 2 : 0.15;
+                p.x += p.vx * drift + Math.sin(time * 0.001 + p.phase) * 0.3;
+                p.y += p.vy * drift + Math.cos(time * 0.0012 + p.phase) * 0.3;
+
+                // Wrap
+                if (p.x < 0) p.x = w;
+                if (p.x > w) p.x = 0;
+                if (p.y < 0) p.y = h;
+                if (p.y > h) p.y = 0;
+
+                // Size reacts to its frequency band
+                const bandValues = [bands.bass, bands.mid, bands.high, bands.average];
+                const bandEnergy = bandValues[p.freqBand] || 0;
+                const targetRadius = p.baseRadius * (1 + bandEnergy * 3);
+                p.radius += (targetRadius - p.radius) * 0.2;
+
+                // Draw
+                const alpha = 0.2 + bandEnergy * 0.6;
+                pCtx.beginPath();
+                pCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                pCtx.fillStyle = `rgba(${p.color[0]}, ${p.color[1]}, ${p.color[2]}, ${alpha})`;
+                pCtx.shadowColor = `rgba(${p.color[0]}, ${p.color[1]}, ${p.color[2]}, ${alpha * 0.5})`;
+                pCtx.shadowBlur = 8 + bandEnergy * 12;
+                pCtx.fill();
+            }
+        }
+
+        // ── Drive visualizer bars from real audio data ──
+        function updateBars(bands) {
+            if (!isPlaying || !analyser) return;
+            analyser.getByteFrequencyData(dataArray);
+            const step = Math.floor(dataArray.length / bars.length);
+            bars.forEach((bar, i) => {
+                const val = dataArray[i * step] / 255;
+                const h = 3 + val * 21;
+                bar.style.height = h + 'px';
+                bar.style.opacity = 0.5 + val * 0.5;
+            });
+        }
+
+        // ── Orb audio reactivity + mouse parallax ──
+        let mouseX = 0.5, mouseY = 0.5;
+        const orb1 = document.getElementById('orb1');
+        const orb2 = document.getElementById('orb2');
+        const orb3 = document.getElementById('orb3');
+
+        function updateOrbs(bands) {
+            if (!isPlaying) return;
+            const bassScale = 1 + bands.bass * 0.15;
+            const midScale = 1 + bands.mid * 0.1;
+            // Parallax offsets from mouse (desktop only)
+            const px = isMobile ? 0 : (mouseX - 0.5) * 30;
+            const py = isMobile ? 0 : (mouseY - 0.5) * 30;
+
+            orb1.style.transform = `translate(${px * 0.8}px, ${py * 0.8}px) scale(${bassScale})`;
+            orb2.style.transform = `translate(${-px * 0.5}px, ${-py * 0.5}px) scale(${midScale})`;
+            orb3.style.transform = `translate(${px * 0.3 - 50}%, ${py * 0.3 - 50}%) scale(${1 + bands.high * 0.12})`;
+        }
+
+        // ── Main animation loop ──
+        let animFrame;
+        function animate(time) {
+            const bands = getFrequencyBands();
+            drawParticles(bands, time);
+            drawFreqRing(bands);
+            updateBars(bands);
+            updateOrbs(bands);
+
+            // Dynamic body hue from audio
+            if (isPlaying && analyser) {
+                const hueShift = bands.bass * 30 - bands.high * 15;
+                const sat = 1.2 + bands.average * 0.4;
+                const bright = 1 + bands.bass * 0.08;
+                if (!isMobile) {
+                    // Only override if no mouse-driven filter is active
+                }
+            }
+
+            animFrame = requestAnimationFrame(animate);
+        }
+        animFrame = requestAnimationFrame(animate);
+
+        // ── Toggle audio ──
         function toggleAudio() {
             if (!isPlaying) {
+                initAudioContext();
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
                 if (hasPlayed && audio.ended) {
                     audio.currentTime = 0;
                     hasPlayed = false;
@@ -547,10 +914,6 @@
                     hasPlayed = true;
                     document.body.classList.add('playing');
                     audioText.textContent = '∞';
-                    
-                    if (!isMobile) {
-                        document.body.style.filter = 'hue-rotate(0deg) brightness(1.1) saturate(1.3)';
-                    }
                 }).catch(error => {
                     console.log('Play failed:', error);
                 });
@@ -559,7 +922,6 @@
                 isPlaying = false;
                 document.body.classList.remove('playing');
                 audioText.textContent = 'ℏ';
-                
                 document.body.style.filter = '';
             }
         }
@@ -601,13 +963,14 @@
             touchStart = null;
         });
 
+        // ── Desktop mouse interactions ──
         if (!isMobile) {
-            let mouseX = 0, mouseY = 0;
+            let rawMouseX = 0, rawMouseY = 0;
             let glowX = 0, glowY = 0;
             
             function animateGlow() {
-                glowX += (mouseX - glowX) * 0.1;
-                glowY += (mouseY - glowY) * 0.1;
+                glowX += (rawMouseX - glowX) * 0.08;
+                glowY += (rawMouseY - glowY) * 0.08;
                 
                 cursorGlow.style.left = glowX + 'px';
                 cursorGlow.style.top = glowY + 'px';
@@ -617,20 +980,19 @@
             animateGlow();
             
             document.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
+                rawMouseX = e.clientX;
+                rawMouseY = e.clientY;
+                mouseX = e.clientX / window.innerWidth;
+                mouseY = e.clientY / window.innerHeight;
                 
-                const x = e.clientX / window.innerWidth;
-                const y = e.clientY / window.innerHeight;
-                
-                const hueRotation = x * 60 - 30;
-                const brightness = 0.95 + y * 0.1;
+                const hueRotation = mouseX * 60 - 30;
+                const brightness = 0.95 + mouseY * 0.1;
                 
                 if (isPlaying) {
                     document.body.style.filter = `hue-rotate(${hueRotation}deg) brightness(${brightness}) saturate(1.4)`;
                 }
                 
-                const duration = isPlaying ? `${10 + y * 5}s, ${4 + x * 2}s` : `${20 + y * 10}s, ${6 + x * 4}s`;
+                const duration = isPlaying ? `${10 + mouseY * 5}s, ${4 + mouseX * 2}s` : `${20 + mouseY * 10}s, ${6 + mouseX * 4}s`;
                 document.body.style.animationDuration = duration;
             });
 
@@ -657,14 +1019,22 @@
             }
         });
 
+        // ── Viewport ──
         function setViewportHeight() {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
         }
-
         setViewportHeight();
-        window.addEventListener('resize', setViewportHeight);
-        window.addEventListener('orientationchange', setViewportHeight);
+        window.addEventListener('resize', () => {
+            setViewportHeight();
+            resizeParticleCanvas();
+            resizeFreqCanvas();
+        });
+        window.addEventListener('orientationchange', () => {
+            setViewportHeight();
+            resizeParticleCanvas();
+            resizeFreqCanvas();
+        });
 
         if (isMobile) {
             document.body.style.willChange = 'transform';
@@ -678,7 +1048,6 @@
         document.addEventListener('touchmove', (e) => {
             const touchY = e.touches[0].clientY;
             const touchDiff = touchY - touchStartY;
-            
             if (touchDiff > 0 && window.scrollY === 0) {
                 e.preventDefault();
             }
