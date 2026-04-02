@@ -320,42 +320,23 @@
             transform: translateX(-50%) scale(0.98);
         }
 
-        .audio-icon {
-            width: clamp(20px, 5vw, 24px);
-            height: clamp(20px, 5vw, 24px);
-            position: relative;
-            opacity: 0.95;
-            flex-shrink: 0;
-        }
-
-        .audio-icon svg {
-            width: 100%;
-            height: 100%;
-            fill: white;
-            filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.5));
-            position: absolute;
-            top: 0;
-            left: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
 
         .planck-btn {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Times New Roman', 'Georgia', serif;
-            font-size: clamp(20px, 5vw, 26px);
-            font-weight: 300;
+            font-size: clamp(22px, 5.5vw, 28px);
+            font-style: italic;
+            font-weight: 400;
             color: white;
             filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.5));
             transition: opacity 0.3s ease, transform 0.3s ease;
             user-select: none;
             line-height: 1;
+            z-index: 2;
         }
 
         .play-icon {
@@ -363,21 +344,10 @@
             transform: scale(1);
         }
 
-        .pause-icon {
-            opacity: 0;
-            transform: scale(0.8);
-        }
-
         body.playing .play-icon {
             opacity: 0;
             transform: scale(0.8);
         }
-
-        body.playing .pause-icon {
-            opacity: 1;
-            transform: scale(1);
-        }
-
 
         .visualizer {
             display: flex;
@@ -519,21 +489,6 @@
                 0 0 300px rgba(0, 255, 255, 0.05);
         }
 
-        /* Frequency ring canvas */
-        #freqCanvas {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 2;
-            opacity: 0;
-            transition: opacity 2s ease;
-        }
-
-        body.playing #freqCanvas {
-            opacity: 0.6;
-        }
 
         @media (max-width: 768px) {
             body {
@@ -578,7 +533,6 @@
 </head>
 <body>
     <canvas class="grain" id="grainCanvas"></canvas>
-    <canvas id="freqCanvas"></canvas>
 
     <div class="planck" id="planckSymbol">ℏ</div>
 
@@ -597,12 +551,7 @@
     <div class="cursor-glow"></div>
 
     <div class="audio-control">
-        <div class="audio-icon">
-            <span class="play-icon planck-btn">ℏ</span>
-            <svg viewBox="0 0 24 24" class="pause-icon">
-                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-            </svg>
-        </div>
+        <span class="play-icon planck-btn">ℏ</span>
         <div class="visualizer">
             <div class="bar bar1"></div>
             <div class="bar bar2"></div>
@@ -627,8 +576,6 @@
         const planckEl = document.getElementById('planckSymbol');
         const grainCanvas = document.getElementById('grainCanvas');
         const gCtx = grainCanvas.getContext('2d');
-        const freqCanvas = document.getElementById('freqCanvas');
-        const fCtx = freqCanvas.getContext('2d');
 
         let isPlaying = false;
         let hasPlayed = false;
@@ -664,74 +611,6 @@
         setInterval(generateGrain, 100);
         initGrain();
 
-        // ── Frequency ring canvas sizing ──
-        function resizeFreqCanvas() {
-            const size = Math.min(window.innerWidth, window.innerHeight) * (isMobile ? 0.6 : 0.55);
-            freqCanvas.width = size * (isMobile ? 1 : window.devicePixelRatio);
-            freqCanvas.height = size * (isMobile ? 1 : window.devicePixelRatio);
-            freqCanvas.style.width = size + 'px';
-            freqCanvas.style.height = size + 'px';
-        }
-        resizeFreqCanvas();
-
-        // ── Draw frequency ring ──
-        function drawFreqRing(bands) {
-            const w = freqCanvas.width;
-            const h = freqCanvas.height;
-            fCtx.clearRect(0, 0, w, h);
-            if (!isPlaying || !analyser) return;
-
-            analyser.getByteFrequencyData(dataArray);
-            const cx = w / 2;
-            const cy = h / 2;
-            const baseRadius = Math.min(cx, cy) * 0.35;
-            const len = dataArray.length;
-
-            // Outer glow ring
-            fCtx.save();
-            fCtx.globalAlpha = 0.15 + bands.bass * 0.3;
-            fCtx.beginPath();
-            fCtx.arc(cx, cy, baseRadius + bands.bass * 40, 0, Math.PI * 2);
-            fCtx.strokeStyle = `rgba(255, 20, 147, ${0.2 + bands.bass * 0.5})`;
-            fCtx.lineWidth = 2 + bands.bass * 4;
-            fCtx.shadowColor = 'rgba(255, 20, 147, 0.6)';
-            fCtx.shadowBlur = 20 + bands.bass * 30;
-            fCtx.stroke();
-            fCtx.restore();
-
-            // Frequency bars in a circle
-            const barCount = Math.min(len, 64);
-            for (let i = 0; i < barCount; i++) {
-                const angle = (i / barCount) * Math.PI * 2 - Math.PI / 2;
-                const val = dataArray[i] / 255;
-                const barLen = val * baseRadius * 0.6;
-
-                const x1 = cx + Math.cos(angle) * baseRadius;
-                const y1 = cy + Math.sin(angle) * baseRadius;
-                const x2 = cx + Math.cos(angle) * (baseRadius + barLen);
-                const y2 = cy + Math.sin(angle) * (baseRadius + barLen);
-
-                const hue = (i / barCount) * 60 + 300;
-                fCtx.beginPath();
-                fCtx.moveTo(x1, y1);
-                fCtx.lineTo(x2, y2);
-                fCtx.strokeStyle = `hsla(${hue}, 100%, 70%, ${0.3 + val * 0.6})`;
-                fCtx.lineWidth = 1.5;
-                fCtx.lineCap = 'round';
-                fCtx.stroke();
-            }
-
-            // Inner breathing circle
-            fCtx.save();
-            fCtx.globalAlpha = 0.06 + bands.average * 0.12;
-            fCtx.beginPath();
-            fCtx.arc(cx, cy, baseRadius * (0.6 + bands.mid * 0.3), 0, Math.PI * 2);
-            fCtx.fillStyle = 'rgba(138, 43, 226, 0.3)';
-            fCtx.shadowColor = 'rgba(138, 43, 226, 0.4)';
-            fCtx.shadowBlur = 30;
-            fCtx.fill();
-            fCtx.restore();
-        }
 
         // ── Web Audio API setup ──
         function initAudioContext() {
@@ -840,7 +719,6 @@
         let animFrame;
         function animate(time) {
             const bands = getFrequencyBands();
-            drawFreqRing(bands);
             updatePlanck(bands);
             updateBars(bands);
             updateOrbs(bands);
@@ -976,11 +854,9 @@
         setViewportHeight();
         window.addEventListener('resize', () => {
             setViewportHeight();
-            resizeFreqCanvas();
         });
         window.addEventListener('orientationchange', () => {
             setViewportHeight();
-            resizeFreqCanvas();
         });
 
         if (isMobile) {
