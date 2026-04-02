@@ -321,23 +321,6 @@
         }
 
 
-        .planck-btn {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Times New Roman', 'Georgia', serif;
-            font-size: clamp(22px, 5.5vw, 28px);
-            font-style: italic;
-            font-weight: 400;
-            color: white;
-            filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.5));
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            user-select: none;
-            line-height: 1;
-            z-index: 2;
-        }
 
         .play-icon {
             opacity: 1;
@@ -551,7 +534,9 @@
     <div class="cursor-glow"></div>
 
     <div class="audio-control">
-        <span class="play-icon planck-btn">ℏ</span>
+        <svg class="play-icon" viewBox="0 0 24 24" style="position:absolute;inset:0;margin:auto;width:clamp(18px,4.5vw,22px);height:clamp(18px,4.5vw,22px);fill:white;filter:drop-shadow(0 0 3px rgba(255,20,147,0.5));transition:opacity 0.3s ease,transform 0.3s ease;z-index:2;">
+            <path d="M8 5v14l11-7z"/>
+        </svg>
         <div class="visualizer">
             <div class="bar bar1"></div>
             <div class="bar bar2"></div>
