@@ -469,11 +469,12 @@
             font-family: 'Times New Roman', 'Georgia', serif;
             color: rgba(255, 255, 255, 0);
             text-shadow: none;
-            transition: color 0.8s ease, text-shadow 0.8s ease, transform 0.8s ease, opacity 0.8s ease;
+            transition: color 0.8s ease, text-shadow 0.8s ease, transform 0.8s ease, opacity 0.8s ease, filter 1.2s ease;
             user-select: none;
             line-height: 1;
-            will-change: transform, text-shadow, color;
+            will-change: transform, text-shadow, color, filter;
             opacity: 0;
+            filter: blur(0px);
         }
 
         .planck::before,
@@ -501,15 +502,15 @@
         }
 
         body.playing .planck::before {
-            color: rgba(255, 20, 147, 0.22);
+            color: rgba(255, 20, 147, 0.2);
             opacity: 1;
-            filter: blur(5px);
+            filter: blur(12px);
         }
 
         body.playing .planck::after {
-            color: rgba(0, 255, 255, 0.18);
+            color: rgba(0, 255, 255, 0.16);
             opacity: 1;
-            filter: blur(6px);
+            filter: blur(14px);
         }
 
         @keyframes drunkDriftA {
@@ -545,11 +546,12 @@
         body.playing .planck {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.25);
+            filter: blur(8px);
             text-shadow:
-                0 0 20px rgba(255, 255, 255, 0.08),
-                0 0 60px rgba(255, 20, 147, 0.1),
-                0 0 120px rgba(138, 43, 226, 0.08);
+                0 0 40px rgba(255, 255, 255, 0.15),
+                0 0 80px rgba(255, 20, 147, 0.12),
+                0 0 160px rgba(138, 43, 226, 0.1);
         }
 
 
