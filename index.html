@@ -142,6 +142,18 @@
             }
         }
 
+        @keyframes planckDefocus {
+            0%, 100% {
+                filter: blur(6px);
+            }
+            40% {
+                filter: blur(3px);
+            }
+            60% {
+                filter: blur(8px);
+            }
+        }
+
         body {
             min-height: 100vh;
             min-height: -webkit-fill-available;
@@ -469,22 +481,25 @@
             font-family: 'Times New Roman', 'Georgia', serif;
             color: rgba(255, 255, 255, 0);
             text-shadow: none;
-            transition: color 1.5s ease, text-shadow 1.5s ease, transform 1.5s ease;
+            transition: color 1.5s ease, text-shadow 1.5s ease, transform 1.5s ease, filter 1.5s ease;
             user-select: none;
             line-height: 1;
-            will-change: transform, text-shadow, color;
+            will-change: transform, text-shadow, color, filter;
             opacity: 0;
+            filter: blur(8px);
         }
 
         body.playing .planck {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
             color: rgba(255, 255, 255, 0.35);
+            filter: blur(5px);
             text-shadow:
                 0 0 30px rgba(255, 255, 255, 0.12),
                 0 0 80px rgba(255, 20, 147, 0.2),
                 0 0 160px rgba(138, 43, 226, 0.12),
                 0 0 300px rgba(0, 255, 255, 0.05);
+            animation: planckDefocus 12s ease-in-out infinite;
         }
 
 
@@ -651,22 +666,34 @@
         // ── Update ℏ symbol from audio ──
         let planckScale = 1;
         let planckGlow = 0;
+        let planckBlur = 8; // out-of-focus blur amount
         function updatePlanck(bands) {
             if (!isPlaying) {
-                // Clear inline styles so CSS transition handles the fade-out
+                // Ease back to defocused resting state
                 planckScale += (1 - planckScale) * 0.05;
                 planckGlow += (0 - planckGlow) * 0.05;
+                planckBlur += (8 - planckBlur) * 0.05;
                 if (Math.abs(planckScale - 1) < 0.01) {
                     planckEl.style.removeProperty('transform');
                     planckEl.style.removeProperty('color');
                     planckEl.style.removeProperty('text-shadow');
+                    planckEl.style.removeProperty('filter');
                 }
                 return;
             }
+
+            // Stop the CSS animation so JS takes full control
+            planckEl.style.animation = 'none';
+
             const targetScale = 1 + bands.bass * 0.18 + bands.average * 0.06;
             const targetGlow = bands.average;
+            // Bass hits momentarily sharpen the symbol; silence lets it drift out of focus
+            const targetBlur = 6 - bands.bass * 4 - bands.average * 2;
+            const clampedBlur = Math.max(0.5, targetBlur);
+
             planckScale += (targetScale - planckScale) * 0.18;
             planckGlow += (targetGlow - planckGlow) * 0.15;
+            planckBlur += (clampedBlur - planckBlur) * 0.12;
 
             const alpha = 0.25 + planckGlow * 0.5;
             const innerGlow = 20 + planckGlow * 60;
@@ -679,6 +706,7 @@
 
             planckEl.style.transform = `translate(-50%, -50%) scale(${planckScale})`;
             planckEl.style.color = `rgba(255, 255, 255, ${alpha})`;
+            planckEl.style.filter = `blur(${planckBlur}px)`;
             planckEl.style.textShadow = `0 0 ${innerGlow}px rgba(255, 255, 255, ${alpha * 0.3}), 0 0 ${magentaGlow}px rgba(255, 20, 147, ${magentaAlpha}), 0 0 ${violetGlow}px rgba(138, 43, 226, ${violetAlpha}), 0 0 ${cyanGlow}px rgba(0, 255, 255, ${cyanAlpha})`;
         }
 
@@ -751,6 +779,8 @@
                 isPlaying = false;
                 document.body.classList.remove('playing');
                 document.body.style.filter = '';
+                // Restore CSS animation for idle defocus breathing
+                planckEl.style.animation = '';
             }
         }
 
@@ -758,6 +788,7 @@
             isPlaying = false;
             document.body.classList.remove('playing');
             document.body.style.filter = '';
+            planckEl.style.animation = '';
         });
 
         audioControl.addEventListener('click', (e) => {
