@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>brassonero</title>
     <meta name="description" content="ℏ">
     <!-- Open Graph (Facebook, LinkedIn, Discord, etc.) -->
     <meta property="og:type" content="website">
@@ -20,7 +21,6 @@
     <meta name="twitter:description" content="ℏ">
     <meta name="twitter:image" content="https://brassonero.github.io/og-image.png">
     <meta name="twitter:image:alt" content="ℏ">
-    <title>brassonero</title>
     <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon">
     <style>
@@ -34,36 +34,47 @@
             0% {
                 background-position: 0% 0%;
             }
+
             25% {
                 background-position: 100% 50%;
             }
+
             50% {
                 background-position: 100% 100%;
             }
+
             75% {
                 background-position: 0% 50%;
             }
+
             100% {
                 background-position: 0% 0%;
             }
         }
 
         @keyframes breathe {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1) translateZ(0);
             }
+
             50% {
                 transform: scale(1.03) translateZ(0);
             }
         }
 
         @keyframes float {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0) translateX(0) rotate(0deg) scale(1);
             }
+
             33% {
                 transform: translateY(-30px) translateX(20px) rotate(120deg) scale(1.1);
             }
+
             66% {
                 transform: translateY(20px) translateX(-20px) rotate(240deg) scale(0.95);
             }
@@ -74,14 +85,17 @@
                 opacity: 0;
                 transform: translate(-30%, -40%) scale(0.8);
             }
+
             40% {
                 opacity: 0.6;
                 transform: translate(0%, -10%) scale(1.1);
             }
+
             70% {
                 opacity: 0.4;
                 transform: translate(20%, 10%) scale(1);
             }
+
             100% {
                 opacity: 0;
                 transform: translate(30%, 40%) scale(0.8);
@@ -89,19 +103,25 @@
         }
 
         @keyframes morphOrb {
-            0%, 100% {
+
+            0%,
+            100% {
                 border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
             }
+
             50% {
                 border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
             }
         }
 
         @keyframes geometricPulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: rotate(0deg) scale(1);
                 opacity: 0.03;
             }
+
             50% {
                 transform: rotate(180deg) scale(1.2);
                 opacity: 0.08;
@@ -109,16 +129,47 @@
         }
 
         @keyframes grainDrift {
-            0%, 100% { transform: translate(0, 0); }
-            10% { transform: translate(-2%, -3%); }
-            20% { transform: translate(3%, 1%); }
-            30% { transform: translate(-1%, 3%); }
-            40% { transform: translate(2%, -2%); }
-            50% { transform: translate(-3%, 1%); }
-            60% { transform: translate(1%, -1%); }
-            70% { transform: translate(-2%, 2%); }
-            80% { transform: translate(3%, -3%); }
-            90% { transform: translate(-1%, -2%); }
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            10% {
+                transform: translate(-2%, -3%);
+            }
+
+            20% {
+                transform: translate(3%, 1%);
+            }
+
+            30% {
+                transform: translate(-1%, 3%);
+            }
+
+            40% {
+                transform: translate(2%, -2%);
+            }
+
+            50% {
+                transform: translate(-3%, 1%);
+            }
+
+            60% {
+                transform: translate(1%, -1%);
+            }
+
+            70% {
+                transform: translate(-2%, 2%);
+            }
+
+            80% {
+                transform: translate(3%, -3%);
+            }
+
+            90% {
+                transform: translate(-1%, -2%);
+            }
         }
 
         @keyframes revealText {
@@ -127,15 +178,18 @@
                 letter-spacing: 0.5em;
                 filter: blur(12px);
             }
+
             50% {
                 opacity: 0.8;
                 letter-spacing: 0.15em;
                 filter: blur(0px);
             }
+
             85% {
                 opacity: 0.5;
                 filter: blur(0px);
             }
+
             100% {
                 opacity: 0;
                 filter: blur(6px);
@@ -143,12 +197,16 @@
         }
 
         @keyframes planckDefocus {
-            0%, 100% {
+
+            0%,
+            100% {
                 filter: blur(6px);
             }
+
             40% {
                 filter: blur(3px);
             }
+
             60% {
                 filter: blur(8px);
             }
@@ -158,14 +216,13 @@
             min-height: 100vh;
             min-height: -webkit-fill-available;
             min-height: 100dvh;
-            background: 
+            background:
                 radial-gradient(ellipse at 20% 30%, rgba(255, 20, 147, 0.4), transparent 40%),
                 radial-gradient(ellipse at 80% 70%, rgba(0, 255, 255, 0.3), transparent 40%),
                 radial-gradient(ellipse at 50% 50%, rgba(138, 43, 226, 0.3), transparent 50%),
                 radial-gradient(ellipse at top left, rgba(254, 168, 55, 0.5), transparent 40%),
                 radial-gradient(ellipse at bottom right, rgba(89, 62, 103, 0.5), transparent 40%),
-                linear-gradient(
-                    135deg, 
+                linear-gradient(135deg,
                     #FF1493,
                     #FF6B35,
                     #FEA837,
@@ -174,10 +231,9 @@
                     #FF1493,
                     #00FA9A,
                     #FFD700,
-                    #FF1493
-                );
+                    #FF1493);
             background-size: 400% 400%;
-            animation: 
+            animation:
                 psychedelicFlow 30s cubic-bezier(0.4, 0, 0.6, 1) infinite,
                 breathe 6s ease-in-out infinite;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -224,7 +280,7 @@
             opacity: 0.06;
             mix-blend-mode: overlay;
             animation: geometricPulse 10s ease-in-out infinite;
-            background-image: 
+            background-image:
                 radial-gradient(circle 2px at 25% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 100%),
                 radial-gradient(circle 3px at 75% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 100%),
                 radial-gradient(circle 2px at 50% 60%, rgba(255, 255, 255, 0.07) 0%, transparent 100%),
@@ -238,7 +294,7 @@
             content: '';
             position: absolute;
             inset: -50%;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(255, 20, 147, 0.03) 0%, transparent 50%);
@@ -325,7 +381,7 @@
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
-            box-shadow: 
+            box-shadow:
                 0 8px 32px rgba(138, 43, 226, 0.15),
                 0 0 80px rgba(255, 20, 147, 0.06),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -337,7 +393,7 @@
         .audio-control:hover {
             background: rgba(255, 255, 255, 0.1);
             transform: translateX(-50%) translateY(-3px) scale(1.05);
-            box-shadow: 
+            box-shadow:
                 0 12px 48px rgba(138, 43, 226, 0.25),
                 0 0 120px rgba(255, 20, 147, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -386,13 +442,33 @@
             will-change: height;
         }
 
-        .bar1 { height: 4px; }
-        .bar2 { height: 6px; }
-        .bar3 { height: 4px; }
-        .bar4 { height: 8px; }
-        .bar5 { height: 5px; }
-        .bar6 { height: 3px; }
-        .bar7 { height: 7px; }
+        .bar1 {
+            height: 4px;
+        }
+
+        .bar2 {
+            height: 6px;
+        }
+
+        .bar3 {
+            height: 4px;
+        }
+
+        .bar4 {
+            height: 8px;
+        }
+
+        .bar5 {
+            height: 5px;
+        }
+
+        .bar6 {
+            height: 3px;
+        }
+
+        .bar7 {
+            height: 7px;
+        }
 
         .cursor-glow {
             position: fixed;
@@ -419,7 +495,7 @@
             opacity: 0;
             animation: revealText 10s ease-in-out 1.5s;
             pointer-events: none;
-            text-shadow: 
+            text-shadow:
                 0 0 30px rgba(255, 20, 147, 0.4),
                 0 2px 10px rgba(0, 0, 0, 0.3);
             padding: 0 20px;
@@ -445,16 +521,14 @@
             content: '';
             position: absolute;
             inset: -50%;
-            background: conic-gradient(
-                from 0deg,
-                transparent,
-                rgba(255, 20, 147, 0.1),
-                transparent,
-                rgba(0, 255, 255, 0.1),
-                transparent,
-                rgba(138, 43, 226, 0.1),
-                transparent
-            );
+            background: conic-gradient(from 0deg,
+                    transparent,
+                    rgba(255, 20, 147, 0.1),
+                    transparent,
+                    rgba(0, 255, 255, 0.1),
+                    transparent,
+                    rgba(138, 43, 226, 0.1),
+                    transparent);
             animation: rotate 60s linear infinite;
         }
 
@@ -464,8 +538,13 @@
         }
 
         @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Central ℏ symbol */
@@ -544,13 +623,14 @@
         }
     </style>
 </head>
+
 <body>
     <canvas class="grain" id="grainCanvas"></canvas>
 
     <div class="planck" id="planckSymbol">ℏ</div>
 
     <div class="geometric-overlay"></div>
-    
+
     <div class="orbs-container" id="orbsContainer">
         <div class="orb orb1" id="orb1"></div>
         <div class="orb orb2" id="orb2"></div>
@@ -564,8 +644,9 @@
     <div class="cursor-glow"></div>
 
     <div class="audio-control">
-        <svg class="play-icon" viewBox="0 0 24 24" style="position:absolute;inset:0;margin:auto;width:clamp(18px,4.5vw,22px);height:clamp(18px,4.5vw,22px);fill:white;filter:drop-shadow(0 0 3px rgba(255,20,147,0.5));transition:opacity 0.3s ease,transform 0.3s ease;z-index:2;">
-            <path d="M8 5v14l11-7z"/>
+        <svg class="play-icon" viewBox="0 0 24 24"
+            style="position:absolute;inset:0;margin:auto;width:clamp(18px,4.5vw,22px);height:clamp(18px,4.5vw,22px);fill:white;filter:drop-shadow(0 0 3px rgba(255,20,147,0.5));transition:opacity 0.3s ease,transform 0.3s ease;z-index:2;">
+            <path d="M8 5v14l11-7z" />
         </svg>
         <div class="visualizer">
             <div class="bar bar1"></div>
@@ -599,8 +680,8 @@
         let dataArray = null;
         let source = null;
 
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                        window.matchMedia("(max-width: 768px)").matches;
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+            window.matchMedia("(max-width: 768px)").matches;
 
         // ── Film grain ──
         function initGrain() {
@@ -766,7 +847,7 @@
                     audio.currentTime = 0;
                     hasPlayed = false;
                 }
-                
+
                 audio.play().then(() => {
                     isPlaying = true;
                     hasPlayed = true;
@@ -825,31 +906,31 @@
         if (!isMobile) {
             let rawMouseX = 0, rawMouseY = 0;
             let glowX = 0, glowY = 0;
-            
+
             function animateGlow() {
                 glowX += (rawMouseX - glowX) * 0.08;
                 glowY += (rawMouseY - glowY) * 0.08;
-                
+
                 cursorGlow.style.left = glowX + 'px';
                 cursorGlow.style.top = glowY + 'px';
-                
+
                 requestAnimationFrame(animateGlow);
             }
             animateGlow();
-            
+
             document.addEventListener('mousemove', (e) => {
                 rawMouseX = e.clientX;
                 rawMouseY = e.clientY;
                 mouseX = e.clientX / window.innerWidth;
                 mouseY = e.clientY / window.innerHeight;
-                
+
                 const hueRotation = mouseX * 60 - 30;
                 const brightness = 0.95 + mouseY * 0.1;
-                
+
                 if (isPlaying) {
                     document.body.style.filter = `hue-rotate(${hueRotation}deg) brightness(${brightness}) saturate(1.4)`;
                 }
-                
+
                 const duration = isPlaying ? `${10 + mouseY * 5}s, ${4 + mouseX * 2}s` : `${20 + mouseY * 10}s, ${6 + mouseX * 4}s`;
                 document.body.style.animationDuration = duration;
             });
@@ -868,7 +949,7 @@
                 e.preventDefault();
                 toggleAudio();
             }
-            
+
             if (e.code === 'KeyP' && !isMobile) {
                 document.body.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(1.2) saturate(2)`;
                 setTimeout(() => {
@@ -908,4 +989,5 @@
         }, { passive: false });
     </script>
 </body>
+
 </html>
