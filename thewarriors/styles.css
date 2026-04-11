@@ -19,6 +19,8 @@
   --green-dim: #1e7a3e;
   --dark: #0e0c0a;
   --text-light: #ccbfaa;
+  --gold: #ffcc33;
+  --cyan: #33ddff;
   --sai-t: env(safe-area-inset-top, 0px);
   --sai-b: env(safe-area-inset-bottom, 0px);
   --sai-l: env(safe-area-inset-left, 0px);
@@ -92,6 +94,16 @@ canvas {
   font-size: clamp(10px, 2vmin, 14px);
   opacity: .8;
   margin-top: 2px;
+}
+
+.hud-fury {
+  font-family: 'Chakra Petch', sans-serif;
+  color: var(--cyan);
+  font-size: clamp(10px, 2vmin, 14px);
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(51, 221, 255, .6);
+  margin-top: 2px;
+  display: none;
 }
 
 .hud-lives {
@@ -212,6 +224,13 @@ canvas {
   border-left: 8px solid var(--green);
 }
 
+.btn-group {
+  display: flex;
+  gap: clamp(8px, 2vmin, 14px);
+  align-items: flex-end;
+  pointer-events: none;
+}
+
 .atk-btn {
   pointer-events: all;
   touch-action: none;
@@ -238,6 +257,34 @@ canvas {
   opacity: .9;
   transform: scale(.92);
   box-shadow: 0 0 30px rgba(200, 60, 30, .3);
+}
+
+.dash-btn {
+  pointer-events: all;
+  touch-action: none;
+  width: clamp(50px, 12vmin, 72px);
+  height: clamp(50px, 12vmin, 72px);
+  border-radius: 50%;
+  border: 2px solid var(--cyan);
+  background: rgba(51, 221, 255, .06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: clamp(16px, 4vmin, 26px);
+  color: var(--cyan);
+  text-shadow: 0 0 10px rgba(51, 221, 255, .4);
+  box-shadow: 0 0 16px rgba(51, 221, 255, .08);
+  opacity: .35;
+  transition: opacity .1s, transform .1s;
+  margin-bottom: 18px;
+}
+
+.dash-btn.active {
+  opacity: .85;
+  transform: scale(.9);
+  box-shadow: 0 0 24px rgba(51, 221, 255, .25);
 }
 
 @media (hover: none) and (pointer: coarse) {
@@ -316,6 +363,16 @@ canvas {
   opacity: .7;
   text-align: center;
   line-height: 1.9;
+}
+
+.screen-stats {
+  color: var(--green-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(9px, 1.6vmin, 13px);
+  letter-spacing: 1px;
+  margin-top: 8px;
+  opacity: .6;
+  text-align: center;
 }
 
 .screen-btn {
@@ -518,5 +575,12 @@ canvas {
     width: clamp(56px, 14vmin, 80px);
     height: clamp(56px, 14vmin, 80px);
     font-size: clamp(18px, 4vmin, 28px);
+  }
+
+  .dash-btn {
+    width: clamp(42px, 10vmin, 60px);
+    height: clamp(42px, 10vmin, 60px);
+    font-size: clamp(14px, 3vmin, 22px);
+    margin-bottom: 14px;
   }
 }

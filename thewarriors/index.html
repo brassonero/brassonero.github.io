@@ -21,6 +21,7 @@
     <div>
       <div class="hud-box">WAVE <span id="hudWave">1</span></div>
       <div class="hud-combo" id="hudCombo"></div>
+      <div class="hud-fury" id="hudFury"></div>
       <div class="hud-lives" id="hudLives"></div>
     </div>
     <div style="text-align:right">
@@ -40,7 +41,10 @@
         <div class="dpad-arrow left"></div>
         <div class="dpad-arrow right"></div>
       </div>
-      <div class="atk-btn" id="atkBtn">斩</div>
+      <div class="btn-group">
+        <div class="dash-btn" id="dashBtn">闪</div>
+        <div class="atk-btn" id="atkBtn">斩</div>
+      </div>
     </div>
   </div>
 
@@ -50,8 +54,8 @@
     <div class="screen-chinese">真战士</div>
     <div class="screen-or">OR</div>
     <div class="screen-chinese">伪战士</div>
-    <div class="screen-info desk-info">ARROW KEYS / WASD TO MOVE<br>SPACE TO STRIKE</div>
-    <div class="screen-info mob-info">JOYSTICK TO MOVE · 斩 TO STRIKE</div>
+    <div class="screen-info desk-info">ARROW KEYS / WASD TO MOVE · SPACE TO STRIKE · SHIFT TO DASH</div>
+    <div class="screen-info mob-info">JOYSTICK TO MOVE · 斩 STRIKE · 闪 DASH</div>
     <button class="screen-btn" id="startBtn">开始 START</button>
   </div>
 
@@ -61,6 +65,7 @@
     <div class="screen-chinese" style="font-size:clamp(24px,8vmin,60px)">伪战士</div>
     <div class="final-score" id="finalScore">0</div>
     <div class="screen-info" id="verdictText"></div>
+    <div class="screen-stats" id="finalStats"></div>
     <button class="screen-btn" id="retryBtn">再战 RETRY</button>
   </div>
 
