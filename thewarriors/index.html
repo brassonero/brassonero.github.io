@@ -1,228 +1,78 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>THE WARRIORS</title>
-  <meta name="description" content="THE WARRIORS — 真战士 OR 伪战士">
-
-  <!-- Open Graph (Facebook, LinkedIn, Discord, etc.) -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="THE WARRIORS">
-  <meta property="og:description" content="真战士 OR 伪战士">
-  <meta property="og:image" content="https://thewarriors.mx/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="THE WARRIORS— 真战士 OR 伪战士">
-  <meta property="og:url" content="https://thewarriors.mx">
-
-  <!-- Twitter / X Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="THE WARRIORS">
-  <meta name="twitter:description" content="真战士 OR 伪战士">
-  <meta name="twitter:image" content="https://thewarriors.mx/og-image.png">
-  <meta name="twitter:image:alt" content="THE WARRIORS — 真战士 OR 伪战士">
-
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-  <link rel="apple-touch-icon" sizes="192x192" href="favicon-192.png">
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>THE WARRIORS — 真战士 OR 伪战士</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<div class="poster" id="poster">
+  <canvas id="game"></canvas>
 
-  <!-- Ambient glow -->
-  <div class="ambient-glow"></div>
-
-  <!-- Corner brackets -->
-  <div class="corner corner-tl"></div>
-  <div class="corner corner-tr"></div>
-  <div class="corner corner-bl"></div>
-  <div class="corner corner-br"></div>
-
-  <!-- Header -->
-  <div class="header">
-    <div class="header-text">THE</div>
-    <div class="header-text">WARRIORS</div>
-  </div>
-
-  <!-- Year markers -->
-  <div class="year-markers">
-    <span style="transform: translateX(-30px);">1990</span>
-    <span style="transform: translateX(30px); margin-top:-12px;">2010</span>
-    <span style="transform: translateX(-15px);">2000</span>
-    <span style="transform: translateX(20px); margin-top:-12px;">2015</span>
-    <span style="transform: translateX(-5px);">2005</span>
-    <span style="transform: translateX(15px); margin-top:-12px;">2019</span>
-  </div>
-
-  <!-- Wireframe globe -->
-  <div class="globe-container">
-    <svg class="globe-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="40" cy="40" r="36" fill="none" stroke="var(--green)" stroke-width="1" opacity="0.7"/>
-      <ellipse cx="40" cy="40" rx="36" ry="14" fill="none" stroke="var(--green)" stroke-width="0.8" opacity="0.5"/>
-      <ellipse cx="40" cy="40" rx="36" ry="24" fill="none" stroke="var(--green)" stroke-width="0.8" opacity="0.4" transform="rotate(30, 40, 40)"/>
-      <ellipse cx="40" cy="40" rx="36" ry="24" fill="none" stroke="var(--green)" stroke-width="0.8" opacity="0.4" transform="rotate(-30, 40, 40)"/>
-      <ellipse cx="40" cy="40" rx="14" ry="36" fill="none" stroke="var(--green)" stroke-width="0.8" opacity="0.5"/>
-      <ellipse cx="40" cy="40" rx="24" ry="36" fill="none" stroke="var(--green)" stroke-width="0.8" opacity="0.4"/>
-      <line x1="4" y1="40" x2="76" y2="40" stroke="var(--green)" stroke-width="0.5" opacity="0.3"/>
-      <line x1="40" y1="4" x2="40" y2="76" stroke="var(--green)" stroke-width="0.5" opacity="0.3"/>
-    </svg>
-  </div>
-
-  <!-- Perspective Grid -->
-  <div class="grid-container">
-    <svg class="grid-svg" viewBox="0 0 460 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <defs>
-        <clipPath id="gridClip">
-          <rect x="0" y="0" width="460" height="360"/>
-        </clipPath>
-        <radialGradient id="gridGlow" cx="50%" cy="25%" r="60%">
-          <stop offset="0%" stop-color="var(--red)" stop-opacity="0.15"/>
-          <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-
-      <rect x="0" y="0" width="460" height="360" fill="url(#gridGlow)"/>
-
-      <g clip-path="url(#gridClip)">
-        <!-- Floor horizontal lines -->
-        <line x1="-40" y1="360" x2="500" y2="360" stroke="var(--red)" stroke-width="1.2" opacity="0.8"/>
-        <line x1="10" y1="320" x2="450" y2="320" stroke="var(--red)" stroke-width="1" opacity="0.7"/>
-        <line x1="40" y1="280" x2="420" y2="280" stroke="var(--red)" stroke-width="0.9" opacity="0.6"/>
-        <line x1="65" y1="245" x2="395" y2="245" stroke="var(--red)" stroke-width="0.8" opacity="0.55"/>
-        <line x1="85" y1="215" x2="375" y2="215" stroke="var(--red)" stroke-width="0.7" opacity="0.5"/>
-        <line x1="100" y1="190" x2="360" y2="190" stroke="var(--red)" stroke-width="0.7" opacity="0.45"/>
-        <line x1="115" y1="168" x2="345" y2="168" stroke="var(--red)" stroke-width="0.6" opacity="0.4"/>
-        <line x1="128" y1="150" x2="332" y2="150" stroke="var(--red)" stroke-width="0.6" opacity="0.35"/>
-        <line x1="140" y1="135" x2="320" y2="135" stroke="var(--red)" stroke-width="0.5" opacity="0.3"/>
-        <line x1="150" y1="122" x2="310" y2="122" stroke="var(--red)" stroke-width="0.5" opacity="0.25"/>
-        <line x1="160" y1="112" x2="300" y2="112" stroke="var(--red)" stroke-width="0.4" opacity="0.2"/>
-        <line x1="170" y1="103" x2="290" y2="103" stroke="var(--red)" stroke-width="0.4" opacity="0.18"/>
-        <line x1="178" y1="96" x2="282" y2="96" stroke="var(--red)" stroke-width="0.3" opacity="0.15"/>
-
-        <!-- Vertical converging lines -->
-        <line x1="-40" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="1.2" opacity="0.8"/>
-        <line x1="30" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="1" opacity="0.7"/>
-        <line x1="90" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="0.9" opacity="0.6"/>
-        <line x1="140" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="0.8" opacity="0.5"/>
-        <line x1="185" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="0.7" opacity="0.45"/>
-        <line x1="230" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="0.7" opacity="0.4"/>
-        <line x1="275" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="0.7" opacity="0.45"/>
-        <line x1="320" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="0.8" opacity="0.5"/>
-        <line x1="370" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="0.9" opacity="0.6"/>
-        <line x1="430" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="1" opacity="0.7"/>
-        <line x1="500" y1="360" x2="230" y2="80" stroke="var(--red)" stroke-width="1.2" opacity="0.8"/>
-
-        <!-- Ceiling -->
-        <line x1="-40" y1="0" x2="500" y2="0" stroke="var(--red)" stroke-width="1.2" opacity="0.6"/>
-        <line x1="10" y1="30" x2="450" y2="30" stroke="var(--red)" stroke-width="0.9" opacity="0.5"/>
-        <line x1="50" y1="52" x2="410" y2="52" stroke="var(--red)" stroke-width="0.7" opacity="0.35"/>
-        <line x1="85" y1="68" x2="375" y2="68" stroke="var(--red)" stroke-width="0.6" opacity="0.25"/>
-
-        <!-- Ceiling verticals -->
-        <line x1="-40" y1="0" x2="230" y2="80" stroke="var(--red)" stroke-width="1" opacity="0.6"/>
-        <line x1="60" y1="0" x2="230" y2="80" stroke="var(--red)" stroke-width="0.8" opacity="0.45"/>
-        <line x1="145" y1="0" x2="230" y2="80" stroke="var(--red)" stroke-width="0.6" opacity="0.35"/>
-        <line x1="230" y1="0" x2="230" y2="80" stroke="var(--red)" stroke-width="0.5" opacity="0.3"/>
-        <line x1="315" y1="0" x2="230" y2="80" stroke="var(--red)" stroke-width="0.6" opacity="0.35"/>
-        <line x1="400" y1="0" x2="230" y2="80" stroke="var(--red)" stroke-width="0.8" opacity="0.45"/>
-        <line x1="500" y1="0" x2="230" y2="80" stroke="var(--red)" stroke-width="1" opacity="0.6"/>
-
-        <!-- Walls -->
-        <line x1="-40" y1="0" x2="-40" y2="360" stroke="var(--red)" stroke-width="1" opacity="0.6"/>
-        <line x1="500" y1="0" x2="500" y2="360" stroke="var(--red)" stroke-width="1" opacity="0.6"/>
-
-        <!-- Border -->
-        <rect x="0" y="0" width="460" height="360" fill="none" stroke="var(--red)" stroke-width="2" opacity="0.9"/>
-      </g>
-
-      <!-- Center diamond -->
-      <g transform="translate(230, 260)" opacity="0.7">
-        <polygon points="0,-18 18,0 0,18 -18,0" fill="none" stroke="var(--red)" stroke-width="1"/>
-        <polygon points="0,-12 12,0 0,12 -12,0" fill="none" stroke="var(--red)" stroke-width="0.6" opacity="0.5"/>
-        <line x1="0" y1="-18" x2="0" y2="18" stroke="var(--red)" stroke-width="0.4" opacity="0.4"/>
-        <line x1="-18" y1="0" x2="18" y2="0" stroke="var(--red)" stroke-width="0.4" opacity="0.4"/>
-        <circle cx="0" cy="0" r="2" fill="var(--red)" opacity="0.8">
-          <animate attributeName="r" values="1.5;3;1.5" dur="2s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
-        </circle>
-      </g>
-    </svg>
-  </div>
-
-  <!-- Scanline -->
-  <div class="scanline"></div>
-
-  <!-- Moving scan -->
-  <div class="h-scan"></div>
-
-  <!-- Decade labels -->
-  <div class="decade-label label-2019">2019 s.</div>
-  <div class="decade-label label-2005">2005 s.</div>
-  <div class="decade-label label-1990">1990's.</div>
-  <div class="decade-label label-2000">2000 s.</div>
-  <div class="decade-label label-2010">2010's.</div>
-  <div class="decade-label label-2015">2015 s.</div>
-
-  <!-- Waveform row -->
-  <div class="waveform-row">
-    <span class="waveform-year">2013</span>
-    <canvas class="waveform-canvas" id="waveCanvas"></canvas>
-    <span class="waveform-year">2026</span>
-  </div>
-
-  <!-- Three dots -->
-  <div class="dots-row">
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-  </div>
-
-  <!-- Main Chinese typography -->
-  <div class="main-type">
-    <div class="chinese-line cn-line-1">
-      <span class="cn-char" data-char="真">真</span>
-      <span class="cn-char" data-char="战">战</span>
-      <span class="cn-char" data-char="士">士</span>
+  <!-- HUD -->
+  <div id="hud">
+    <div>
+      <div class="hud-box">WAVE <span id="hudWave">1</span></div>
+      <div class="hud-combo" id="hudCombo"></div>
+      <div class="hud-lives" id="hudLives"></div>
     </div>
-    <div style="text-align:center; margin: -8px 0;">
-      <span class="or-text">OR</span>
-    </div>
-    <div class="chinese-line cn-line-2">
-      <span class="cn-char" data-char="伪">伪</span>
-      <span class="cn-char" data-char="战">战</span>
-      <span class="cn-char" data-char="士">士</span>
+    <div style="text-align:right">
+      <div class="hud-score" id="hudScore">0</div>
+      <div class="hud-box" id="hudHi">HI 0</div>
     </div>
   </div>
 
-  <!-- Subtitle -->
-  <div class="subtitle">
-    <div class="cn-sub">大屁股鸟</div>
-    <span class="en-sub">XXVI</span>
+  <!-- Mobile controls -->
+  <div id="mobileControls">
+    <div class="ctrl-row">
+      <div class="dpad" id="dpad">
+        <div class="dpad-bg"></div>
+        <div class="dpad-center"></div>
+        <div class="dpad-arrow up"></div>
+        <div class="dpad-arrow down"></div>
+        <div class="dpad-arrow left"></div>
+        <div class="dpad-arrow right"></div>
+      </div>
+      <div class="atk-btn" id="atkBtn">斩</div>
+    </div>
   </div>
 
-  <!-- Side text -->
-  <div class="side-left">1980S</div>
-  <div class="side-right">2020S</div>
-
-  <!-- Data bar -->
-  <div class="data-bar">
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span>
+  <!-- Title screen -->
+  <div class="screen-overlay" id="titleScreen">
+    <div class="screen-title">THE WARRIORS</div>
+    <div class="screen-chinese">真战士</div>
+    <div class="screen-or">OR</div>
+    <div class="screen-chinese">伪战士</div>
+    <div class="screen-info desk-info">ARROW KEYS / WASD TO MOVE<br>SPACE TO STRIKE</div>
+    <div class="screen-info mob-info">JOYSTICK TO MOVE · 斩 TO STRIKE</div>
+    <button class="screen-btn" id="startBtn">开始 START</button>
   </div>
 
-  <!-- Overlays -->
-  <div class="scanlines"></div>
-  <div class="vignette"></div>
-  <div class="noise"></div>
-  <div class="rgb-flash"></div>
-</div>
+  <!-- Game over screen -->
+  <div class="screen-overlay hidden" id="gameOverScreen">
+    <div class="screen-sub">GAME OVER</div>
+    <div class="screen-chinese" style="font-size:clamp(24px,8vmin,60px)">伪战士</div>
+    <div class="final-score" id="finalScore">0</div>
+    <div class="screen-info" id="verdictText"></div>
+    <button class="screen-btn" id="retryBtn">再战 RETRY</button>
+  </div>
 
-<script src="script.js"></script>
+  <!-- Post-processing overlays -->
+  <div class="scan-ov"></div>
+  <div class="vig-ov"></div>
+  <div class="corner c-tl"></div>
+  <div class="corner c-tr"></div>
+  <div class="corner c-bl"></div>
+  <div class="corner c-br"></div>
+
+  <script src="script.js"></script>
 </body>
+
 </html>
