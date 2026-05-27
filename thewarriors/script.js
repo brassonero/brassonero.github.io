@@ -17,6 +17,18 @@
     CYAN: '#33ddff', WHITE: '#ffffff',
   };
 
+  // Adaptive quality — mobile / low-power devices get reduced shadow blur,
+  // lower pixel density, and fewer particles. shadowBlur is the single most
+  // expensive 2D-canvas op; cutting it is the biggest win.
+  const IS_MOBILE = (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches);
+  const PERF = {
+    shadowMult: IS_MOBILE ? 0.35 : 0.7,   // global glow multiplier
+    particleMult: IS_MOBILE ? 0.6 : 1,    // fewer particles on mobile
+    dprCap: IS_MOBILE ? 1.5 : 2,          // lower pixel density on mobile
+    maxParticles: IS_MOBILE ? 70 : 120,   // hard cap on live particles
+    maxFloats: 30,                        // hard cap on floating texts
+  };
+
   const CORRIDOR_CFG = { VP_X: 0.5, VP_Y: 0.38, FLOOR_Y: 0.85, CEIL_Y: 0.08 };
 
   const PLAYER_CFG = {
@@ -153,6 +165,7 @@
       enemies: [], particles: [], floats: [], powerups: [], trails: [],
       enemiesKilled: 0, totalKills: 0, bossActive: false, bossWarning: 0,
     });
+    resetHudCache();
   }
 
   // ===========================================================
@@ -186,6 +199,7 @@
   }
 
   function spawnFloat(x, y, text, color, size) {
+    if (S.floats.length >= PERF.maxFloats) S.floats.shift();
     S.floats.push({ x, y, text, color, size: size || 16, life: 50, vy: -1.5 });
   }
 
@@ -277,7 +291,9 @@
   }
 
   function spawnParticles(x, y, color, n) {
+    n = Math.max(1, Math.round(n * PERF.particleMult));
     for (let i = 0; i < n; i++) {
+      if (S.particles.length >= PERF.maxParticles) S.particles.shift();
       const a = Math.random() * Math.PI * 2, sp = 1 + Math.random() * 5;
       S.particles.push({
         x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1.5,
@@ -360,7 +376,7 @@
   // ===========================================================
 
   let canvas, ctx;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = Math.min(window.devicePixelRatio || 1, PERF.dprCap);
 
   function initRenderer() {
     canvas = document.getElementById('game');
@@ -444,7 +460,7 @@
     const fury = S.furyTimer > 0;
     const mc = fury ? COLORS.CYAN : COLORS.RED_B;
     const gc = fury ? COLORS.CYAN : COLORS.RED_G;
-    ctx.shadowColor = gc; ctx.shadowBlur = fury ? 30 : 20;
+    ctx.shadowColor = gc; ctx.shadowBlur = (fury ? 30 : 20) * PERF.shadowMult;
     ctx.fillStyle = mc;
     ctx.font = `900 ${p.s}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('战', 0, 0);
@@ -474,13 +490,13 @@
       ctx.save(); ctx.translate(ep.x, ep.y);
       ctx.globalAlpha = Math.min(1, (1 - e.depth) * 3);
       if (e.flash > 0) {
-        ctx.shadowColor = '#fff'; ctx.shadowBlur = 30; ctx.fillStyle = '#fff'; e.flash--;
+        ctx.shadowColor = '#fff'; ctx.shadowBlur = 30 * PERF.shadowMult; ctx.fillStyle = '#fff'; e.flash--;
       } else if (e.type === 'boss') {
-        ctx.shadowColor = COLORS.GOLD; ctx.shadowBlur = 20; ctx.fillStyle = COLORS.GOLD;
+        ctx.shadowColor = COLORS.GOLD; ctx.shadowBlur = 20 * PERF.shadowMult; ctx.fillStyle = COLORS.GOLD;
       } else if (e.type === 'shield') {
-        ctx.shadowColor = COLORS.CYAN; ctx.shadowBlur = 14; ctx.fillStyle = COLORS.CYAN;
+        ctx.shadowColor = COLORS.CYAN; ctx.shadowBlur = 14 * PERF.shadowMult; ctx.fillStyle = COLORS.CYAN;
       } else {
-        ctx.shadowColor = COLORS.GRN; ctx.shadowBlur = 12;
+        ctx.shadowColor = COLORS.GRN; ctx.shadowBlur = 12 * PERF.shadowMult;
         ctx.fillStyle = e.type === 'fast' ? COLORS.GRN_B : COLORS.GRN;
       }
       ctx.font = `900 ${ep.s}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -519,7 +535,7 @@
       ctx.globalAlpha = Math.min(1, f.life / 20); ctx.fillStyle = f.color;
       ctx.font = `700 ${f.size}px 'Chakra Petch', sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.shadowColor = f.color; ctx.shadowBlur = 8;
+      ctx.shadowColor = f.color; ctx.shadowBlur = 8 * PERF.shadowMult;
       ctx.fillText(f.text, f.x, f.y);
     }
     ctx.restore();
@@ -530,7 +546,7 @@
     for (const pu of S.powerups) {
       const pulse = 1 + Math.sin(S.tick * 0.15) * 0.15;
       ctx.globalAlpha = Math.min(1, pu.life / 30);
-      ctx.shadowColor = pu.color; ctx.shadowBlur = 15; ctx.fillStyle = pu.color;
+      ctx.shadowColor = pu.color; ctx.shadowBlur = 15 * PERF.shadowMult; ctx.fillStyle = pu.color;
       ctx.font = `900 ${20 * pulse}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(pu.char, pu.x, pu.y);
       ctx.strokeStyle = pu.color; ctx.lineWidth = 1; ctx.globalAlpha *= 0.4;
@@ -565,7 +581,7 @@
     ctx.fillRect(bx - mw / 2, by, mw, 3);
     const fill = Math.min(1, S.combo / 20);
     const col = S.combo >= 10 ? COLORS.GOLD : COLORS.GRN_B;
-    ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 6;
+    ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 6 * PERF.shadowMult;
     ctx.fillRect(bx - mw / 2, by, mw * fill, 3);
     ctx.shadowBlur = 0; ctx.globalAlpha = 0.8; ctx.fillStyle = col;
     ctx.font = `700 ${Math.min(14, 10 + S.combo * 0.3)}px 'Chakra Petch', sans-serif`;
@@ -684,21 +700,41 @@
 
   const $ = id => document.getElementById(id);
 
+  // HUD diff cache — avoids touching the DOM (and rebuilding lives nodes)
+  // every frame. Previously updateHUD ran 60×/sec and recreated up to 5 div
+  // elements each call, which was the dominant cost on mobile.
+  const HUD_CACHE = { wave: -1, score: -1, hi: -1, combo: -1, lives: -1, maxLives: -1, fury: -1 };
+
+  function resetHudCache() {
+    HUD_CACHE.wave = HUD_CACHE.score = HUD_CACHE.hi = HUD_CACHE.combo = -1;
+    HUD_CACHE.lives = HUD_CACHE.maxLives = HUD_CACHE.fury = -1;
+  }
+
   function updateHUD() {
-    $('hudWave').textContent = S.wave;
-    $('hudScore').textContent = S.score.toLocaleString();
-    $('hudHi').textContent = 'HI ' + S.hi.toLocaleString();
-    $('hudCombo').textContent = S.combo > 1 ? `COMBO ×${S.combo}` : '';
-    const lc = $('hudLives'); lc.innerHTML = '';
-    for (let i = 0; i < S.maxLives; i++) {
-      const d = document.createElement('div');
-      d.className = 'hud-life' + (i >= S.lives ? ' lost' : '');
-      lc.appendChild(d);
+    if (HUD_CACHE.wave !== S.wave) { $('hudWave').textContent = S.wave; HUD_CACHE.wave = S.wave; }
+    if (HUD_CACHE.score !== S.score) { $('hudScore').textContent = S.score.toLocaleString(); HUD_CACHE.score = S.score; }
+    if (HUD_CACHE.hi !== S.hi) { $('hudHi').textContent = 'HI ' + S.hi.toLocaleString(); HUD_CACHE.hi = S.hi; }
+    if (HUD_CACHE.combo !== S.combo) {
+      $('hudCombo').textContent = S.combo > 1 ? `COMBO ×${S.combo}` : '';
+      HUD_CACHE.combo = S.combo;
     }
-    const furyEl = $('hudFury');
-    if (furyEl) {
-      if (S.furyTimer > 0) { furyEl.textContent = `FURY ${Math.ceil(S.furyTimer / 60)}s`; furyEl.style.display = 'block'; }
-      else furyEl.style.display = 'none';
+    if (HUD_CACHE.lives !== S.lives || HUD_CACHE.maxLives !== S.maxLives) {
+      const lc = $('hudLives'); lc.innerHTML = '';
+      for (let i = 0; i < S.maxLives; i++) {
+        const d = document.createElement('div');
+        d.className = 'hud-life' + (i >= S.lives ? ' lost' : '');
+        lc.appendChild(d);
+      }
+      HUD_CACHE.lives = S.lives; HUD_CACHE.maxLives = S.maxLives;
+    }
+    const furySec = S.furyTimer > 0 ? Math.ceil(S.furyTimer / 60) : 0;
+    if (HUD_CACHE.fury !== furySec) {
+      const furyEl = $('hudFury');
+      if (furyEl) {
+        if (furySec > 0) { furyEl.textContent = `FURY ${furySec}s`; furyEl.style.display = 'block'; }
+        else furyEl.style.display = 'none';
+      }
+      HUD_CACHE.fury = furySec;
     }
   }
 
