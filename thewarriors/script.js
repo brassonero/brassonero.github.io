@@ -17,23 +17,23 @@
     CYAN: '#33ddff', WHITE: '#ffffff',
   };
 
-  // Adaptive quality — cuts shadow blur, pixel density, and particle count
-  // on mobile / low-power devices. shadowBlur is by far the most expensive
-  // 2D-canvas op so this is where the framerate is recovered.
+  // Adaptive quality — mobile / low-power devices get reduced shadow blur,
+  // lower pixel density, and fewer particles. shadowBlur is the single most
+  // expensive 2D-canvas op; cutting it is the biggest win.
   const IS_MOBILE = (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches);
   const PERF = {
-    shadowMult: IS_MOBILE ? 0.35 : 0.7,
-    particleMult: IS_MOBILE ? 0.6 : 1,
-    dprCap: IS_MOBILE ? 1.5 : 2,
-    maxParticles: IS_MOBILE ? 70 : 120,
-    maxFloats: 30,
+    shadowMult: IS_MOBILE ? 0.35 : 0.7,   // global glow multiplier
+    particleMult: IS_MOBILE ? 0.6 : 1,    // fewer particles on mobile
+    dprCap: IS_MOBILE ? 1.5 : 2,          // lower pixel density on mobile
+    maxParticles: IS_MOBILE ? 70 : 120,   // hard cap on live particles
+    maxFloats: 30,                        // hard cap on floating texts
   };
 
   const CORRIDOR_CFG = { VP_X: 0.5, VP_Y: 0.38, FLOOR_Y: 0.85, CEIL_Y: 0.08 };
 
   const PLAYER_CFG = {
     DEPTH: 0.05, LANE_SCALE: 0.7, MOVE_SPEED: 0.04, LERP: 0.15,
-    SIZE_FACTOR: 0.07, ATTACK_CD: 12, ATTACK_RANGE: 0.27, ATTACK_DEPTH: 0.7,
+    SIZE_FACTOR: 0.07, ATTACK_CD: 12, ATTACK_RANGE: 0.18, ATTACK_DEPTH: 0.5,
     DASH_CD: 45, DASH_SPEED: 0.25, DASH_DUR: 6, IFRAMES: 20,
   };
 
@@ -467,15 +467,10 @@
     ctx.shadowBlur = 0; ctx.strokeStyle = gc; ctx.lineWidth = 1; ctx.strokeText('战', 0, 0);
 
     if (S.slashArc > 0) {
-      const fury2 = S.furyTimer > 0;
-      const rangeMult = fury2 ? 1.4 : 1;
-      const reach = Math.min(S.W, S.H) * PLAYER_CFG.ATTACK_RANGE * rangeMult;
-      ctx.strokeStyle = fury2 ? COLORS.CYAN : COLORS.GRN_B; ctx.lineWidth = 3;
+      ctx.strokeStyle = fury ? COLORS.CYAN : COLORS.GRN_B; ctx.lineWidth = 3;
       ctx.globalAlpha = S.slashArc / 10;
       const prog = 1 - S.slashArc / 10;
-      // Arc radius interpolates from the player body out to the actual hitbox reach.
-      const r = p.s + (reach - p.s) * prog;
-      ctx.beginPath(); ctx.arc(0, 0, r, S.slashAngle, S.slashAngle + Math.PI * prog * 1.4); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, p.s * (1 + prog * 1.5), S.slashAngle, S.slashAngle + Math.PI * prog * 1.2); ctx.stroke();
       S.slashArc--;
     }
 
@@ -705,8 +700,9 @@
 
   const $ = id => document.getElementById(id);
 
-  // HUD diff cache — only touch the DOM when values actually change.
-  // Previously updateHUD rebuilt the lives nodes every frame (~300 DOM ops/sec).
+  // HUD diff cache — avoids touching the DOM (and rebuilding lives nodes)
+  // every frame. Previously updateHUD ran 60×/sec and recreated up to 5 div
+  // elements each call, which was the dominant cost on mobile.
   const HUD_CACHE = { wave: -1, score: -1, hi: -1, combo: -1, lives: -1, maxLives: -1, fury: -1 };
 
   function resetHudCache() {
