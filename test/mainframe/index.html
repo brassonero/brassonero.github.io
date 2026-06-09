@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TEST CERTIFICACIÓN MAINFRAME — JCL · CICS · CHANGEMAN · COBOL · DB2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050805;
+  --screen-1:#081008;
+  --screen-2:#040804;
+  --green:#33e84a;        /* texto normal (campo desprotegido) */
+  --green-dim:#1c7e2a;    /* texto protegido / leyendas */
+  --green-int:#c7ffc7;    /* intensificado / blanco-verde */
+  --turq:#3ce0e0;         /* cian: etiquetas y cabeceras */
+  --yellow:#ffd23f;       /* selección / advertencia */
+  --red:#ff5454;          /* error / incorrecto */
+  --blue:#74a9ff;         /* acento raro */
+  --pink:#ff7ad0;
+  --line:#15431d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(120% 120% at 50% 0%, #0a140a 0%, var(--bg) 60%, #020402 100%);
+  min-height:100vh;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:24px 16px 48px;
+  font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color:var(--green);
+  -webkit-font-smoothing:antialiased;
+}
+.crt{
+  width:100%;max-width:1040px;
+  position:relative;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,.22) 3px, rgba(0,0,0,0) 4px),
+    linear-gradient(180deg, var(--screen-1), var(--screen-2));
+  border:1px solid #0e2c14;
+  border-radius:14px;
+  padding:22px clamp(16px,3.5vw,34px) 16px;
+  box-shadow:
+    0 0 0 2px #060b06,
+    0 0 60px rgba(40,180,60,.10),
+    inset 0 0 90px rgba(0,0,0,.7),
+    inset 0 0 12px rgba(40,200,70,.05);
+  overflow:hidden;
+  animation:boot .55s ease-out;
+}
+.crt::after{ /* scanline + curvatura sutil */
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:14px;
+  background:
+    radial-gradient(130% 120% at 50% 50%, transparent 62%, rgba(0,0,0,.45) 100%);
+  mix-blend-mode:multiply;
+}
+@keyframes boot{
+  0%{opacity:0;transform:scaleY(.6);filter:brightness(2.2)}
+  40%{opacity:1;filter:brightness(1.3)}
+  100%{opacity:1;transform:scaleY(1);filter:none}
+}
+@keyframes flick{0%,97%{opacity:1}98%{opacity:.93}100%{opacity:1}}
+.crt{animation:boot .55s ease-out}
+@media (prefers-reduced-motion:no-preference){
+  .glowtxt{animation:flick 6s infinite}
+}
+
+/* ---- cabecera estilo aplicación 3270 ---- */
+.term-head{
+  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  color:var(--turq);font-size:13px;letter-spacing:.5px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line);
+  text-shadow:0 0 6px rgba(60,224,224,.4);
+}
+.term-head .mid{color:var(--green-int);text-shadow:0 0 8px rgba(199,255,199,.45)}
+.term-head .r{color:var(--green-dim)}
+.term-foot{
+  margin-top:14px;padding-top:8px;border-top:1px dashed var(--line);
+  color:var(--green-dim);font-size:12px;letter-spacing:.4px;
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.term-foot b{color:var(--turq);font-weight:600}
+.cur{display:inline-block;width:.62em;height:1.05em;background:var(--green);
+  vertical-align:-2px;margin-left:2px;animation:blink 1.05s steps(1) infinite;box-shadow:0 0 8px var(--green)}
+@keyframes blink{50%{opacity:0}}
+
+.screen{min-height:420px;padding:18px 2px 4px}
+
+/* ---- pantalla de inicio ---- */
+.logo{
+  font-family:"VT323",monospace;line-height:.95;color:var(--green-int);
+  font-size:clamp(34px,7vw,60px);letter-spacing:1px;margin:6px 0 2px;
+  text-shadow:0 0 14px rgba(80,255,120,.5),0 0 2px rgba(120,255,150,.8);
+}
+.logo small{display:block;font-family:"IBM Plex Mono";font-size:13px;letter-spacing:3px;
+  color:var(--turq);text-shadow:0 0 8px rgba(60,224,224,.4);margin-top:6px}
+.lead{color:var(--green);max-width:74ch;line-height:1.6;margin:18px 0 6px;font-size:14px}
+.lead .hl{color:var(--yellow)}
+.divr{border:0;border-top:1px solid var(--line);margin:18px 0}
+
+.cfg{display:grid;gap:18px;margin-top:6px}
+.cfg h3{color:var(--turq);font-size:13px;letter-spacing:2px;font-weight:600;margin:0 0 8px;
+  text-transform:uppercase;text-shadow:0 0 6px rgba(60,224,224,.3)}
+.topicgrid{display:flex;flex-wrap:wrap;gap:8px}
+.tgl{
+  cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--green-dim);
+  font:inherit;font-size:14px;padding:7px 12px;border-radius:4px;letter-spacing:.5px;
+  transition:.12s;user-select:none;
+}
+.tgl .mk{color:var(--green-dim)}
+.tgl[data-on="1"]{color:var(--green-int);border-color:#2c7e3a;background:rgba(40,160,60,.10);
+  text-shadow:0 0 8px rgba(120,255,150,.4)}
+.tgl[data-on="1"] .mk{color:var(--green)}
+.tgl:hover{border-color:#3aa84d;color:var(--green)}
+.opts-inline{display:flex;flex-wrap:wrap;gap:6px}
+.pill{
+  cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--green-dim);
+  font:inherit;font-size:14px;padding:7px 14px;border-radius:999px;letter-spacing:.5px;transition:.12s
+}
+.pill[data-on="1"]{color:#06140a;background:var(--yellow);border-color:var(--yellow);font-weight:600;
+  box-shadow:0 0 14px rgba(255,210,63,.35)}
+.pill:hover{border-color:#3aa84d}
+.pill[data-on="1"]:hover{border-color:var(--yellow)}
+
+.go{
+  margin-top:6px;cursor:pointer;font:inherit;font-size:16px;letter-spacing:2px;font-weight:600;
+  color:var(--green-int);background:transparent;border:1px solid #2c7e3a;border-radius:6px;
+  padding:13px 26px;transition:.14s;text-shadow:0 0 8px rgba(120,255,150,.4)
+}
+.go:hover{background:var(--green-int);color:#04120a;box-shadow:0 0 22px rgba(120,255,150,.45);text-shadow:none}
+.warnmsg{color:var(--red);font-size:13px;min-height:18px;letter-spacing:.5px}
+
+/* ---- pantalla de preguntas ---- */
+.qbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.badge{font-size:12px;letter-spacing:1.5px;color:var(--turq);border:1px solid var(--line);
+  padding:3px 9px;border-radius:4px;text-shadow:0 0 6px rgba(60,224,224,.3)}
+.badge.k{color:var(--green-dim);margin-left:6px}
+.qnum{color:var(--green-dim);font-size:13px;letter-spacing:1px}
+.qnum b{color:var(--green-int)}
+.track{height:6px;background:#0c220f;border:1px solid var(--line);border-radius:3px;overflow:hidden;margin:8px 0 22px}
+.fill{height:100%;background:linear-gradient(90deg,#1c7e2a,var(--green));box-shadow:0 0 10px rgba(60,232,80,.5);
+  width:0;transition:width .25s ease}
+.qtext{font-size:clamp(16px,2.4vw,19px);line-height:1.55;color:var(--green-int);margin:4px 0 16px;
+  text-shadow:0 0 8px rgba(150,255,170,.25)}
+.code{
+  white-space:pre;overflow:auto;background:rgba(0,0,0,.45);border:1px solid var(--line);
+  border-left:3px solid var(--turq);border-radius:5px;padding:13px 15px;margin:0 0 18px;
+  font-size:13.5px;line-height:1.5;color:var(--green);
+}
+.code .lbl{display:block;color:var(--turq);font-size:11px;letter-spacing:2px;margin-bottom:7px}
+.opt{
+  display:flex;gap:12px;align-items:flex-start;cursor:pointer;border:1px solid var(--line);
+  background:rgba(20,60,28,.10);border-radius:6px;padding:12px 14px;margin-bottom:10px;
+  transition:.12s;font-size:15px;line-height:1.45;color:var(--green)
+}
+.opt .key{flex:0 0 auto;color:var(--green-dim);font-weight:600;min-width:1.4em}
+.opt:hover{border-color:#3aa84d;background:rgba(40,160,60,.12)}
+.opt[data-sel="1"]{border-color:var(--yellow);background:rgba(255,210,63,.12);color:var(--green-int)}
+.opt[data-sel="1"] .key{color:var(--yellow)}
+.opt[data-sel="1"]::before{content:"►";color:var(--yellow);margin-right:-4px}
+.opt[data-state="ok"]{border-color:#2fae3c;background:rgba(40,170,60,.18);color:var(--green-int)}
+.opt[data-state="ok"] .key{color:var(--green)}
+.opt[data-state="ok"]::after{content:"✓ CORRECTA";margin-left:auto;color:var(--green);font-size:12px;letter-spacing:1px;white-space:nowrap}
+.opt[data-state="bad"]{border-color:#b83838;background:rgba(200,60,60,.16);color:#ffc9c9}
+.opt[data-state="bad"] .key{color:var(--red)}
+.opt[data-state="bad"]::after{content:"✗ TU RESPUESTA";margin-left:auto;color:var(--red);font-size:12px;letter-spacing:1px;white-space:nowrap}
+.opt.lock{cursor:default}
+.expl{border:1px dashed var(--line);border-left:3px solid var(--yellow);border-radius:5px;
+  padding:12px 14px;margin:2px 0 4px;color:var(--green);font-size:14px;line-height:1.55;display:none}
+.expl b{color:var(--yellow)}
+.expl.show{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap}
+.btn{cursor:pointer;font:inherit;font-size:14px;letter-spacing:1.5px;color:var(--green);
+  background:transparent;border:1px solid var(--line);border-radius:6px;padding:11px 20px;transition:.13s}
+.btn:hover:not(:disabled){border-color:#3aa84d;color:var(--green-int);background:rgba(40,160,60,.10)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn.prim{color:var(--green-int);border-color:#2c7e3a;text-shadow:0 0 8px rgba(120,255,150,.35)}
+.btn.prim:hover{background:var(--green-int);color:#04120a;box-shadow:0 0 18px rgba(120,255,150,.4);text-shadow:none}
+.btn.fin{color:var(--yellow);border-color:#9a7d18}
+.btn.fin:hover{background:var(--yellow);color:#06140a;box-shadow:0 0 18px rgba(255,210,63,.4)}
+
+/* ---- resultados ---- */
+.res-score{font-family:"VT323",monospace;font-size:clamp(72px,16vw,140px);line-height:.85;
+  color:var(--green-int);text-shadow:0 0 24px rgba(80,255,120,.5);margin:6px 0}
+.res-score.fail{color:#ff8f8f;text-shadow:0 0 24px rgba(255,80,80,.45)}
+.verdict{font-size:18px;letter-spacing:3px;font-weight:600}
+.verdict.pass{color:var(--green)} .verdict.no{color:var(--red)}
+.stats{display:flex;flex-wrap:wrap;gap:24px;margin:16px 0 6px;color:var(--green-dim);font-size:14px}
+.stats b{color:var(--green-int);font-size:18px;display:block;letter-spacing:1px}
+.stats .red b{color:var(--red)}
+.bytopic{margin:22px 0;display:grid;gap:10px;max-width:560px}
+.tr{display:grid;grid-template-columns:120px 1fr 62px;align-items:center;gap:12px;font-size:13px}
+.tr .nm{color:var(--turq);letter-spacing:1px}
+.tr .mt{height:10px;background:#0c220f;border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.tr .mf{height:100%;background:linear-gradient(90deg,#1c7e2a,var(--green));box-shadow:0 0 8px rgba(60,232,80,.4)}
+.tr .vl{color:var(--green-int);text-align:right;letter-spacing:.5px}
+
+#review{display:none;margin-top:16px}
+#review.show{display:block}
+.rv{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-bottom:12px;background:rgba(0,0,0,.25)}
+.rv .h{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px;font-size:12px}
+.rv .tag{color:var(--turq);border:1px solid var(--line);padding:2px 8px;border-radius:4px;letter-spacing:1px}
+.rv . st.ok{color:var(--green)} .rv .st.bad{color:var(--red)}
+.rv .q{color:var(--green-int);font-size:14px;line-height:1.5;margin-bottom:8px}
+.rv pre{white-space:pre;overflow:auto;background:rgba(0,0,0,.4);border-left:3px solid var(--turq);
+  padding:9px 12px;border-radius:4px;font-size:12.5px;color:var(--green);margin:0 0 8px}
+.rv .ln{font-size:13px;line-height:1.5;margin:3px 0}
+.rv .ln .lab{color:var(--green-dim);letter-spacing:.5px}
+.rv .ln.you .lab{color:var(--red)} .rv .ln.you .v{color:#ffc9c9}
+.rv .ln.cor .lab{color:var(--green)} .rv .ln.cor .v{color:var(--green-int)}
+.rv .ex{font-size:13px;color:var(--green);line-height:1.5;margin-top:7px;padding-top:7px;border-top:1px dashed var(--line)}
+.rv .ex b{color:var(--yellow)}
+.hide{display:none!important}
+::-webkit-scrollbar{height:8px;width:8px}
+::-webkit-scrollbar-thumb{background:#1c5226;border-radius:4px}
+/* ===== RESPONSIVE ===== */
+@media(max-width:760px){
+  .bytopic{max-width:100%}
+}
+@media(max-width:640px){
+  body{padding:12px 8px 30px}
+  .crt{border-radius:11px;padding:16px clamp(11px,3.4vw,18px) 12px}
+  .crt::after{border-radius:11px}
+  .screen{min-height:0;padding:14px 0 2px}
+
+  .term-head{font-size:11px;letter-spacing:.3px;gap:6px}
+  .term-head .r{flex-basis:100%}              /* ROW/COL en su propia línea */
+  .term-foot{font-size:10px;letter-spacing:.2px;gap:6px;flex-direction:column}
+
+  .logo small{font-size:11px;letter-spacing:2px}
+  .lead{font-size:13px;line-height:1.55;margin:14px 0 4px}
+  .divr{margin:14px 0}
+  .cfg{gap:14px}
+  .cfg h3{font-size:12px;letter-spacing:1.5px}
+  .tgl,.pill{font-size:13px;padding:7px 11px}
+  .go{width:100%;text-align:center;font-size:15px;padding:13px 16px}
+
+  .qbar{margin-bottom:4px}
+  .badge{font-size:11px;letter-spacing:1px;padding:3px 7px}
+  .track{margin:8px 0 16px}
+  .qtext{font-size:16px;line-height:1.5;margin-bottom:13px}
+  .code{font-size:12px;padding:11px 12px;margin-bottom:14px}
+
+  .opt{font-size:14px;line-height:1.4;padding:11px 12px;gap:9px;margin-bottom:8px;flex-wrap:wrap}
+  .opt .key{min-width:1.3em}
+  /* la etiqueta CORRECTA/TU RESPUESTA pasa a su propia línea en móvil */
+  .opt[data-state="ok"]::after,
+  .opt[data-state="bad"]::after{margin-left:0;flex-basis:100%;margin-top:6px;padding-left:2.2em;font-size:11px}
+  .expl{font-size:13px;padding:11px 12px}
+
+  .nav{gap:8px}
+  .nav .btn{flex:1 1 0;text-align:center;padding:11px 10px;font-size:12px;letter-spacing:.8px}
+
+  .res-score{font-size:clamp(60px,22vw,108px)}
+  .verdict{font-size:16px;letter-spacing:2px}
+  .stats{gap:16px}
+  .stats b{font-size:16px}
+  .tr{grid-template-columns:76px 1fr 50px;gap:9px;font-size:12px}
+  .rv{padding:12px 13px}
+  .rv .q{font-size:13px}
+  .rv pre{font-size:12px}
+}
+@media(max-width:380px){
+  .opts-inline{gap:5px}
+  .tgl,.pill{font-size:12px;padding:6px 9px}
+  .qtext{font-size:15px}
+  .opt{font-size:13.5px}
+  .nav .btn{font-size:11px;letter-spacing:.4px;padding:11px 6px}
+  .tr{grid-template-columns:64px 1fr 46px;gap:7px}
+}
+
+</style>
+</head>
+<body>
+<main class="crt">
+  <div class="term-head">
+    <span class="l">ZMF0001&nbsp;&nbsp;USER.<span id="hUser">SYSPROG</span></span>
+    <span class="mid glowtxt">CERTIFICACIÓN MAINFRAME</span>
+    <span class="r"><span id="hPos">ROW 001 COL 001</span></span>
+  </div>
+
+  <section class="screen" id="screen">
+
+    <!-- ============ INICIO ============ -->
+    <div id="start">
+      <div class="logo glowtxt">TEST z/OS<small>JCL · CICS · CHANGEMAN · COBOL · DB2</small></div>
+      <p class="lead">
+        Banco de <span class="hl">100 preguntas</span> de opción múltiple: teoría y
+        <span class="hl">casos de código</span> (JCL, EXEC CICS, COBOL, SQL embebido). El orden de las
+        preguntas y de las respuestas se <span class="hl">aleatoriza</span> en cada intento, y
+        <span class="hl">cada respuesta se corrige al instante</span>. Aprobado a partir del <span class="hl">70%</span>.
+      </p>
+      <hr class="divr">
+      <div class="cfg">
+        <div>
+          <h3>// Temas a evaluar</h3>
+          <div class="topicgrid" id="topics">
+            <button class="tgl" data-topic="JCL"       data-on="1"><span class="mk">[X]</span> JCL</button>
+            <button class="tgl" data-topic="CICS"      data-on="1"><span class="mk">[X]</span> CICS</button>
+            <button class="tgl" data-topic="CHANGEMAN" data-on="1"><span class="mk">[X]</span> CHANGEMAN</button>
+            <button class="tgl" data-topic="COBOL"     data-on="1"><span class="mk">[X]</span> COBOL</button>
+            <button class="tgl" data-topic="DB2"       data-on="1"><span class="mk">[X]</span> DB2</button>
+          </div>
+        </div>
+        <div>
+          <h3>// Número de preguntas</h3>
+          <div class="opts-inline" id="counts">
+            <button class="pill" data-count="10">10</button>
+            <button class="pill" data-count="25" data-on="1">25</button>
+            <button class="pill" data-count="50">50</button>
+            <button class="pill" data-count="100">100</button>
+          </div>
+        </div>
+        <div>
+          <button class="go" id="btnStart">INICIAR TEST&nbsp;<span class="cur"></span></button>
+          <p class="warnmsg" id="warn"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PREGUNTA ============ -->
+    <div id="quiz" class="hide">
+      <div class="qbar">
+        <span><span class="badge" id="qTopic">JCL</span><span class="badge k" id="qKind">TEÓRICA</span></span>
+        <span class="qnum">PREGUNTA <b id="qN">01</b> / <span id="qT">25</span></span>
+      </div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div id="qBody"></div>
+      <div class="expl" id="expl"></div>
+      <div class="nav">
+        <button class="btn" id="btnPrev">◄ PF7 ATRÁS</button>
+        <button class="btn prim" id="btnNext">PF8 AVANCE ►</button>
+      </div>
+    </div>
+
+    <!-- ============ RESULTADOS ============ -->
+    <div id="results" class="hide">
+      <div class="qbar"><span class="badge">RESULTADO DEL TEST</span></div>
+      <div class="res-score" id="rScore">0%</div>
+      <div class="verdict" id="rVerdict">—</div>
+      <div class="stats">
+        <div><b id="rOk">0</b>correctas</div>
+        <div class="red"><b id="rBad">0</b>incorrectas</div>
+        <div><b id="rTot">0</b>total</div>
+        <div><b id="rTime">00:00</b>tiempo</div>
+      </div>
+      <div class="bytopic" id="byTopic"></div>
+      <div class="nav">
+        <button class="btn" id="btnReview">REVISAR RESPUESTAS</button>
+        <button class="btn" id="btnRetry">REINTENTAR</button>
+        <button class="btn prim" id="btnNew">NUEVO TEST</button>
+      </div>
+      <div id="review"></div>
+    </div>
+
+  </section>
+
+  <div class="term-foot">
+    <span><b>A–D</b> seleccionar &nbsp; <b>←/→</b> navegar &nbsp; <b>ENTER</b> avanzar &nbsp; <b>PF7/PF8</b> atrás/avance</span>
+    <span id="footStat"><b>X</b> SYSTEM &nbsp; <span id="clock">00:00</span></span>
+  </div>
+</main>
+
+<script>
+/* ===================== BANCO DE PREGUNTAS (100) ===================== */
+/* t=tema  k=T(teoría)/C(código)  c=código  o=opciones  a=índice correcto  e=explicación */
+const QUESTIONS=[
+/*Q*/{id:1,t:'JCL',k:'T',q:'¿Qué parámetro del DD statement indica la disposición del dataset (qué hacer antes, al terminar normal y al terminar anormal)?',o:[`SPACE`,`DCB`,`DISP`,`UNIT`],a:2,e:`DISP=(estado, disp-normal, disp-anormal). Ej: DISP=(NEW,CATLG,DELETE).`},
+/*Q*/{id:2,t:'JCL',k:'C',q:'En DISP=(NEW,CATLG,DELETE), si el step termina con ABEND, ¿qué pasa con el dataset?',c:`//DD1 DD DSN=USER.TEST.FILE,\n//   DISP=(NEW,CATLG,DELETE),\n//   SPACE=(TRK,(5,2)),UNIT=SYSDA`,o:[`Se cataloga igualmente`,`Se conserva sin catalogar (KEEP)`,`Se borra (DELETE)`,`Queda en estado NEW`],a:2,e:`El 3er subparámetro es la disposición ANORMAL. Aquí es DELETE, así que ante ABEND el dataset se borra.`},
+/*Q*/{id:3,t:'JCL',k:'C',q:'¿Qué hace este step?',c:`//STEP01 EXEC PGM=IEFBR14\n//DD1 DD DSN=USER.TEST.FILE,\n//   DISP=(NEW,CATLG,DELETE),\n//   SPACE=(TRK,(5,2)),UNIT=SYSDA`,o:[`Copia un archivo a otro`,`Crea (asigna) y cataloga un dataset vacío`,`Borra el dataset existente`,`Ordena registros`],a:1,e:`IEFBR14 es un programa "no hace nada"; la asignación/catalogación ocurre por el DD con DISP. Resultado: dataset vacío catalogado.`},
+/*Q*/{id:4,t:'JCL',k:'T',q:'¿Qué utility se usa típicamente para copiar un dataset secuencial a otro (copia simple)?',o:[`IDCAMS`,`IEBGENER`,`IEFBR14`,`ICETOOL`],a:1,e:`IEBGENER copia secuencial→secuencial. IDCAMS es para VSAM; IEFBR14 no hace nada.`},
+/*Q*/{id:5,t:'JCL',k:'T',q:'¿Cuál es la longitud máxima del nombre de un job (en el JOB statement)?',o:[`6 caracteres`,`8 caracteres`,`16 caracteres`,`44 caracteres`],a:1,e:`Jobname, stepname y ddname admiten hasta 8 caracteres. 44 es el largo máximo del DSN.`},
+/*Q*/{id:6,t:'JCL',k:'C',q:'¿Cuándo se EJECUTA STEP02?',c:`//STEP02 EXEC PGM=MYPROG,\n//   COND=(4,LT,STEP01)`,o:[`Siempre, sin condición`,`Sólo si el RC de STEP01 es <= 4 (se omite si 4 < RC)`,`Sólo si el RC de STEP01 es exactamente 4`,`Nunca`],a:1,e:`COND tiene lógica invertida: si la condición es VERDADERA el step se OMITE. (4,LT,STEP01) es verdad si 4<RC, por eso STEP02 corre sólo cuando RC<=4.`},
+/*Q*/{id:7,t:'JCL',k:'T',q:'¿Qué concatenación indica dónde buscar el programa con alcance de TODO el job?',o:[`STEPLIB`,`JOBLIB`,`SYSLIB`,`ISPLLIB`],a:1,e:`JOBLIB (tras el JOB statement) aplica a todos los steps; STEPLIB aplica a un único step y tiene prioridad sobre JOBLIB.`},
+/*Q*/{id:8,t:'JCL',k:'C',q:'¿Qué hace este control de SORT?',c:`//SYSIN DD *\n  SORT FIELDS=(1,5,CH,A)\n/*`,o:[`Ordena DESCENDENTE por bytes 1 a 5`,`Ordena ASCENDENTE por los bytes 1 a 5, formato caracter`,`Suma los bytes 1 a 5`,`Filtra registros que empiezan con 5`],a:1,e:`SORT FIELDS=(posición,longitud,formato,orden). CH=caracter, A=ascendente. Ordena por los primeros 5 bytes.`},
+/*Q*/{id:9,t:'JCL',k:'T',q:'¿Qué representa un GDG en JCL?',o:[`Global Data Get`,`Generation Data Group`,`General Data Generator`,`Group DD General`],a:1,e:`GDG = Generation Data Group: grupo de datasets generacionales referidos como (+1), (0), (-1)...`},
+/*Q*/{id:10,t:'JCL',k:'C',q:'Para crear/referir la NUEVA generación de un GDG dentro del job actual, ¿qué se usa?',c:`//OUT DD DSN=USER.GDG.FILE(___),\n//   DISP=(NEW,CATLG)`,o:[`(0)`,`(+1)`,`(-1)`,`(*)`],a:1,e:`(+1) crea la nueva generación; (0) es la actual; (-1) la anterior.`},
+/*Q*/{id:11,t:'JCL',k:'T',q:'¿Qué significa //SYSIN DD *?',o:[`Define datos en línea (instream), hasta /* o la siguiente sentencia //`,`Asigna un dataset VSAM`,`Comenta el resto del JCL`,`Repite el step anterior`],a:0,e:`DD * inicia datos instream que terminan con /* o con la siguiente sentencia //.`},
+/*Q*/{id:12,t:'JCL',k:'T',q:'¿Qué parámetro especifica la cantidad de espacio en disco para un dataset nuevo?',o:[`DCB`,`SPACE`,`DISP`,`UNIT`],a:1,e:`SPACE=(unidad,(primaria,secundaria,directorio)). DCB define características; UNIT el tipo de dispositivo.`},
+/*Q*/{id:13,t:'JCL',k:'C',q:'¿Qué hace NOTIFY=&SYSUID?',c:`//JOBX JOB (ACCT),'NAME',CLASS=A,\n//   MSGCLASS=X,NOTIFY=&SYSUID`,o:[`Cancela el job al iniciar`,`Notifica al userid que envió el job cuando termina`,`Asigna prioridad máxima`,`Aumenta la región de memoria`],a:1,e:`&SYSUID se resuelve al userid del que hace el submit; NOTIFY envía un mensaje al completar el job.`},
+/*Q*/{id:14,t:'JCL',k:'T',q:'Un return code (RC) de 0 normalmente significa:',o:[`Ejecución exitosa, sin advertencias`,`Advertencia`,`Error`,`ABEND del sistema`],a:0,e:`Escala típica: 0 OK, 4 warning, 8 error, 12 grave, 16 severo.`},
+/*Q*/{id:15,t:'JCL',k:'C',q:'Si un step termina con S0C7, ¿qué problema indica normalmente?',c:`IEC...  COMPLETION CODE\n        SYSTEM = 0C7`,o:[`Falta de espacio en disco`,`Dirección inválida (protección)`,`Datos no numéricos en operación numérica (data exception)`,`División por cero`],a:2,e:`S0C7 = excepción de datos: típico al operar con un campo numérico/COMP-3 que contiene basura (no inicializado).`},
+/*Q*/{id:16,t:'JCL',k:'T',q:'¿Qué utility ofrece DEFINE, DELETE, REPRO y LISTCAT (servicios de VSAM/catálogo)?',o:[`IDCAMS`,`IEBGENER`,`IEFBR14`,`DFSORT`],a:0,e:`IDCAMS = Access Method Services, usado para administrar VSAM y catálogos.`},
+/*Q*/{id:17,t:'JCL',k:'C',q:'¿Qué implica DISP=SHR?',c:`//DD1 DD DSN=A.B.C,DISP=SHR`,o:[`El dataset se crea exclusivo`,`El dataset existe y se accede compartido (no exclusivo)`,`El dataset se borra al terminar`,`Es un dataset temporal`],a:1,e:`SHR = SHARE: el dataset ya existe y otros jobs pueden accederlo a la vez. Equivale a (SHR,KEEP,KEEP).`},
+/*Q*/{id:18,t:'JCL',k:'T',q:'Diferencia entre PROC instream y catalogada:',o:[`Son idénticas`,`Instream se define dentro del JCL (termina en PEND); catalogada reside en una PROCLIB`,`Catalogada sólo corre en TSO`,`Instream no admite símbolos`],a:1,e:`La instream se escribe en el mismo miembro y se cierra con // PEND; la catalogada está en una biblioteca de PROCs.`},
+/*Q*/{id:19,t:'JCL',k:'T',q:'¿Qué DD statement se usa para obtener un dump formateado ante un ABEND?',o:[`SYSPRINT`,`SYSIN`,`SYSUDUMP (o SYSABEND/SYSMDUMP)`,`SYSOUT`],a:2,e:`SYSUDUMP da un dump de usuario; SYSABEND uno más completo; SYSMDUMP en binario para IPCS.`},
+/*Q*/{id:20,t:'JCL',k:'C',q:'¿Cómo recibe un programa COBOL el valor de PARM?',c:`//STEP1 EXEC PGM=PROG1,PARM='ABC,123'`,o:[`Por la FILE SECTION`,`En LINKAGE SECTION: media palabra de longitud (S9(4) COMP) seguida del texto`,`Como un copybook`,`Vía SYSIN obligatoriamente`],a:1,e:`El PARM llega a LINKAGE como un campo de 2 bytes con la longitud y a continuación los datos.`},
+
+/*Q*/{id:21,t:'CICS',k:'T',q:'¿Qué bloque de control contiene EIBCALEN, EIBTRNID, EIBDATE y datos del entorno de la transacción?',o:[`COMMAREA`,`EIB (EXEC Interface Block)`,`TWA`,`CSA`],a:1,e:`El EIB es el bloque que CICS mantiene por tarea con información del estado de la transacción.`},
+/*Q*/{id:22,t:'CICS',k:'T',q:'¿Qué comando transfiere el control a otro programa SIN retorno al que llama?',o:[`LINK`,`XCTL`,`RETURN`,`START`],a:1,e:`XCTL (transfer control) no regresa; LINK sí regresa, como un CALL.`},
+/*Q*/{id:23,t:'CICS',k:'T',q:'¿Qué comando llama a otro programa esperando que el control RETORNE?',o:[`XCTL`,`LINK`,`ABEND`,`SEND`],a:1,e:`LINK invoca el programa y al terminar éste el control vuelve a la instrucción siguiente.`},
+/*Q*/{id:24,t:'CICS',k:'T',q:'¿Qué es la COMMAREA en CICS?',o:[`Una cola de mensajes`,`Un área de comunicación para pasar datos entre programas/transacciones`,`El log de transacciones`,`Un mapa BMS`],a:1,e:`COMMAREA = Communication Area; transporta datos entre LINK/XCTL y entre pasos pseudo-conversacionales.`},
+/*Q*/{id:25,t:'CICS',k:'C',q:'¿Qué hace este comando?',c:`EXEC CICS RECEIVE MAP('MAP1')\n     MAPSET('MSET1')\n     INTO(WS-MAP)\nEND-EXEC.`,o:[`Envía un mapa a la pantalla`,`Recibe los datos tecleados en el mapa BMS hacia el área de trabajo`,`Borra la pantalla`,`Lee un archivo VSAM`],a:1,e:`RECEIVE MAP lee de la terminal el mapa indicado y mueve los datos a la estructura INTO.`},
+/*Q*/{id:26,t:'CICS',k:'T',q:'¿Qué caracteriza a una transacción pseudo-conversacional?',o:[`Mantiene la tarea activa esperando al usuario`,`El programa hace RETURN tras enviar la pantalla y libera recursos; se reanuda con TRANSID al recibir entrada`,`No usa terminal`,`Sólo corre en batch`],a:1,e:`Pseudo-conversacional: no hay tarea esperando; se libera memoria entre interacciones y se retoma vía TRANSID/COMMAREA.`},
+/*Q*/{id:27,t:'CICS',k:'C',q:'¿Qué patrón implementa este RETURN?',c:`EXEC CICS RETURN\n     TRANSID('TRN1')\n     COMMAREA(WS-COMM)\n     LENGTH(100)\nEND-EXEC.`,o:[`Conversacional puro`,`Pseudo-conversacional: define la próxima transacción y pasa la COMMAREA`,`Un XCTL implícito`,`Un SYNCPOINT`],a:1,e:`RETURN TRANSID(...) COMMAREA(...) reanuda la lógica en el siguiente teclazo sin mantener la tarea viva.`},
+/*Q*/{id:28,t:'CICS',k:'T',q:'En una transacción pseudo-conversacional, ¿qué valor tiene EIBCALEN la PRIMERA vez (sin COMMAREA previa)?',o:[`0`,`100`,`Longitud del mapa`,`-1`],a:0,e:`EIBCALEN=0 indica que no hay COMMAREA recibida → es el primer paso de la transacción.`},
+/*Q*/{id:29,t:'CICS',k:'T',q:'¿Qué comando escribe en una cola de Temporary Storage (TS)?',o:[`WRITE`,`WRITEQ TD`,`WRITEQ TS`,`SEND`],a:2,e:`WRITEQ TS escribe en almacenamiento temporal; WRITEQ TD en datos transitorios.`},
+/*Q*/{id:30,t:'CICS',k:'T',q:'Diferencia clave entre Temporary Storage (TS) y Transient Data (TD):',o:[`Son lo mismo`,`TS: lectura aleatoria y relectura; TD: secuencial, lectura destructiva y puede disparar tareas (ATI)`,`TD es más rápido siempre`,`TS sólo en memoria, TD nunca`],a:1,e:`TS permite acceso por número de ítem y releer; TD es secuencial, se lee una vez y soporta trigger automático.`},
+/*Q*/{id:31,t:'CICS',k:'T',q:'¿Qué comando "clásico" intercepta condiciones excepcionales y transfiere a una rutina?',o:[`HANDLE CONDITION`,`IGNORE CONDITION`,`ABEND`,`ASSIGN`],a:0,e:`HANDLE CONDITION ramifica a rutinas ante condiciones (NOTFND, etc.). Hoy se prefiere la opción RESP.`},
+/*Q*/{id:32,t:'CICS',k:'T',q:'¿Qué opción se recomienda hoy para verificar el resultado de un comando CICS?',o:[`GETMAIN`,`La opción RESP (y RESP2) comparada con DFHRESP(...)`,`HANDLE ABEND`,`ENTER`],a:1,e:`RESP captura el código de respuesta; se compara con DFHRESP(NORMAL), DFHRESP(NOTFND), etc.`},
+/*Q*/{id:33,t:'CICS',k:'C',q:'¿Qué se está comprobando aquí?',c:`EXEC CICS READ FILE('CUSTFILE')\n     INTO(WS-REC) RIDFLD(WS-KEY)\n     RESP(WS-RESP) END-EXEC.\nIF WS-RESP = DFHRESP(NOTFND)\n   ...`,o:[`Si el archivo está bloqueado`,`Si el registro NO fue encontrado`,`Si hubo fin de archivo`,`Si la COMMAREA está vacía`],a:1,e:`DFHRESP(NOTFND) indica que no existe un registro con esa clave (RIDFLD).`},
+/*Q*/{id:34,t:'CICS',k:'T',q:'¿Qué ABEND de CICS corresponde a un program check (p.ej. un S0C7 bajo CICS)?',o:[`AEIV`,`ASRA`,`AICA`,`APCT`],a:1,e:`ASRA es la abend por excepción de programa. APCT = programa no encontrado; AICA = bucle/runaway.`},
+/*Q*/{id:35,t:'CICS',k:'T',q:'¿Qué genera BMS (Basic Mapping Support)?',o:[`Reportes batch`,`Mapas de pantalla (mapsets) para terminales 3270`,`Tablas DB2`,`Colas TS`],a:1,e:`BMS define los mapas que formatean la pantalla del 3270 (campos, atributos, posiciones).`},
+/*Q*/{id:36,t:'CICS',k:'T',q:'¿Qué comando confirma los cambios recuperables y marca un punto de sincronización?',o:[`SYNCPOINT`,`RETURN`,`DELAY`,`SUSPEND`],a:0,e:`SYNCPOINT hace permanentes los cambios; SYNCPOINT ROLLBACK los deshace.`},
+/*Q*/{id:37,t:'CICS',k:'C',q:'Tras ejecutarse PROG2 con este LINK, ¿qué sucede?',c:`EXEC CICS LINK PROGRAM('PROG2')\n     COMMAREA(WS-AREA)\n     LENGTH(80) END-EXEC.`,o:[`El control NO regresa (como XCTL)`,`El control regresa a la instrucción siguiente del programa llamador`,`Inicia una nueva transacción`,`Termina la tarea`],a:1,e:`LINK es como un CALL: PROG2 se ejecuta y devuelve el control al punto siguiente del programa original.`},
+/*Q*/{id:38,t:'CICS',k:'T',q:'¿Qué identifica de forma única a una transacción CICS (1 a 4 caracteres) que teclea el usuario?',o:[`PROGRAM`,`TRANSID`,`MAPSET`,`TERMID`],a:1,e:`El TRANSID (1–4 caracteres) está definido en la PCT/CSD y arranca el programa asociado.`},
+/*Q*/{id:39,t:'CICS',k:'T',q:'¿Para qué sirven ENQ/DEQ en CICS?',o:[`Encriptar datos`,`Serializar el acceso a un recurso (bloqueo lógico) entre tareas`,`Enviar mapas`,`Confirmar transacciones`],a:1,e:`ENQ adquiere control exclusivo de un recurso lógico y DEQ lo libera, evitando accesos simultáneos.`},
+/*Q*/{id:40,t:'CICS',k:'C',q:'¿Qué obtiene esta secuencia?',c:`EXEC CICS ASKTIME\n     ABSTIME(WS-ABS) END-EXEC.\nEXEC CICS FORMATTIME\n     ABSTIME(WS-ABS)\n     DDMMYYYY(WS-DATE) END-EXEC.`,o:[`La hora del último login`,`La fecha/hora actuales y luego las formatea`,`El tiempo de CPU usado`,`La duración de la transacción`],a:1,e:`ASKTIME devuelve la hora absoluta; FORMATTIME la convierte a un formato legible (aquí DDMMYYYY).`},
+
+/*Q*/{id:41,t:'CHANGEMAN',k:'T',q:'En ChangeMan ZMF, ¿qué es un "package"?',o:[`Un compilador`,`Un contenedor lógico que agrupa los componentes de un cambio para implementarlos juntos`,`Una biblioteca de producción`,`Un job de batch`],a:1,e:`El package agrupa fuentes, loads, JCL, copybooks, etc. de un cambio y los hace avanzar por el ciclo de vida juntos.`},
+/*Q*/{id:42,t:'CHANGEMAN',k:'T',q:'¿Qué acción "congela" un package e impide modificarlo antes de aprobaciones?',o:[`FREEZE`,`DEMOTE`,`SCRATCH`,`BUILD`],a:0,e:`FREEZE bloquea el package; ya no se pueden añadir/editar componentes y queda listo para la aprobación.`},
+/*Q*/{id:43,t:'CHANGEMAN',k:'T',q:'¿Qué significa "promote" (promoción) en ChangeMan?',o:[`Instalar en producción`,`Mover/copiar componentes a un entorno de prueba superior (p.ej. QA) sin instalarlos en producción`,`Borrar el package`,`Aprobar el cambio`],a:1,e:`La promoción lleva los componentes a entornos de test cada vez más altos para validarlos antes del install.`},
+/*Q*/{id:44,t:'CHANGEMAN',k:'T',q:'¿Qué es la "baseline" en ChangeMan?',o:[`Un entorno de pruebas`,`La biblioteca con la versión actual/aprobada (de producción) de los componentes`,`El log de auditoría`,`Una cola de aprobación`],a:1,e:`La baseline contiene la versión vigente; el install actualiza la baseline (y permite backout a la anterior).`},
+/*Q*/{id:45,t:'CHANGEMAN',k:'T',q:'¿Qué operación revierte una promoción (saca componentes del entorno promovido)?',o:[`FREEZE`,`DEMOTE`,`INSTALL`,`AUDIT`],a:1,e:`DEMOTE es la inversa de PROMOTE: retira los componentes del entorno de prueba.`},
+/*Q*/{id:46,t:'CHANGEMAN',k:'T',q:'¿Qué función verifica la consistencia entre componentes (p.ej. que el fuente coincide con el load) de un package?',o:[`AUDIT`,`BUILD`,`PROMOTE`,`APPROVE`],a:0,e:`AUDIT detecta inconsistencias: regresiones, fuentes desincronizados del load, dependencias rotas, etc.`},
+/*Q*/{id:47,t:'CHANGEMAN',k:'T',q:'Tras la aprobación, ¿qué proceso lleva los componentes a producción en la fecha/hora programada?',o:[`PROMOTE`,`INSTALL`,`CHECKOUT`,`STAGE`],a:1,e:`INSTALL copia los componentes a las bibliotecas de producción y actualiza la baseline en la ventana planificada.`},
+/*Q*/{id:48,t:'CHANGEMAN',k:'T',q:'Si un install causa problemas, ¿qué función restaura la versión anterior?',o:[`BACKOUT`,`DEMOTE`,`FREEZE`,`RECOMPILE`],a:0,e:`BACKOUT revierte el install restaurando desde la baseline la versión previa de los componentes.`},
+/*Q*/{id:49,t:'CHANGEMAN',k:'T',q:'¿Qué tipo de package se usa para un cambio urgente fuera del ciclo normal?',o:[`Planned`,`Emergency`,`Temporary`,`Participating`],a:1,e:`Un package Emergency permite atender incidentes urgentes, frente al ciclo Planned habitual.`},
+/*Q*/{id:50,t:'CHANGEMAN',k:'T',q:'¿Qué representa "staging" (stage) en ChangeMan?',o:[`Aprobar el cambio`,`Copiar/editar componentes en las bibliotecas de staging del package para trabajarlos`,`Instalar en QA`,`Auditar el package`],a:1,e:`Staging coloca los componentes en las librerías de trabajo del package, donde se editan y compilan (build).`},
+/*Q*/{id:51,t:'CHANGEMAN',k:'T',q:'¿Quién debe dar "approval" típicamente antes del install?',o:[`Sólo el desarrollador`,`Los aprobadores definidos en la lista de aprobación de la aplicación (p.ej. líder, QA, operaciones)`,`Nadie, es automático`,`El compilador`],a:1,e:`Cada aplicación define una lista de aprobadores; todos deben aprobar el package congelado antes de instalar.`},
+/*Q*/{id:52,t:'CHANGEMAN',k:'T',q:'¿Qué es un "component type" (p.ej. SRC, LOD, CPY, JCL)?',o:[`El estado del package`,`La clasificación del componente que determina bibliotecas y procesos (compilar, copiar, etc.)`,`Un código de error`,`Un aprobador`],a:1,e:`El tipo (SRC fuente, LOD load, CPY copybook, JCL...) controla en qué biblioteca va y cómo se procesa.`},
+/*Q*/{id:53,t:'CHANGEMAN',k:'T',q:'¿Qué diferencia hay entre un package "open" y "frozen"?',o:[`Ninguna`,`Open: se pueden editar/añadir componentes; Frozen: bloqueado, listo para aprobación`,`Frozen permite editar; Open no`,`Open es de producción`],a:1,e:`Mientras está abierto se trabaja sobre el package; al congelarlo (FREEZE) se inhabilita la edición.`},
+/*Q*/{id:54,t:'CHANGEMAN',k:'T',q:'¿Para qué sirve "scratch/rename" en un package?',o:[`Compilar fuentes`,`Borrar o renombrar componentes en producción como parte del cambio`,`Promover a QA`,`Aprobar el package`],a:1,e:`Scratch elimina y rename renombra componentes de producción, registrándolo dentro del package.`},
+/*Q*/{id:55,t:'CHANGEMAN',k:'T',q:'En un package complejo/super, ¿qué es un "participating package"?',o:[`Un package aprobado`,`Un package que forma parte de un package complejo para instalarse junto con otros`,`Una baseline`,`Un tipo de componente`],a:1,e:`Los participating packages se agrupan bajo un complex/super package para coordinar su instalación conjunta.`},
+/*Q*/{id:56,t:'CHANGEMAN',k:'T',q:'El proceso "recompile" en ChangeMan sirve para:',o:[`Editar el fuente manualmente`,`Recompilar un fuente desde baseline con las opciones del package (sin re-editar el fuente)`,`Borrar el load`,`Aprobar el cambio`],a:1,e:`Recompile toma el fuente de baseline y lo compila bajo el package, útil al cambiar copybooks o subrutinas.`},
+/*Q*/{id:57,t:'CHANGEMAN',k:'T',q:'¿Qué es "checkout" en ChangeMan?',o:[`Aprobar el package`,`Copiar un componente desde baseline (o promotion) a las bibliotecas de staging para modificarlo`,`Instalar en producción`,`Auditar`],a:1,e:`Checkout extrae la versión actual del componente al staging del package para poder editarlo.`},
+/*Q*/{id:58,t:'CHANGEMAN',k:'T',q:'Al hacer checkout de un componente que ya está en otro package, ChangeMan normalmente:',o:[`Lo ignora`,`Advierte de checkout concurrente (out-of-sync) para evitar sobrescrituras`,`Borra el otro package`,`Lo aprueba automáticamente`],a:1,e:`El control de concurrencia avisa cuando otro package ya tiene el mismo componente, evitando pisar cambios.`},
+/*Q*/{id:59,t:'CHANGEMAN',k:'T',q:'¿Qué es el "build" / install JCL generado por ChangeMan?',o:[`Un copybook`,`El JCL que compila/enlaza (build) o instala los componentes`,`La baseline`,`Un aprobador`],a:1,e:`ChangeMan genera el JCL de compilación/link y el de instalación a partir de skeletons y los tipos de componente.`},
+/*Q*/{id:60,t:'CHANGEMAN',k:'T',q:'¿Cuál describe mejor el ciclo de vida típico de un package?',o:[`Install → Create → Freeze`,`Create → Checkout/Stage → Build → Freeze → Approve → Install → Baseline (→ Backout si falla)`,`Approve → Promote → Create`,`Baseline → Demote → Create`],a:1,e:`El flujo habitual: crear, traer/editar componentes, compilar, congelar, aprobar, instalar y actualizar baseline.`},
+
+/*Q*/{id:61,t:'COBOL',k:'T',q:'¿Cuántas DIVISIONS tiene un programa COBOL y cuáles son?',o:[`3: ENVIRONMENT, DATA, PROCEDURE`,`4: IDENTIFICATION, ENVIRONMENT, DATA, PROCEDURE`,`2: DATA, PROCEDURE`,`5: incluyendo REPORT`],a:1,e:`Las 4 divisiones, en orden: IDENTIFICATION, ENVIRONMENT, DATA y PROCEDURE.`},
+/*Q*/{id:62,t:'COBOL',k:'T',q:'¿Qué nivel se usa para definir condition-names (valores con nombre)?',o:[`01`,`66`,`77`,`88`],a:3,e:`El nivel 88 define condition-names asociados a valores de un campo (p.ej. 88 FIN-ARCHIVO VALUE 'Y').`},
+/*Q*/{id:63,t:'COBOL',k:'C',q:'Dado el campo, tras MOVE 12.5 TO WS-NUM, ¿qué contiene?',c:`05 WS-NUM PIC 9(3)V99.\n...\nMOVE 12.5 TO WS-NUM.`,o:[`12.5`,`012.50 (almacenado como 01250 con punto implícito)`,`125.00`,`12.50 con error`],a:1,e:`V es el punto decimal IMPLÍCITO. 9(3) reserva 3 enteros: queda 012 y 50 → 012.50.`},
+/*Q*/{id:64,t:'COBOL',k:'T',q:'¿Qué USAGE almacena números en decimal empaquetado (2 dígitos por byte + signo)?',o:[`COMP (binario)`,`COMP-3 (PACKED-DECIMAL)`,`DISPLAY`,`COMP-1`],a:1,e:`COMP-3 empaqueta 2 dígitos por byte y el signo en el último nibble; COMP es binario y DISPLAY zonado.`},
+/*Q*/{id:65,t:'COBOL',k:'C',q:'¿Cuántos bytes ocupa PIC S9(7) COMP-3?',c:`05 WS-AMT PIC S9(7) COMP-3.`,o:[`3 bytes`,`4 bytes`,`7 bytes`,`8 bytes`],a:1,e:`Bytes = (dígitos + 1) / 2 redondeado hacia arriba = (7+1)/2 = 4.`},
+/*Q*/{id:66,t:'COBOL',k:'T',q:'¿Qué cláusula reutiliza el mismo espacio de almacenamiento que otro campo?',o:[`OCCURS`,`REDEFINES`,`RENAMES`,`USAGE`],a:1,e:`REDEFINES superpone una definición distinta sobre el mismo área de memoria.`},
+/*Q*/{id:67,t:'COBOL',k:'T',q:'¿Qué cláusula define una tabla/array (elementos repetidos)?',o:[`REDEFINES`,`OCCURS`,`COPY`,`PERFORM`],a:1,e:`OCCURS n define n ocurrencias; se accede con subíndices o INDEXED BY.`},
+/*Q*/{id:68,t:'COBOL',k:'C',q:'¿Cuántas veces se ejecuta el DISPLAY?',c:`PERFORM VARYING I FROM 1 BY 1\n        UNTIL I > 5\n   DISPLAY I\nEND-PERFORM.`,o:[`4`,`5 (I = 1,2,3,4,5)`,`6`,`Infinitas`],a:1,e:`La condición se evalúa ANTES de cada iteración; sale cuando I llega a 6, tras imprimir 1..5.`},
+/*Q*/{id:69,t:'COBOL',k:'C',q:'Si WS-A = 5, ¿qué muestra este EVALUATE?',c:`EVALUATE TRUE\n  WHEN WS-A > 10  DISPLAY 'ALTO'\n  WHEN OTHER      DISPLAY 'BAJO'\nEND-EVALUATE.`,o:[`ALTO`,`BAJO`,`Nada`,`Error de compilación`],a:1,e:`WS-A>10 es falso (5), así que aplica WHEN OTHER → 'BAJO'.`},
+/*Q*/{id:70,t:'COBOL',k:'T',q:'Diferencia entre CALL estática y dinámica:',o:[`No hay diferencia`,`Estática: el subprograma se enlaza en el load (CALL literal/NODYNAM); Dinámica: se carga en ejecución (CALL identificador/DYNAM)`,`La estática es más lenta`,`La dinámica no permite COMMAREA`],a:1,e:`Estática incluye el módulo en el load (cambios requieren relink); dinámica resuelve y carga en runtime.`},
+/*Q*/{id:71,t:'COBOL',k:'C',q:'¿Qué hace esta instrucción?',c:`INSPECT WS-FIELD\n   REPLACING ALL SPACES BY ZEROS.`,o:[`Cuenta los espacios`,`Reemplaza todos los espacios por ceros en el campo`,`Elimina los espacios`,`Convierte a mayúsculas`],a:1,e:`INSPECT ... REPLACING ALL X BY Y sustituye todas las apariciones de X (espacios) por Y (ceros).`},
+/*Q*/{id:72,t:'COBOL',k:'T',q:'¿Qué verbo concatena varios campos en uno (con delimitadores opcionales)?',o:[`UNSTRING`,`STRING`,`INSPECT`,`MOVE`],a:1,e:`STRING concatena; UNSTRING hace lo inverso, separando un campo en varios.`},
+/*Q*/{id:73,t:'COBOL',k:'C',q:'¿Qué muestra PIC ZZZ9 para el valor 7?',c:`05 WS-ED PIC ZZZ9.\n...\nMOVE 7 TO WS-ED.`,o:[`0007`,`'   7' (tres espacios y el 7)`,`7`,`ZZZ7`],a:1,e:`Z suprime ceros a la izquierda dejando espacios; el 9 final siempre muestra dígito. 0007 → '   7'.`},
+/*Q*/{id:74,t:'COBOL',k:'T',q:'¿Qué sección (de DATA DIVISION) contiene las descripciones de archivos (FD) y sus registros?',o:[`WORKING-STORAGE SECTION`,`FILE SECTION`,`LINKAGE SECTION`,`LOCAL-STORAGE SECTION`],a:1,e:`La FILE SECTION define los FD y la estructura de los registros de cada archivo.`},
+/*Q*/{id:75,t:'COBOL',k:'C',q:'Con WS-X PIC X(3), tras MOVE \'ABCDE\' TO WS-X, ¿qué queda?',c:`05 WS-X PIC X(3).\n...\nMOVE 'ABCDE' TO WS-X.`,o:[`'CDE'`,`'ABC' (alfanumérico se justifica a la izquierda y trunca a la derecha)`,`'ABCDE'`,`Espacios`],a:1,e:`En un MOVE alfanumérico se alinea a la izquierda y se trunca lo que excede → 'ABC'.`},
+/*Q*/{id:76,t:'COBOL',k:'T',q:'¿Qué cláusula del SELECT asocia el archivo lógico con el DDNAME del JCL?',o:[`ORGANIZATION`,`ASSIGN TO`,`ACCESS MODE`,`FILE STATUS`],a:1,e:`SELECT archivo ASSIGN TO ddname enlaza el nombre interno con el DD del JCL.`},
+/*Q*/{id:77,t:'COBOL',k:'C',q:'¿Qué hace PERFORM PARA-A THRU PARA-C?',c:`PERFORM PARA-A THRU PARA-C.`,o:[`Ejecuta sólo PARA-A`,`Ejecuta los párrafos desde PARA-A hasta PARA-C inclusive`,`Ejecuta PARA-A y PARA-C, omitiendo PARA-B`,`Ejecuta en bucle infinito`],a:1,e:`THRU ejecuta de forma consecutiva todos los párrafos entre el primero y el último, ambos incluidos.`},
+/*Q*/{id:78,t:'COBOL',k:'T',q:'¿Para qué sirve la cláusula COPY?',o:[`Copiar archivos en disco`,`Incluir (copiar) código fuente de un copybook en tiempo de compilación`,`Duplicar registros`,`Hacer backup`],a:1,e:`COPY inserta el contenido de un miembro (copybook) en el fuente al compilar; admite REPLACING.`},
+/*Q*/{id:79,t:'COBOL',k:'C',q:'Con OCCURS 10 y se accede a un índice fuera de rango sin SSRANGE, ¿qué puede ocurrir?',c:`01 TBL.\n   05 ELEM PIC X(4) OCCURS 10.\n...\nMOVE 'XXXX' TO ELEM(15).`,o:[`Error de compilación seguro`,`Resultados impredecibles / corrupción de memoria (COBOL no verifica límites sin SSRANGE)`,`Se ignora el MOVE`,`Se expande la tabla`],a:1,e:`Sin la opción SSRANGE no hay verificación de límites; acceder fuera de rango produce comportamiento indefinido.`},
+/*Q*/{id:80,t:'COBOL',k:'T',q:'¿Qué nivel especial define un dato elemental independiente en WORKING-STORAGE?',o:[`01`,`66`,`77`,`88`],a:2,e:`El nivel 77 declara un campo elemental que no se subdivide ni forma parte de un grupo.`},
+
+/*Q*/{id:81,t:'DB2',k:'T',q:'¿Qué SQLCODE indica que no se encontraron filas / fin de cursor?',o:[`0`,`+100`,`-803`,`-911`],a:1,e:`SQLCODE +100 = "row not found" / fin de datos (no es un error, es condición normal).`},
+/*Q*/{id:82,t:'DB2',k:'T',q:'Un SQLCODE NEGATIVO indica:',o:[`Éxito`,`Una advertencia`,`Un error: la operación falló`,`Fin de cursor`],a:2,e:`Negativo = error; 0 = éxito; positivo (p.ej. +100) = advertencia/condición.`},
+/*Q*/{id:83,t:'DB2',k:'T',q:'¿Qué SQLCODE indica deadlock o timeout (recurso no disponible, con rollback)?',o:[`-805`,`-911`,`+100`,`-501`],a:1,e:`-911: deadlock o timeout; DB2 hace ROLLBACK automático de la unidad de trabajo. (-913 es similar sin rollback automático.)`},
+/*Q*/{id:84,t:'DB2',k:'T',q:'¿Qué genera DCLGEN?',o:[`El plan de acceso`,`La estructura host (copybook) y la DECLARE TABLE de una tabla`,`Los índices`,`El JCL del BIND`],a:1,e:`DCLGEN produce la declaración de variables host equivalentes a las columnas y la DECLARE TABLE.`},
+/*Q*/{id:85,t:'DB2',k:'T',q:'¿Qué proceso asocia el SQL (DBRM) a un plan/package y fija la estrategia de acceso?',o:[`PRECOMPILE`,`BIND`,`COMPILE`,`RUN`],a:1,e:`El BIND vincula el DBRM en un package/plan y deja preparado el access path elegido por el optimizador.`},
+/*Q*/{id:86,t:'DB2',k:'C',q:'Para procesar MÚLTIPLES filas en COBOL+DB2, ¿qué se usa?',c:`EXEC SQL\n  DECLARE C1 CURSOR FOR\n    SELECT ID, NAME FROM EMP\nEND-EXEC.`,o:[`Un SELECT INTO simple`,`Un CURSOR (DECLARE, OPEN, FETCH, CLOSE)`,`Un INSERT`,`La SQLCA`],a:1,e:`Un SELECT INTO sólo sirve para una fila; para conjuntos de filas se usa un cursor.`},
+/*Q*/{id:87,t:'DB2',k:'C',q:'¿Qué filas devuelve esta condición?',c:`SELECT * FROM EMP\nWHERE SALARY > 50000\n  AND DEPT = 'D11';`,o:[`Salario>50000 O depto D11`,`Filas con salario>50000 Y depto D11 (ambas condiciones)`,`Todas las filas`,`Sólo del depto D11`],a:1,e:`AND exige que se cumplan ambas condiciones simultáneamente.`},
+/*Q*/{id:88,t:'DB2',k:'T',q:'¿Qué sentencia confirma permanentemente los cambios de la unidad de trabajo?',o:[`COMMIT`,`ROLLBACK`,`SAVEPOINT`,`CLOSE`],a:0,e:`COMMIT hace permanentes los cambios y libera locks; ROLLBACK los deshace.`},
+/*Q*/{id:89,t:'DB2',k:'C',q:'¿Qué cuenta esta consulta?',c:`SELECT COUNT(*) FROM EMP\nWHERE COMM IS NULL;`,o:[`Empleados con comisión 0`,`Empleados cuyo COMM es NULO`,`Todos los empleados`,`Da error de sintaxis`],a:1,e:`IS NULL identifica valores nulos (ausencia de valor), distinto de un cero.`},
+/*Q*/{id:90,t:'DB2',k:'T',q:'¿Por qué NO se usa "= NULL" en SQL?',o:[`Es más lento`,`NULL no es igual a nada; se usa IS NULL / IS NOT NULL`,`Sólo funciona en índices`,`Da resultado siempre TRUE`],a:1,e:`Cualquier comparación con NULL da UNKNOWN; por eso se usan los predicados IS NULL / IS NOT NULL.`},
+/*Q*/{id:91,t:'DB2',k:'C',q:'¿Qué tipo de JOIN devuelve sólo filas con coincidencia en AMBAS tablas?',c:`SELECT A.ID, B.DEPT\nFROM EMP A JOIN DEPT B\n  ON A.DEPTNO = B.DEPTNO;`,o:[`LEFT OUTER JOIN`,`INNER JOIN`,`FULL OUTER JOIN`,`CROSS JOIN`],a:1,e:`INNER JOIN (o JOIN a secas) devuelve sólo las filas que casan en ambas tablas según el ON.`},
+/*Q*/{id:92,t:'DB2',k:'T',q:'Un LEFT OUTER JOIN devuelve:',o:[`Sólo coincidencias`,`Todas las filas de la tabla IZQUIERDA + coincidencias de la derecha (NULL si no hay)`,`Todas las de la derecha`,`El producto cartesiano`],a:1,e:`Conserva todas las filas de la tabla izquierda; donde no hay match en la derecha, esas columnas van NULL.`},
+/*Q*/{id:93,t:'DB2',k:'T',q:'¿Qué cláusula agrupa filas para usar funciones agregadas (SUM, COUNT...)?',o:[`ORDER BY`,`GROUP BY`,`WHERE`,`DISTINCT`],a:1,e:`GROUP BY agrupa filas por las columnas indicadas; las agregadas se calculan por grupo.`},
+/*Q*/{id:94,t:'DB2',k:'T',q:'Diferencia entre WHERE y HAVING:',o:[`Son equivalentes`,`WHERE filtra filas antes de agrupar; HAVING filtra grupos después del GROUP BY`,`HAVING filtra filas, WHERE grupos`,`WHERE no admite AND`],a:1,e:`WHERE actúa sobre filas individuales; HAVING aplica condiciones sobre el resultado agregado de cada grupo.`},
+/*Q*/{id:95,t:'DB2',k:'T',q:'¿Qué herramienta interactiva permite ejecutar SQL desde TSO/ISPF contra DB2?',o:[`SPUFI`,`SDSF`,`IDCAMS`,`RACF`],a:0,e:`SPUFI (y también QMF) ejecuta SQL de forma interactiva; SDSF es para salidas/jobs.`},
+/*Q*/{id:96,t:'DB2',k:'C',q:'En SQL embebido, ¿qué estructura recibe SQLCODE/SQLSTATE?',c:`EXEC SQL INCLUDE SQLCA END-EXEC.`,o:[`La DECLARE TABLE`,`La SQLCA (SQL Communication Area)`,`El cursor`,`El DBRM`],a:1,e:`La SQLCA contiene SQLCODE, SQLSTATE, SQLERRD, etc., y se incluye con INCLUDE SQLCA.`},
+/*Q*/{id:97,t:'DB2',k:'T',q:'¿Qué hace EXPLAIN en DB2?',o:[`Ejecuta el SQL`,`Muestra el plan de acceso elegido por el optimizador (en la PLAN_TABLE)`,`Crea índices`,`Hace COMMIT`],a:1,e:`EXPLAIN puebla la PLAN_TABLE con el access path: uso de índices, joins, tablespace scan, etc.`},
+/*Q*/{id:98,t:'DB2',k:'C',q:'¿Qué hace FETCH C1 INTO :WS-ID, :WS-NAME?',c:`EXEC SQL\n  FETCH C1 INTO :WS-ID, :WS-NAME\nEND-EXEC.`,o:[`Abre el cursor`,`Recupera la SIGUIENTE fila del cursor C1 a las variables host`,`Cierra el cursor`,`Inserta una fila`],a:1,e:`FETCH avanza el cursor una fila y copia las columnas a las variables host (precedidas por :).`},
+/*Q*/{id:99,t:'DB2',k:'T',q:'¿Qué nivel de aislamiento permite leer filas no comprometidas (dirty read)?',o:[`CS (Cursor Stability)`,`RR (Repeatable Read)`,`UR (Uncommitted Read)`,`RS (Read Stability)`],a:2,e:`UR (Uncommitted Read) lee cambios aún no confirmados; es el menos restrictivo y el de mayor concurrencia.`},
+/*Q*/{id:100,t:'DB2',k:'C',q:'¿Qué hace esta sentencia?',c:`UPDATE EMP\nSET SALARY = SALARY * 1.10\nWHERE DEPT = 'D11';`,o:[`Borra empleados del depto D11`,`Aumenta 10% el salario de los empleados del depto D11`,`Reduce el salario 10%`,`Da error: no se puede usar SALARY a ambos lados`],a:1,e:`Multiplica el salario por 1.10 (= +10%) sólo para las filas cuyo DEPT es 'D11'.`}
+];
+
+/* ===================== ESTADO ===================== */
+const TOPIC_LABEL={JCL:'JCL',CICS:'CICS',CHANGEMAN:'CHANGEMAN',COBOL:'COBOL',DB2:'DB2'};
+const KIND_LABEL={T:'TEÓRICA',C:'CÓDIGO'};
+const PASS=70;
+let st={pool:[],idx:0,answers:[],mode:'exam',count:25,topics:new Set(['JCL','CICS','CHANGEMAN','COBOL','DB2']),start:0,timer:null,elapsed:0};
+
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function fmt(s){const m=String(Math.floor(s/60)).padStart(2,'0');const x=String(s%60).padStart(2,'0');return m+':'+x;}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ---- pantalla de inicio: toggles ---- */
+$$('#topics .tgl').forEach(b=>b.addEventListener('click',()=>{
+  const on=b.dataset.on==='1'; b.dataset.on=on?'0':'1';
+  b.querySelector('.mk').textContent=on?'[ ]':'[X]';
+}));
+function singleSelect(sel,attr){
+  $$(sel+' .pill').forEach(b=>b.addEventListener('click',()=>{
+    $$(sel+' .pill').forEach(x=>x.dataset.on='0'); b.dataset.on='1';
+  }));
+}
+singleSelect('#counts','count');
+
+/* ---- iniciar ---- */
+$('#btnStart').addEventListener('click',startQuiz);
+function startQuiz(){
+  const topics=new Set($$('#topics .tgl').filter(b=>b.dataset.on==='1').map(b=>b.dataset.topic));
+  if(topics.size===0){ $('#warn').textContent='>> Selecciona al menos un tema para iniciar.'; return; }
+  $('#warn').textContent='';
+  const count=+($('#counts .pill[data-on="1"]')||{dataset:{count:25}}).dataset.count;
+  st.topics=topics;
+
+  let bank=QUESTIONS.filter(q=>topics.has(q.t));
+  shuffle(bank);
+  const n=Math.min(count,bank.length);
+  st.pool=bank.slice(0,n).map(q=>{
+    const opts=q.o.map((x,i)=>({x,ok:i===q.a}));
+    shuffle(opts);
+    return {id:q.id,t:q.t,k:q.k,q:q.q,c:q.c,e:q.e,opts};
+  });
+  st.count=n; st.idx=0; st.answers=new Array(n).fill(-1);
+  st.start=Date.now(); st.elapsed=0;
+  clearInterval(st.timer);
+  st.timer=setInterval(()=>{st.elapsed=Math.floor((Date.now()-st.start)/1000);$('#clock').textContent=fmt(st.elapsed);},1000);
+
+  show('quiz'); $('#qT').textContent=String(n).padStart(2,'0');
+  renderQ();
+}
+
+function show(which){
+  $('#start').classList.toggle('hide',which!=='start');
+  $('#quiz').classList.toggle('hide',which!=='quiz');
+  $('#results').classList.toggle('hide',which!=='results');
+}
+
+/* ---- render de pregunta ---- */
+function renderQ(){
+  const q=st.pool[st.idx], n=st.idx+1, total=st.count;
+  $('#qTopic').textContent=TOPIC_LABEL[q.t];
+  $('#qKind').textContent=KIND_LABEL[q.k];
+  $('#qN').textContent=String(n).padStart(2,'0');
+  $('#fill').style.width=(n/total*100)+'%';
+  $('#hPos').textContent='ROW '+String(n).padStart(3,'0')+' COL 001';
+
+  const answered=st.answers[st.idx]!==-1;
+  const reveal=answered;  // feedback inmediato: se revela en cuanto se responde
+  let html='';
+  html+='<div class="qtext">'+esc(q.q)+'</div>';
+  if(q.c){html+='<div class="code"><span class="lbl">CÓDIGO</span>'+esc(q.c)+'</div>';}
+  const keys=['A','B','C','D','E','F'];
+  q.opts.forEach((o,i)=>{
+    let attrs='', cls='opt';
+    if(reveal){
+      cls+=' lock';
+      if(o.ok) attrs+=' data-state="ok"';
+      else if(st.answers[st.idx]===i) attrs+=' data-state="bad"';
+    }else if(st.answers[st.idx]===i){
+      attrs+=' data-sel="1"';
+    }
+    html+='<div class="'+cls+'"'+attrs+' data-i="'+i+'"><span class="key">'+keys[i]+'.</span><span>'+esc(o.x)+'</span></div>';
+  });
+  $('#qBody').innerHTML=html;
+
+  $$('#qBody .opt').forEach(el=>el.addEventListener('click',()=>pick(+el.dataset.i)));
+
+  const ex=$('#expl');
+  if(reveal){ ex.innerHTML='<b>Explicación &gt;&gt; </b>'+esc(q.e); ex.classList.add('show'); }
+  else { ex.classList.remove('show'); ex.innerHTML=''; }
+
+  // navegación
+  $('#btnPrev').disabled=(st.idx===0);
+  const last=(st.idx===st.count-1);
+  const next=$('#btnNext');
+  if(last){ next.textContent='FINALIZAR ►'; next.classList.add('fin'); next.classList.remove('prim'); }
+  else { next.textContent='PF8 AVANCE ►'; next.classList.remove('fin'); next.classList.add('prim'); }
+  // no se puede avanzar (ni finalizar) hasta responder la pregunta actual
+  next.disabled=!answered;
+}
+
+function pick(i){
+  if(st.answers[st.idx]!==-1) return; // ya respondida: queda bloqueada
+  st.answers[st.idx]=i;
+  renderQ();
+}
+
+$('#btnPrev').addEventListener('click',()=>{ if(st.idx>0){st.idx--;renderQ();} });
+$('#btnNext').addEventListener('click',()=>{
+  if(st.answers[st.idx]===-1) return; // exige responder antes de avanzar
+  if(st.idx<st.count-1){ st.idx++; renderQ(); } else { finish(); }
+});
+
+/* ---- resultados ---- */
+function finish(){
+  clearInterval(st.timer);
+  let ok=0; const byT={};
+  st.pool.forEach((q,i)=>{
+    const sel=st.answers[i];
+    const correct=(sel!==-1 && q.opts[sel].ok);
+    if(correct) ok++;
+    byT[q.t]=byT[q.t]||{ok:0,tot:0}; byT[q.t].tot++; if(correct) byT[q.t].ok++;
+  });
+  const total=st.count, pct=total?Math.round(ok/total*100):0;
+  const pass=pct>=PASS;
+  $('#rScore').textContent=pct+'%'; $('#rScore').classList.toggle('fail',!pass);
+  const v=$('#rVerdict'); v.textContent=pass?'■ APROBADO':'■ NO APROBADO';
+  v.className='verdict '+(pass?'pass':'no');
+  $('#rOk').textContent=ok; $('#rBad').textContent=total-ok; $('#rTot').textContent=total;
+  $('#rTime').textContent=fmt(st.elapsed);
+
+  // por tema
+  let bt='';
+  Object.keys(byT).sort().forEach(t=>{
+    const d=byT[t], p=Math.round(d.ok/d.tot*100);
+    bt+='<div class="tr"><span class="nm">'+TOPIC_LABEL[t]+'</span>'+
+        '<span class="mt"><span class="mf" style="width:'+p+'%"></span></span>'+
+        '<span class="vl">'+d.ok+'/'+d.tot+'</span></div>';
+  });
+  $('#byTopic').innerHTML=bt;
+
+  // revisión
+  const keys=['A','B','C','D','E','F'];
+  let rv='';
+  st.pool.forEach((q,i)=>{
+    const sel=st.answers[i];
+    const correctIdx=q.opts.findIndex(o=>o.ok);
+    const correct=(sel!==-1 && q.opts[sel].ok);
+    rv+='<div class="rv">';
+    rv+='<div class="h"><span class="tag">'+TOPIC_LABEL[q.t]+'</span><span class="tag">'+KIND_LABEL[q.k]+'</span>'+
+        '<span class="st '+(correct?'ok':'bad')+'">'+(correct?'✓ CORRECTA':'✗ INCORRECTA')+'</span>'+
+        '<span style="color:var(--green-dim);margin-left:auto">#'+String(i+1).padStart(2,'0')+'</span></div>';
+    rv+='<div class="q">'+esc(q.q)+'</div>';
+    if(q.c) rv+='<pre>'+esc(q.c)+'</pre>';
+    const yourTxt = sel===-1 ? '(sin responder)' : keys[sel]+'. '+q.opts[sel].x;
+    if(!correct) rv+='<div class="ln you"><span class="lab">Tu respuesta: </span><span class="v">'+esc(yourTxt)+'</span></div>';
+    rv+='<div class="ln cor"><span class="lab">Correcta: </span><span class="v">'+keys[correctIdx]+'. '+esc(q.opts[correctIdx].x)+'</span></div>';
+    rv+='<div class="ex"><b>Por qué:</b> '+esc(q.e)+'</div>';
+    rv+='</div>';
+  });
+  $('#review').innerHTML=rv; $('#review').classList.remove('show');
+  $('#btnReview').textContent='REVISAR RESPUESTAS';
+  $('#hPos').textContent='ROW 001 COL 001';
+  show('results');
+  $('#screen').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+$('#btnReview').addEventListener('click',()=>{
+  const r=$('#review'); const on=r.classList.toggle('show');
+  $('#btnReview').textContent=on?'OCULTAR REVISIÓN':'REVISAR RESPUESTAS';
+});
+$('#btnRetry').addEventListener('click',startQuiz);
+$('#btnNew').addEventListener('click',()=>{ clearInterval(st.timer); show('start'); });
+
+/* ---- teclado (estilo PF) ---- */
+document.addEventListener('keydown',e=>{
+  if($('#quiz').classList.contains('hide')) return;
+  const k=e.key.toLowerCase();
+  const map={a:0,b:1,c:2,d:3,'1':0,'2':1,'3':2,'4':3};
+  if(k in map){ const q=st.pool[st.idx]; if(map[k]<q.opts.length){ pick(map[k]); e.preventDefault(); } return; }
+  if(e.key==='ArrowRight'||e.key==='Enter'||e.key==='F8'){
+    if(st.answers[st.idx]===-1){ e.preventDefault(); return; }
+    if(st.idx<st.count-1){st.idx++;renderQ();}else{finish();} e.preventDefault();
+  }
+  if(e.key==='ArrowLeft'||e.key==='F7'){ if(st.idx>0){st.idx--;renderQ();} e.preventDefault(); }
+});
+document.addEventListener('keydown',e=>{
+  if(!$('#start').classList.contains('hide') && e.key==='Enter'){ startQuiz(); }
+});
+</script>
+</body>
+</html>
