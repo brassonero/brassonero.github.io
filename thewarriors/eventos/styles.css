@@ -602,7 +602,7 @@ main {
   height: 44px;
   background: none;
   border: 1px solid var(--green);
-  color: var(--red-bright);
+  color: var(--cyan);
   font-size: 26px;
   font-family: 'Chakra Petch', sans-serif;
   cursor: pointer;
