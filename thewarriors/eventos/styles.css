@@ -773,7 +773,13 @@ main {
     top: 0;
     left: 0;
     right: 0;
+    z-index: 30;
+    pointer-events: auto;
     padding-top: max(14px, var(--sai-t));
+  }
+
+  main {
+    z-index: 4;
   }
 
   .foot {
