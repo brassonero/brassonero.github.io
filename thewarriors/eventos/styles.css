@@ -601,7 +601,7 @@ main {
   width: 44px;
   height: 44px;
   background: none;
-  border: 1px solid var(--red);
+  border: 1px solid var(--green);
   color: var(--red-bright);
   font-size: 26px;
   font-family: 'Chakra Petch', sans-serif;
@@ -612,7 +612,7 @@ main {
 .lb-close:hover,
 .lb-close:focus-visible {
   color: #fff;
-  border-color: var(--red-bright);
+  border-color: var(--cyan);
   box-shadow: 0 0 20px rgba(224, 74, 38, .4);
   outline: none;
 }
