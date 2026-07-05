@@ -210,11 +210,15 @@
     shareBtn.rel = 'noopener';
   }
 
+  // Ubicación tomada del QR / poster Casino Guzmán
+  var EVENT_LOCATION = 'Sexto Callejón de San Rafael 24, Pueblo Nuevo Bajo, Magdalena Contreras, CDMX';
+  var EVENT_LOCATION_QR = 'https://qr.codes/ijPxkt';
+
   var calHref = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
     '&text=' + encodeURIComponent('El Primate Galáctico — Los Warriors') +
     '&dates=' + encodeURIComponent('20260719T030000Z/20260719T120000Z') +
-    '&details=' + encodeURIComponent('Música electrónica & vibras bohemias · Fogata mística, show de fuego y percusiones.\nInfo: ' + PAGE_URL) +
-    '&location=' + encodeURIComponent('Por anunciar');
+    '&details=' + encodeURIComponent('Estacionamiento limitado a calles aledañas y consumo personal.\nUbicación QR: ' + EVENT_LOCATION_QR + '\nInfo: ' + PAGE_URL) +
+    '&location=' + encodeURIComponent(EVENT_LOCATION);
   $('calBtn').href = calHref;
 
 })();
