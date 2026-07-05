@@ -466,7 +466,7 @@ main {
 }
 
 .spec-row {
-  border-left: 2px solid var(--red);
+  border-left: 2px solid var(--cyan);
   padding-left: clamp(10px, 2vmin, 16px);
 }
 
