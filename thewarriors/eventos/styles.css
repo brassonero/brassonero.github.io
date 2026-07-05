@@ -472,7 +472,7 @@ main {
 
 .spec-row dt {
   font-family: 'Chakra Petch', sans-serif;
-  color: var(--green);
+  color: var(--green-bright);
   font-size: clamp(9px, 1.8vmin, 12px);
   letter-spacing: 3px;
   margin-bottom: 3px;
