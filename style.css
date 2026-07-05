@@ -38,19 +38,28 @@
     }
 }
 
+/*
+ * float composes its drift with live custom properties:
+ *   --ox / --oy  static offset (orb3 uses them to stay centered)
+ *   --px / --py  audio/parallax offset driven from JS
+ *   --s          audio-reactive scale driven from JS
+ * Defaults keep the animation identical when the vars are unset
+ * (e.g. body::before), but let JS reactivity actually render —
+ * inline transforms are overridden by running animations, vars are not.
+ */
 @keyframes float {
 
     0%,
     100% {
-        transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+        transform: translate(calc(var(--ox, 0px) + var(--px, 0px)), calc(var(--oy, 0px) + var(--py, 0px))) rotate(0deg) scale(var(--s, 1));
     }
 
     33% {
-        transform: translateY(-30px) translateX(20px) rotate(120deg) scale(1.1);
+        transform: translate(calc(var(--ox, 0px) + var(--px, 0px) + 20px), calc(var(--oy, 0px) + var(--py, 0px) - 30px)) rotate(120deg) scale(calc(var(--s, 1) * 1.1));
     }
 
     66% {
-        transform: translateY(20px) translateX(-20px) rotate(240deg) scale(0.95);
+        transform: translate(calc(var(--ox, 0px) + var(--px, 0px) - 20px), calc(var(--oy, 0px) + var(--py, 0px) + 20px)) rotate(240deg) scale(calc(var(--s, 1) * 0.95));
     }
 }
 
@@ -315,7 +324,6 @@ body.playing .orbs-container {
     position: absolute;
     mix-blend-mode: screen;
     animation: morphOrb 8s ease-in-out infinite;
-    transition: transform 0.3s ease-out;
 }
 
 .orb1 {
@@ -337,13 +345,17 @@ body.playing .orbs-container {
 }
 
 .orb3 {
+    /* Centering lives in the animation vars so the delayed float
+       animation no longer makes the orb jump off-center at 3s. */
+    --ox: -50%;
+    --oy: -50%;
     width: min(350px, 50vw);
     height: min(350px, 50vw);
     background: radial-gradient(circle, rgba(138, 43, 226, 0.6), rgba(0, 255, 127, 0.3), transparent);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    animation: float 18s ease-in-out infinite 3s, morphOrb 7s ease-in-out infinite;
+    animation: float 18s ease-in-out 3s infinite backwards, morphOrb 7s ease-in-out infinite;
 }
 
 .audio-control {
@@ -385,14 +397,34 @@ body.playing .orbs-container {
     transform: translateX(-50%) scale(0.98);
 }
 
+.audio-control:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.75);
+    outline-offset: 4px;
+}
+
 .play-icon {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: clamp(18px, 4.5vw, 22px);
+    height: clamp(18px, 4.5vw, 22px);
+    fill: white;
+    filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.5));
+    z-index: 2;
     opacity: 1;
     transform: scale(1);
+    will-change: opacity;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 body.playing .play-icon {
     opacity: 0;
     transform: scale(0.8);
+    /* Hard-hide after the fade: opacity transitions on children of
+       backdrop-filter elements can silently fail on Android Chrome,
+       so visibility guarantees the icon actually disappears. */
+    visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
 }
 
 .visualizer {
@@ -452,16 +484,20 @@ body.playing .visualizer {
 
 .cursor-glow {
     position: fixed;
+    top: 0;
+    left: 0;
     width: 500px;
     height: 500px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255, 20, 147, 0.08), rgba(0, 255, 255, 0.04), transparent 40%);
     pointer-events: none;
+    opacity: 0;
     transform: translate(-50%, -50%);
     transition: opacity 0.3s ease;
     z-index: 5;
     mix-blend-mode: screen;
     filter: blur(2px);
+    will-change: transform;
 }
 
 .hint {
@@ -530,12 +566,31 @@ body.playing .kaleidoscope {
     font-family: 'Times New Roman', 'Georgia', serif;
     color: rgba(255, 255, 255, 0);
     text-shadow: none;
-    transition: color 1.5s ease, text-shadow 1.5s ease, transform 1.5s ease, filter 1.5s ease;
+    transition: color 1.5s ease, text-shadow 1.5s ease, transform 1.5s ease, filter 1.5s ease, opacity 1.5s ease;
     user-select: none;
+    -webkit-user-select: none;
     line-height: 1;
-    will-change: transform, text-shadow, color, filter;
+    will-change: transform, opacity, filter;
     opacity: 0;
     filter: blur(8px);
+}
+
+/* Audio-reactive glow layer: a duplicate glyph whose only visible part
+   is its shadow stack. JS drives --pulse (0..1) each frame, so the hot
+   glow blooms with the music via a cheap opacity change instead of
+   repainting new text-shadows on the main glyph every frame. */
+.planck::after {
+    content: 'ℏ';
+    position: absolute;
+    inset: 0;
+    color: transparent;
+    pointer-events: none;
+    text-shadow:
+        0 0 25px rgba(255, 255, 255, 0.35),
+        0 0 60px rgba(255, 20, 147, 0.5),
+        0 0 140px rgba(138, 43, 226, 0.3),
+        0 0 280px rgba(0, 255, 255, 0.12);
+    opacity: var(--pulse, 0);
 }
 
 body.playing .planck {
@@ -549,6 +604,10 @@ body.playing .planck {
         0 0 160px rgba(138, 43, 226, 0.12),
         0 0 300px rgba(0, 255, 255, 0.05);
     animation: planckDefocus 12s ease-in-out infinite;
+    /* Only opacity keeps its long fade while playing, so the
+       per-frame scale pulses from JS stay crisp instead of
+       being smeared by 1.5s transitions. */
+    transition: opacity 1.5s ease;
 }
 
 @media (max-width: 768px) {
@@ -588,5 +647,15 @@ body.playing .planck {
     .geometric-overlay,
     .grain {
         animation: none;
+    }
+
+    body.playing .planck {
+        animation: none;
+    }
+
+    /* Show the name statically instead of the animated reveal. */
+    .hint {
+        animation: none;
+        opacity: 0.5;
     }
 }

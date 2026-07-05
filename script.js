@@ -19,36 +19,73 @@ let dataArray = null;
 let source = null;
 let mouseX = 0.5;
 let mouseY = 0.5;
-let planckScale = 1;
-let planckGlow = 0;
-let planckBlur = 8;
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 const isMobile =
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-    window.matchMedia('(max-width: 768px)').matches;
+    window.matchMedia('(max-width: 768px)').matches ||
+    window.matchMedia('(pointer: coarse)').matches;
 
 // ── Film grain ──
-function initGrain() {
-    grainCanvas.width = 1024;
-    grainCanvas.height = 1024;
-    generateGrain();
-}
+// A handful of noise frames are rendered ONCE into offscreen canvases;
+// each tick just blits a cached frame (sub-millisecond) instead of
+// filling a megapixel buffer with Math.random() on the main thread.
+const GRAIN_SIZE = isMobile ? 320 : 640;
+const GRAIN_FRAMES = 6;
+const GRAIN_INTERVAL_MS = 100;
+const grainFrames = [];
+let grainIdx = 0;
 
-function generateGrain() {
-    const imageData = gCtx.createImageData(1024, 1024);
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-        const v = Math.random() * 255;
-        data[i] = v;
-        data[i + 1] = v;
-        data[i + 2] = v;
-        data[i + 3] = 255;
+const isLittleEndian = (() => {
+    const buf = new ArrayBuffer(4);
+    new Uint32Array(buf)[0] = 0x0a0b0c0d;
+    return new Uint8Array(buf)[0] === 0x0d;
+})();
+
+function makeGrainFrame() {
+    const c = document.createElement('canvas');
+    c.width = GRAIN_SIZE;
+    c.height = GRAIN_SIZE;
+    const ctx = c.getContext('2d');
+    const img = ctx.createImageData(GRAIN_SIZE, GRAIN_SIZE);
+    const px = new Uint32Array(img.data.buffer);
+    if (isLittleEndian) {
+        for (let i = 0; i < px.length; i++) {
+            const v = (Math.random() * 256) | 0;
+            px[i] = 0xFF000000 | (v << 16) | (v << 8) | v; // ABGR
+        }
+    } else {
+        for (let i = 0; i < px.length; i++) {
+            const v = (Math.random() * 256) | 0;
+            px[i] = (v << 24) | (v << 16) | (v << 8) | 0xFF; // RGBA
+        }
     }
-    gCtx.putImageData(imageData, 0, 0);
+    ctx.putImageData(img, 0, 0);
+    return c;
 }
 
-setInterval(generateGrain, 100);
+function initGrain() {
+    grainCanvas.width = GRAIN_SIZE;
+    grainCanvas.height = GRAIN_SIZE;
+    grainFrames.push(makeGrainFrame());
+    gCtx.drawImage(grainFrames[0], 0, 0);
+    // Build the remaining frames off the critical path.
+    const buildNext = () => {
+        if (grainFrames.length < GRAIN_FRAMES) {
+            grainFrames.push(makeGrainFrame());
+            setTimeout(buildNext, 50);
+        }
+    };
+    setTimeout(buildNext, 80);
+}
+
 initGrain();
+setInterval(() => {
+    if (document.hidden || prefersReducedMotion.matches || grainFrames.length < 2) return;
+    grainIdx = (grainIdx + 1) % grainFrames.length;
+    gCtx.drawImage(grainFrames[grainIdx], 0, 0);
+}, GRAIN_INTERVAL_MS);
 
 // ── Web Audio API setup ──
 function initAudioContext() {
@@ -64,8 +101,9 @@ function initAudioContext() {
 }
 
 // ── Audio-reactive helpers ──
-function getFrequencyBands() {
-    if (!analyser || !isPlaying) return { bass: 0, mid: 0, high: 0, average: 0 };
+// Reads the frequency data once per frame; every consumer shares it.
+function readFrequencyBands() {
+    if (!analyser || !isPlaying) return null;
     analyser.getByteFrequencyData(dataArray);
     const len = dataArray.length;
     let bass = 0, mid = 0, high = 0, sum = 0;
@@ -87,50 +125,39 @@ function getFrequencyBands() {
 }
 
 // ── Update ℏ symbol from audio ──
+// Only two cheap writes per frame: a composited transform, and a --pulse
+// custom property that drives the glow layer's opacity in CSS. The heavy
+// per-frame text-shadow / color / filter repaints are gone — the ambient
+// defocus and base glow live entirely in CSS now.
+let planckScale = 1;
+let planckPulse = 0;
+let planckSettled = true;
+
 function updatePlanck(bands) {
-    if (!isPlaying) {
-        planckScale += (1 - planckScale) * 0.05;
-        planckGlow += (0 - planckGlow) * 0.05;
-        planckBlur += (8 - planckBlur) * 0.05;
-        if (Math.abs(planckScale - 1) < 0.01) {
+    if (!bands) {
+        if (planckSettled) return;
+        planckScale += (1 - planckScale) * ease(0.06);
+        planckPulse += (0 - planckPulse) * ease(0.08);
+        if (Math.abs(planckScale - 1) < 0.005 && planckPulse < 0.01) {
             planckEl.style.removeProperty('transform');
-            planckEl.style.removeProperty('color');
-            planckEl.style.removeProperty('text-shadow');
-            planckEl.style.removeProperty('filter');
+            planckEl.style.removeProperty('--pulse');
+            planckSettled = true;
+            return;
         }
-        return;
+    } else {
+        planckSettled = false;
+        const targetScale = 1 + bands.bass * 0.18 + bands.average * 0.06;
+        const targetPulse = Math.min(1, bands.average * 0.85 + bands.bass * 0.5);
+        planckScale += (targetScale - planckScale) * ease(0.18);
+        planckPulse += (targetPulse - planckPulse) * ease(0.15);
     }
-
-    planckEl.style.animation = 'none';
-
-    const targetScale = 1 + bands.bass * 0.18 + bands.average * 0.06;
-    const targetGlow = bands.average;
-    const targetBlur = 6 - bands.bass * 4 - bands.average * 2;
-    const clampedBlur = Math.max(0.5, targetBlur);
-
-    planckScale += (targetScale - planckScale) * 0.18;
-    planckGlow += (targetGlow - planckGlow) * 0.15;
-    planckBlur += (clampedBlur - planckBlur) * 0.12;
-
-    const alpha = 0.25 + planckGlow * 0.5;
-    const innerGlow = 20 + planckGlow * 60;
-    const magentaGlow = 40 + bands.bass * 120;
-    const violetGlow = 80 + bands.mid * 160;
-    const cyanGlow = 160 + bands.high * 300;
-    const magentaAlpha = 0.1 + bands.bass * 0.4;
-    const violetAlpha = 0.06 + bands.mid * 0.25;
-    const cyanAlpha = 0.02 + bands.high * 0.1;
-
-    planckEl.style.transform = `translate(-50%, -50%) scale(${planckScale})`;
-    planckEl.style.color = `rgba(255, 255, 255, ${alpha})`;
-    planckEl.style.filter = `blur(${planckBlur}px)`;
-    planckEl.style.textShadow = `0 0 ${innerGlow}px rgba(255, 255, 255, ${alpha * 0.3}), 0 0 ${magentaGlow}px rgba(255, 20, 147, ${magentaAlpha}), 0 0 ${violetGlow}px rgba(138, 43, 226, ${violetAlpha}), 0 0 ${cyanGlow}px rgba(0, 255, 255, ${cyanAlpha})`;
+    planckEl.style.transform = `translate(-50%, -50%) scale(${planckScale.toFixed(4)})`;
+    planckEl.style.setProperty('--pulse', planckPulse.toFixed(3));
 }
 
 // ── Drive visualizer bars from real audio data ──
 function updateBars(bands) {
-    if (!isPlaying || !analyser) return;
-    analyser.getByteFrequencyData(dataArray);
+    if (!bands) return;
     const step = Math.floor(dataArray.length / bars.length);
     bars.forEach((bar, i) => {
         const val = dataArray[i * step] / 255;
@@ -141,29 +168,105 @@ function updateBars(bands) {
 }
 
 // ── Orb audio reactivity + mouse parallax ──
-function updateOrbs(bands) {
-    if (!isPlaying) return;
-    const bassScale = 1 + bands.bass * 0.15;
-    const midScale = 1 + bands.mid * 0.1;
-    const px = isMobile ? 0 : (mouseX - 0.5) * 30;
-    const py = isMobile ? 0 : (mouseY - 0.5) * 30;
+// The floating orbs are moved by a CSS animation, which overrides any
+// inline transform — so reactivity is fed through custom properties
+// (--px / --py / --s) that the float keyframes compose in. Writes are
+// skipped when the value hasn't meaningfully changed.
+const orbState = [
+    { el: orb1, band: 'bass', amount: 0.15, parallax: 0.8, s: 1, x: 0, y: 0, ws: NaN, wx: NaN, wy: NaN },
+    { el: orb2, band: 'mid', amount: 0.10, parallax: -0.5, s: 1, x: 0, y: 0, ws: NaN, wx: NaN, wy: NaN },
+    { el: orb3, band: 'high', amount: 0.12, parallax: 0.3, s: 1, x: 0, y: 0, ws: NaN, wx: NaN, wy: NaN },
+];
+let orbsSettled = true;
 
-    orb1.style.transform = `translate(${px * 0.8}px, ${py * 0.8}px) scale(${bassScale})`;
-    orb2.style.transform = `translate(${-px * 0.5}px, ${-py * 0.5}px) scale(${midScale})`;
-    orb3.style.transform = `translate(${px * 0.3 - 50}%, ${py * 0.3 - 50}%) scale(${1 + bands.high * 0.12})`;
+function updateOrbs(bands) {
+    const active = !!bands;
+    if (!active && orbsSettled) return;
+
+    const px = (active && !isMobile) ? (mouseX - 0.5) * 30 : 0;
+    const py = (active && !isMobile) ? (mouseY - 0.5) * 30 : 0;
+    let allSettled = true;
+
+    for (const o of orbState) {
+        const targetS = active ? 1 + bands[o.band] * o.amount : 1;
+        const k = ease(0.15);
+        o.s += (targetS - o.s) * k;
+        o.x += (px * o.parallax - o.x) * k;
+        o.y += (py * o.parallax - o.y) * k;
+
+        if (Math.abs(o.s - 1) > 0.002 || Math.abs(o.x) > 0.05 || Math.abs(o.y) > 0.05) {
+            allSettled = false;
+        }
+        if (Math.abs(o.s - o.ws) > 0.003 || !isFinite(o.ws)) {
+            o.el.style.setProperty('--s', o.s.toFixed(3));
+            o.ws = o.s;
+        }
+        if (Math.abs(o.x - o.wx) > 0.25 || !isFinite(o.wx)) {
+            o.el.style.setProperty('--px', o.x.toFixed(1) + 'px');
+            o.wx = o.x;
+        }
+        if (Math.abs(o.y - o.wy) > 0.25 || !isFinite(o.wy)) {
+            o.el.style.setProperty('--py', o.y.toFixed(1) + 'px');
+            o.wy = o.y;
+        }
+    }
+
+    if (!active && allSettled) {
+        for (const o of orbState) {
+            o.el.style.removeProperty('--s');
+            o.el.style.removeProperty('--px');
+            o.el.style.removeProperty('--py');
+            o.ws = o.wx = o.wy = NaN;
+        }
+        orbsSettled = true;
+    } else {
+        orbsSettled = false;
+    }
 }
 
-// ── Main animation loop ──
-function animate() {
-    const bands = getFrequencyBands();
+// ── Cursor glow (desktop) ──
+let rawMouseX = 0, rawMouseY = 0;
+let glowX = 0, glowY = 0;
+let glowInitialized = false;
+
+function updateGlow() {
+    if (isMobile || !glowInitialized) return;
+    const k = ease(0.08);
+    glowX += (rawMouseX - glowX) * k;
+    glowY += (rawMouseY - glowY) * k;
+    cursorGlow.style.transform = `translate3d(${glowX}px, ${glowY}px, 0) translate(-50%, -50%)`;
+}
+
+// ── Main animation loop (one rAF for everything) ──
+// Smoothing factors are corrected by real elapsed time so the easing
+// speed is identical at 30fps on a weak phone and 120fps on a desktop.
+let lastFrameTime = performance.now();
+let frameScale = 1;
+
+function ease(ratePerFrameAt60) {
+    return 1 - Math.pow(1 - ratePerFrameAt60, frameScale);
+}
+
+function animate(now) {
+    const dt = Math.min(100, now - lastFrameTime) || 16.7;
+    lastFrameTime = now;
+    frameScale = dt / 16.7;
+
+    const bands = readFrequencyBands();
     updatePlanck(bands);
     updateBars(bands);
     updateOrbs(bands);
+    updateGlow();
     requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
 
 // ── Toggle audio ──
+function syncControlState() {
+    audioControl.setAttribute('aria-pressed', String(isPlaying));
+    audioControl.setAttribute('aria-label', isPlaying ? 'Pausar la música' : 'Reproducir la música');
+}
+
 function toggleAudio() {
     if (!isPlaying) {
         initAudioContext();
@@ -179,6 +282,7 @@ function toggleAudio() {
             isPlaying = true;
             hasPlayed = true;
             document.body.classList.add('playing');
+            syncControlState();
         }).catch(error => {
             console.log('Play failed:', error);
         });
@@ -187,8 +291,17 @@ function toggleAudio() {
         isPlaying = false;
         document.body.classList.remove('playing');
         document.body.style.filter = '';
-        planckEl.style.animation = '';
+        syncControlState();
     }
+}
+
+// ── Media Session (lock screen / hardware keys) ──
+if ('mediaSession' in navigator) {
+    try {
+        navigator.mediaSession.metadata = new MediaMetadata({ title: 'brassonero' });
+        navigator.mediaSession.setActionHandler('play', () => { if (!isPlaying) toggleAudio(); });
+        navigator.mediaSession.setActionHandler('pause', () => { if (isPlaying) toggleAudio(); });
+    } catch (e) { /* optional enhancement only */ }
 }
 
 // ── Event listeners ──
@@ -196,12 +309,31 @@ audio.addEventListener('ended', () => {
     isPlaying = false;
     document.body.classList.remove('playing');
     document.body.style.filter = '';
-    planckEl.style.animation = '';
+    syncControlState();
 });
+
+audio.addEventListener('error', () => {
+    console.warn('No se pudo cargar el audio:', audio.error);
+});
+const audioSource = audio.querySelector('source');
+if (audioSource) {
+    audioSource.addEventListener('error', () => {
+        console.warn('No se pudo cargar el audio (fuente no disponible).');
+    });
+}
 
 audioControl.addEventListener('click', (e) => {
     e.stopPropagation();
     toggleAudio();
+});
+
+// Keyboard activation for the role="button" control.
+audioControl.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!e.repeat) toggleAudio();
+    }
 });
 
 document.body.addEventListener('click', (e) => {
@@ -210,46 +342,41 @@ document.body.addEventListener('click', (e) => {
     }
 });
 
-let touchStart = null;
-document.body.addEventListener('touchstart', (e) => {
-    touchStart = e.touches[0];
-});
+// ── Touch: pull-to-refresh guard (tap-to-play is handled by 'click') ──
+let touchStartY = null;
 
-document.body.addEventListener('touchend', (e) => {
-    if (touchStart && !isPlaying && e.target === document.body) {
-        const touchEnd = e.changedTouches[0];
-        const distance = Math.sqrt(
-            Math.pow(touchEnd.clientX - touchStart.clientX, 2) +
-            Math.pow(touchEnd.clientY - touchStart.clientY, 2)
-        );
-        if (distance < 10) {
-            toggleAudio();
-        }
+document.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+    if (touchStartY === null) return;
+    const touchDiff = e.touches[0].clientY - touchStartY;
+    if (touchDiff > 0 && window.scrollY === 0) {
+        e.preventDefault(); // block pull-to-refresh
     }
-    touchStart = null;
-});
+}, { passive: false });
+
+document.addEventListener('touchend', () => {
+    touchStartY = null;
+}, { passive: true });
 
 // ── Desktop mouse interactions ──
 if (!isMobile) {
-    let rawMouseX = 0, rawMouseY = 0;
-    let glowX = 0, glowY = 0;
-
-    function animateGlow() {
-        glowX += (rawMouseX - glowX) * 0.08;
-        glowY += (rawMouseY - glowY) * 0.08;
-
-        cursorGlow.style.left = glowX + 'px';
-        cursorGlow.style.top = glowY + 'px';
-
-        requestAnimationFrame(animateGlow);
-    }
-    animateGlow();
-
     document.addEventListener('mousemove', (e) => {
         rawMouseX = e.clientX;
         rawMouseY = e.clientY;
         mouseX = e.clientX / window.innerWidth;
         mouseY = e.clientY / window.innerHeight;
+
+        if (!glowInitialized) {
+            glowX = rawMouseX;
+            glowY = rawMouseY;
+            glowInitialized = true;
+            cursorGlow.style.opacity = '1';
+        }
+
+        if (prefersReducedMotion.matches) return;
 
         const hueRotation = mouseX * 60 - 30;
         const brightness = 0.95 + mouseY * 0.1;
@@ -276,10 +403,10 @@ if (!isMobile) {
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         e.preventDefault();
-        toggleAudio();
+        if (!e.repeat) toggleAudio();
     }
 
-    if (e.code === 'KeyP' && !isMobile) {
+    if (e.code === 'KeyP' && !isMobile && !prefersReducedMotion.matches) {
         document.body.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(1.2) saturate(2)`;
         setTimeout(() => {
             document.body.style.filter = isPlaying ? 'brightness(1.1) saturate(1.3)' : '';
@@ -295,20 +422,3 @@ function setViewportHeight() {
 setViewportHeight();
 window.addEventListener('resize', setViewportHeight);
 window.addEventListener('orientationchange', setViewportHeight);
-
-if (isMobile) {
-    document.body.style.willChange = 'transform';
-}
-
-let touchStartY = 0;
-document.addEventListener('touchstart', (e) => {
-    touchStartY = e.touches[0].clientY;
-}, { passive: false });
-
-document.addEventListener('touchmove', (e) => {
-    const touchY = e.touches[0].clientY;
-    const touchDiff = touchY - touchStartY;
-    if (touchDiff > 0 && window.scrollY === 0) {
-        e.preventDefault();
-    }
-}, { passive: false });
