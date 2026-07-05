@@ -133,6 +133,27 @@ main {
   }
 }
 
+/* Mobile: the poster already carries the title + tagline, so keep only the
+   "TRANSMISIÓN ENTRANTE" eyebrow, and disable poster expand (handled in JS too). */
+@media (max-width: 879px) {
+  .title,
+  .tagline {
+    display: none;
+  }
+
+  .eyebrow {
+    margin-bottom: 0;
+  }
+
+  .poster-wrap figcaption {
+    display: none;
+  }
+
+  .poster-frame {
+    cursor: default;
+  }
+}
+
 
 /* ========== HEAD ========== */
 

@@ -162,6 +162,7 @@
   }
 
   var lb = $('lightbox'), lbClose = $('lbClose');
+  var mqExpand = window.matchMedia('(min-width: 880px)');
 
   function openLB() {
     lb.hidden = false;
@@ -175,7 +176,10 @@
     frame.focus();
   }
 
-  frame.addEventListener('click', openLB);
+  frame.addEventListener('click', function () {
+    if (!mqExpand.matches) return;   // expand disabled on mobile
+    openLB();
+  });
   lbClose.addEventListener('click', closeLB);
   lb.addEventListener('click', function (e) { if (e.target === lb) closeLB(); });
   document.addEventListener('keydown', function (e) {
