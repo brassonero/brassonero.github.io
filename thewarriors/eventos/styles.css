@@ -21,6 +21,7 @@
   --text-light: #ccbfaa;
   --gold: #ffcc33;
   --gold-warm: #ff8c28;
+  --gold-deep: #a86f1c;
   --cyan: #33ddff;
   --sai-t: env(safe-area-inset-top, 0px);
   --sai-b: env(safe-area-inset-bottom, 0px);
@@ -391,8 +392,8 @@ main {
 }
 
 .cd-cell {
-  border: 1px solid rgba(45, 170, 90, .35);
-  background: rgba(45, 170, 90, .05);
+  border: 1px solid rgba(51, 221, 255, .38);
+  background: rgba(51, 221, 255, .05);
   padding: clamp(8px, 1.8vmin, 14px) 4px;
   text-align: center;
 }
@@ -401,19 +402,19 @@ main {
   display: block;
   font-family: 'Chakra Petch', sans-serif;
   font-weight: 700;
-  color: var(--green-bright);
+  color: var(--cyan);
   font-size: clamp(22px, 5vmin, 40px);
-  text-shadow: 0 0 14px rgba(45, 170, 90, .55);
+  text-shadow: 0 0 14px rgba(51, 221, 255, .55);
   font-variant-numeric: tabular-nums;
 }
 
 .cd-lab {
   display: block;
   margin-top: 2px;
-  color: var(--green);
+  color: var(--cyan);
   font-size: clamp(8px, 1.5vmin, 11px);
   letter-spacing: 3px;
-  opacity: .75;
+  opacity: .7;
 }
 
 .cd-status {
@@ -433,7 +434,8 @@ main {
 
 .cd-status.done {
   display: block;
-  color: var(--green-dim);
+  color: var(--cyan);
+  opacity: .6;
   text-shadow: none;
   animation: none;
 }
