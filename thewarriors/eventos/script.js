@@ -217,7 +217,7 @@
   var calHref = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
     '&text=' + encodeURIComponent('El Primate Galáctico — Los Warriors') +
     '&dates=' + encodeURIComponent('20260719T030000Z/20260719T120000Z') +
-    '&details=' + encodeURIComponent('Estacionamiento limitado a calles aledañas y consumo personal.\nUbicación QR: ' + EVENT_LOCATION_QR + '\nInfo: ' + PAGE_URL) +
+    '&details=' + encodeURIComponent('Ubicación QR: ' + EVENT_LOCATION_QR + '\nInfo: ' + PAGE_URL + '\nEstacionamiento limitado a calles aledañas y consumo personal.') +
     '&location=' + encodeURIComponent(EVENT_LOCATION);
   $('calBtn').href = calHref;
 
