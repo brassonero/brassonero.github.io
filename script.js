@@ -8,7 +8,8 @@ const grainCanvas = document.getElementById('grainCanvas');
 const gCtx = grainCanvas.getContext('2d');
 const orb1 = document.getElementById('orb1');
 const orb2 = document.getElementById('orb2');
-const orb3 = document.getElementById('orb3');
+const stage = document.getElementById('stage');
+const bg = document.querySelector('.bg');
 
 // ── State ──
 let isPlaying = false;
@@ -175,7 +176,6 @@ function updateBars(bands) {
 const orbState = [
     { el: orb1, band: 'bass', amount: 0.15, parallax: 0.8, s: 1, x: 0, y: 0, ws: NaN, wx: NaN, wy: NaN },
     { el: orb2, band: 'mid', amount: 0.10, parallax: -0.5, s: 1, x: 0, y: 0, ws: NaN, wx: NaN, wy: NaN },
-    { el: orb3, band: 'high', amount: 0.12, parallax: 0.3, s: 1, x: 0, y: 0, ws: NaN, wx: NaN, wy: NaN },
 ];
 let orbsSettled = true;
 
@@ -290,7 +290,7 @@ function toggleAudio() {
         audio.pause();
         isPlaying = false;
         document.body.classList.remove('playing');
-        document.body.style.filter = '';
+        stage.style.filter = '';
         syncControlState();
     }
 }
@@ -308,7 +308,7 @@ if ('mediaSession' in navigator) {
 audio.addEventListener('ended', () => {
     isPlaying = false;
     document.body.classList.remove('playing');
-    document.body.style.filter = '';
+    stage.style.filter = '';
     syncControlState();
 });
 
@@ -382,13 +382,13 @@ if (!isMobile) {
         const brightness = 0.95 + mouseY * 0.1;
 
         if (isPlaying) {
-            document.body.style.filter = `hue-rotate(${hueRotation}deg) brightness(${brightness}) saturate(1.4)`;
+            stage.style.filter = `hue-rotate(${hueRotation}deg) brightness(${brightness}) saturate(1.4)`;
         }
 
         const duration = isPlaying
             ? `${10 + mouseY * 5}s, ${4 + mouseX * 2}s`
             : `${20 + mouseY * 10}s, ${6 + mouseX * 4}s`;
-        document.body.style.animationDuration = duration;
+        bg.style.animationDuration = duration;
     });
 
     document.addEventListener('mouseenter', () => {
@@ -407,18 +407,9 @@ document.addEventListener('keydown', (e) => {
     }
 
     if (e.code === 'KeyP' && !isMobile && !prefersReducedMotion.matches) {
-        document.body.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(1.2) saturate(2)`;
+        stage.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(1.2) saturate(2)`;
         setTimeout(() => {
-            document.body.style.filter = isPlaying ? 'brightness(1.1) saturate(1.3)' : '';
+            stage.style.filter = isPlaying ? 'brightness(1.1) saturate(1.3)' : '';
         }, 2000);
     }
 });
-
-// ── Viewport ──
-function setViewportHeight() {
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-}
-setViewportHeight();
-window.addEventListener('resize', setViewportHeight);
-window.addEventListener('orientationchange', setViewportHeight);
