@@ -740,3 +740,119 @@ main {
     animation: none !important;
   }
 }
+
+
+/* ==========================================================
+   RESPONSIVE PATCH
+   - Mobile: hide specs because the poster already includes them.
+   - Desktop: lock the event section into one stable 1200x630-style
+     viewport block, preserving the same visual width/height ratio.
+   ========================================================== */
+
+@media (max-width: 879px) {
+  .specs {
+    display: none;
+  }
+}
+
+@media (min-width: 880px) {
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-top: max(14px, var(--sai-t));
+  }
+
+  .foot {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: max(14px, var(--sai-b));
+    padding: 0 16px;
+  }
+
+  main {
+    max-width: none;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    padding: clamp(58px, 8vh, 86px) max(18px, var(--sai-r)) clamp(44px, 7vh, 70px) max(18px, var(--sai-l));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero {
+    flex: 0 0 auto;
+    height: min(630px, calc(100dvh - 116px), 50vw);
+    width: auto;
+    max-width: calc(100vw - 36px);
+    aspect-ratio: 1200 / 630;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 28%);
+    grid-template-areas:
+      "head poster"
+      "details poster";
+    column-gap: clamp(28px, 4.8vw, 58px);
+    row-gap: clamp(12px, 2.2vh, 24px);
+    align-items: center;
+  }
+
+  .poster-wrap {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    justify-self: end;
+  }
+
+  .poster-frame {
+    padding: clamp(6px, 1vh, 10px);
+  }
+
+  .poster-frame img {
+    width: 100%;
+    height: auto;
+    max-height: calc(100dvh - 150px);
+    object-fit: contain;
+  }
+
+  .title {
+    font-size: clamp(38px, 6.2vw, 78px);
+  }
+
+  .tagline {
+    font-size: clamp(11px, 1.6vw, 16px);
+  }
+
+  .countdown {
+    max-width: min(480px, 100%);
+  }
+
+  .specs {
+    margin-top: clamp(12px, 2vh, 22px);
+    gap: clamp(8px, 1.5vh, 14px);
+  }
+
+  .spec-row dd {
+    font-size: clamp(10px, 1.3vw, 14px);
+    line-height: 1.45;
+  }
+
+  .actions {
+    margin-top: clamp(14px, 2.4vh, 24px);
+  }
+}
