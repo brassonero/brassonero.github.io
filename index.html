@@ -1,74 +1,241 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>brassonero</title>
-    <meta name="description" content="ℏ">
-    <meta name="theme-color" content="#8a2be2">
-    <!-- Open Graph (Facebook, LinkedIn, Discord, etc.) -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="brassonero">
-    <meta property="og:description" content="ℏ">
-    <meta property="og:image" content="https://brassonero.github.io/assets/og-image.jpg">
-    <meta property="og:image:width" content="1672">
-    <meta property="og:image:height" content="941">
-    <meta property="og:image:alt" content="ℏ">
-    <meta property="og:url" content="https://brassonero.github.io">
-    <!-- Twitter / X Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="brassonero">
-    <meta name="twitter:description" content="ℏ">
-    <meta name="twitter:image" content="https://brassonero.github.io/assets/og-image.jpg">
-    <meta name="twitter:image:alt" content="ℏ">
-    <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
+
+    <style>
+        :root {
+            --green: #10ff21;
+            --white: #f7fff8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+            background: #020402;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden;
+        }
+
+        body {
+            min-height: 100svh;
+        }
+
+        .poster {
+            position: relative;
+            width: 100vw;
+            height: 100svh;
+            min-height: 100svh;
+            overflow: hidden;
+            isolation: isolate;
+            color: var(--white);
+            background:
+                radial-gradient(circle at 50% 50%, rgba(13, 255, 36, .24), transparent 29%),
+                radial-gradient(circle at 50% 8%, rgba(42, 255, 40, .22), transparent 34%),
+                radial-gradient(circle at 50% 94%, rgba(26, 255, 26, .20), transparent 34%),
+                linear-gradient(90deg, #061006 0%, #112017 45%, #061006 100%);
+            box-shadow: 0 0 50px rgba(0, 0, 0, .75);
+        }
+
+        .poster::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            opacity: .38;
+            pointer-events: none;
+            background-image:
+                radial-gradient(circle, rgba(255, 255, 255, .24) 0 1px, transparent 1.5px),
+                linear-gradient(90deg, transparent 0 49%, rgba(255, 255, 255, .04) 50%, transparent 51%),
+                linear-gradient(0deg, transparent 0 49%, rgba(255, 255, 255, .03) 50%, transparent 51%);
+            background-size: 7px 7px, 100% 3px, 3px 100%;
+            mix-blend-mode: overlay;
+        }
+
+        .poster::after {
+            content: "";
+            position: absolute;
+            inset: -10%;
+            z-index: 8;
+            opacity: .34;
+            pointer-events: none;
+            background:
+                repeating-radial-gradient(circle at 21% 19%, transparent 0 18px, rgba(255, 255, 255, .08) 19px, transparent 21px),
+                repeating-linear-gradient(102deg, transparent 0 22px, rgba(255, 255, 255, .025) 23px, transparent 26px);
+            filter: blur(.25px);
+            mix-blend-mode: screen;
+        }
+
+        .ribbons {
+            position: absolute;
+            inset: -4% -12%;
+            width: 124%;
+            height: 108%;
+            z-index: 2;
+            filter: drop-shadow(0 0 18px rgba(20, 255, 30, .72));
+        }
+
+        .ribbons path {
+            fill: none;
+            stroke: var(--green);
+            stroke-width: 10;
+            stroke-linecap: round;
+            opacity: .88;
+        }
+
+        .ribbons .soft {
+            stroke: #54ff45;
+            stroke-width: 22;
+            opacity: .12;
+            filter: blur(4px);
+        }
+
+        .center-glow {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 3;
+            width: 48%;
+            height: 52%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(ellipse at center, rgba(17, 255, 35, .38), transparent 58%);
+            filter: blur(20px);
+            pointer-events: none;
+        }
+
+        .brand {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 6;
+            width: max-content;
+            max-width: 88vw;
+            margin: 0;
+            color: var(--green);
+            font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+            font-size: clamp(3.4rem, 8vw, 9rem);
+            font-weight: 950;
+            line-height: .82;
+            letter-spacing: -.08em;
+            text-align: center;
+            text-transform: lowercase;
+            white-space: nowrap;
+            transform: translate(-50%, -50%) scaleX(.74);
+            transform-origin: center center;
+            text-shadow:
+                0 0 8px rgba(25, 255, 35, .68),
+                0 0 22px rgba(25, 255, 35, .36);
+            filter: url(#wobble);
+        }
+
+        .bottom-left {
+            position: absolute;
+            left: 5.8%;
+            bottom: 5.5%;
+            z-index: 7;
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            color: var(--white);
+            font-size: clamp(1rem, 2.4svh, 1.65rem);
+            font-weight: 400;
+            text-shadow: 0 0 12px rgba(0, 0, 0, .35);
+        }
+
+        .bottom-left strong {
+            display: block;
+            font-size: clamp(2.4rem, 6svh, 4.7rem);
+            line-height: .8;
+            font-weight: 950;
+            letter-spacing: -.05em;
+        }
+
+        @media (max-width: 900px) {
+            .brand {
+                font-size: clamp(2.7rem, 13vw, 6rem);
+                max-width: 92vw;
+                transform: translate(-50%, -50%) scaleX(.68);
+            }
+
+            .ribbons path {
+                stroke-width: 8;
+            }
+
+            .ribbons .soft {
+                stroke-width: 18;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .brand {
+                font-size: clamp(2.2rem, 14vw, 4.5rem);
+                transform: translate(-50%, -50%) scaleX(.66);
+            }
+
+            .bottom-left {
+                left: 5%;
+                bottom: 4.7%;
+            }
+        }
+
+        @media (orientation: portrait) {
+            .ribbons {
+                inset: -4% -32%;
+                width: 164%;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <!-- Everything visual lives in .stage, a single viewport-fixed layer.
-         The hue-shift filter and the breathing gradient are applied INSIDE
-         here so they never turn <body> into a containing block for the
-         fixed controls below (that was breaking the layout on zoom/scroll). -->
-    <div class="stage" id="stage" aria-hidden="true">
-        <div class="bg"></div>
-        <canvas class="grain" id="grainCanvas"></canvas>
-        <div class="geometric-overlay"></div>
-        <div class="orbs-container" id="orbsContainer">
-            <div class="orb orb1" id="orb1"></div>
-            <div class="orb orb2" id="orb2"></div>
-        </div>
-        <div class="kaleidoscope"></div>
-        <div class="planck" id="planckSymbol">ℏ</div>
-    </div>
-
-    <div class="hint">brassonero</div>
-
-    <div class="cursor-glow" aria-hidden="true"></div>
-
-    <div class="audio-control" role="button" tabindex="0" aria-label="Reproducir la música" aria-pressed="false">
-        <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M8 5v14l11-7z" />
+    <main class="poster" aria-label="Neon green Brassonero poster">
+        <svg width="0" height="0" aria-hidden="true" focusable="false">
+            <filter id="wobble">
+                <feTurbulence type="fractalNoise" baseFrequency="0.012 0.055" numOctaves="1" seed="8" />
+                <feDisplacementMap in="SourceGraphic" scale="4" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
         </svg>
-        <div class="visualizer" aria-hidden="true">
-            <div class="bar bar1"></div>
-            <div class="bar bar2"></div>
-            <div class="bar bar3"></div>
-            <div class="bar bar4"></div>
-            <div class="bar bar5"></div>
-            <div class="bar bar6"></div>
-            <div class="bar bar7"></div>
+
+        <svg class="ribbons" viewBox="0 0 1000 1250" preserveAspectRatio="none" aria-hidden="true">
+            <path class="soft" d="M190 -80 C420 275 360 450 500 625 C640 800 580 980 810 1330" />
+            <path class="soft" d="M260 -80 C435 280 405 455 500 625 C595 795 565 980 740 1330" />
+            <path class="soft" d="M350 -80 C455 285 455 460 500 625 C545 790 545 980 650 1330" />
+            <path class="soft" d="M500 -90 C500 260 500 440 500 625 C500 810 500 990 500 1340" />
+            <path class="soft" d="M650 -80 C545 285 545 460 500 625 C455 790 455 980 350 1330" />
+            <path class="soft" d="M740 -80 C565 280 595 455 500 625 C405 795 435 980 260 1330" />
+            <path class="soft" d="M810 -80 C580 275 640 450 500 625 C360 800 420 980 190 1330" />
+
+            <path d="M180 -80 C415 275 355 450 495 625 C635 800 575 980 810 1330" />
+            <path d="M245 -80 C428 280 398 455 497 625 C596 795 566 980 750 1330" />
+            <path d="M315 -80 C445 282 430 458 499 625 C568 792 555 980 685 1330" />
+            <path d="M390 -80 C465 285 465 460 500 625 C535 790 535 980 610 1330" />
+            <path d="M465 -85 C488 278 492 455 500 625 C508 795 512 982 535 1335" />
+            <path d="M535 -85 C512 278 508 455 500 625 C492 795 488 982 465 1335" />
+            <path d="M610 -80 C535 285 535 460 500 625 C465 790 465 980 390 1330" />
+            <path d="M685 -80 C555 282 568 458 501 625 C432 792 445 980 315 1330" />
+            <path d="M755 -80 C572 280 602 455 503 625 C404 795 434 980 250 1330" />
+            <path d="M820 -80 C585 275 645 450 505 625 C365 800 425 980 190 1330" />
+        </svg>
+
+        <div class="center-glow"></div>
+
+        <h1 class="brand">brassonero</h1>
+
+        <div class="bottom-left">
+            <div>
+                <strong>17</strong>
+            </div>
         </div>
-    </div>
-
-    <audio id="backgroundAudio" preload="auto">
-        <source src="./assets/brassonero.mp3" type="audio/mpeg">
-        Tu navegador no admite el elemento de audio.
-    </audio>
-
-    <script src="script.js"></script>
+    </main>
 </body>
 
 </html>
