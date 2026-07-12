@@ -137,28 +137,6 @@
             filter: url(#wobble);
         }
 
-        .bottom-left {
-            position: absolute;
-            left: 5.8%;
-            bottom: 5.5%;
-            z-index: 7;
-            display: flex;
-            align-items: center;
-            gap: .8rem;
-            color: var(--white);
-            font-size: clamp(1rem, 2.4svh, 1.65rem);
-            font-weight: 400;
-            text-shadow: 0 0 12px rgba(0, 0, 0, .35);
-        }
-
-        .bottom-left strong {
-            display: block;
-            font-size: clamp(2.4rem, 6svh, 4.7rem);
-            line-height: .8;
-            font-weight: 950;
-            letter-spacing: -.05em;
-        }
-
         @media (max-width: 900px) {
             .brand {
                 font-size: clamp(2.7rem, 13vw, 6rem);
@@ -179,11 +157,6 @@
             .brand {
                 font-size: clamp(2.2rem, 14vw, 4.5rem);
                 transform: translate(-50%, -50%) scaleX(.66);
-            }
-
-            .bottom-left {
-                left: 5%;
-                bottom: 4.7%;
             }
         }
 
@@ -229,12 +202,6 @@
         <div class="center-glow"></div>
 
         <h1 class="brand">brassonero</h1>
-
-        <div class="bottom-left">
-            <div>
-                <strong>17</strong>
-            </div>
-        </div>
     </main>
 </body>
 
